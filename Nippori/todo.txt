@@ -1,8 +1,10 @@
 ﻿TODO LIST
 ================================================================================
-- Předělat vybírání skupin tak, aby jich šlo označit více najednou.
+- Předělat vybírání skupin tak, aby jich šlo označit více najednou + aby šly
+  jedním škrtátkem označit všechny.
 - Přesunout odpovídající údaje do konfiguračního souboru (výchozí adresář se
   slovíčky, jména listů v sešitech, ...).
+- Slovíčkům bez definovaného typu nastavit, že má všechny typy.
 
 JIŽ HOTOVO
 ================================================================================

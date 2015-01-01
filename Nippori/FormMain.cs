@@ -184,7 +184,7 @@ namespace Nippori
                                select buttonTypes.DropDownItems.IndexOf(item) + 1;
 
             Vocabulary.EnabledGroups = checkedGroups.ToArray();
-            Vocabulary.EnabledTypes = checkedTypes.ToArray();
+            Vocabulary.EnabledType = checkedTypes.ToArray()[0];
         }
 
         #endregion

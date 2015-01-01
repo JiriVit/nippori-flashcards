@@ -42,7 +42,7 @@ namespace Nippori
         public static List<VocableType> Types;
 
         public static string[] EnabledGroups;
-        public static int[] EnabledTypes;
+        public static int EnabledType;
 
         #endregion
 
@@ -193,13 +193,7 @@ namespace Nippori
         /// <returns>Je-li slovíčko povolené.</returns>
         private static bool IsVocableEnabled(Vocable vocable)
         {
-            bool matchType = false;
-
-            foreach (int t in EnabledTypes)
-                if (matchType = vocable.Types.Contains(t))
-                    break;
-
-            if (!matchType)
+            if (!(vocable.Types.Contains(EnabledType)))
                 return false;
 
             foreach (string g in EnabledGroups)
