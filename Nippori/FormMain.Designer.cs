@@ -41,13 +41,14 @@
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.buttonStart = new System.Windows.Forms.ToolStripButton();
             this.buttonStop = new System.Windows.Forms.ToolStripButton();
+            this.buttonTest = new System.Windows.Forms.ToolStripButton();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.label1 = new System.Windows.Forms.Label();
             this.buttonAnswer = new System.Windows.Forms.Button();
             this.labelCzech = new System.Windows.Forms.Label();
+            this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
             this.vocableField1 = new Nippori.VocableField();
             this.vocableField2 = new Nippori.VocableField();
-            this.buttonTest = new System.Windows.Forms.ToolStripButton();
             this.toolStrip1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
@@ -159,6 +160,17 @@
             this.buttonStop.Size = new System.Drawing.Size(23, 22);
             this.buttonStop.Text = "Stop";
             // 
+            // buttonTest
+            // 
+            this.buttonTest.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.buttonTest.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.buttonTest.Image = ((System.Drawing.Image)(resources.GetObject("buttonTest.Image")));
+            this.buttonTest.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonTest.Name = "buttonTest";
+            this.buttonTest.Size = new System.Drawing.Size(23, 22);
+            this.buttonTest.Text = "toolStripButton1";
+            this.buttonTest.Click += new System.EventHandler(this.buttonTest_Click);
+            // 
             // tableLayoutPanel1
             // 
             this.tableLayoutPanel1.ColumnCount = 1;
@@ -224,6 +236,11 @@
             this.labelCzech.TabIndex = 1;
             this.labelCzech.Text = "孙悟空";
             // 
+            // backgroundWorker
+            // 
+            this.backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker_DoWork);
+            this.backgroundWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker_RunWorkerCompleted);
+            // 
             // vocableField1
             // 
             this.vocableField1.CorrectAnswer = "odpoved";
@@ -251,17 +268,6 @@
             this.vocableField2.Name = "vocableField2";
             this.vocableField2.Size = new System.Drawing.Size(1054, 75);
             this.vocableField2.TabIndex = 8;
-            // 
-            // buttonTest
-            // 
-            this.buttonTest.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            this.buttonTest.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.buttonTest.Image = ((System.Drawing.Image)(resources.GetObject("buttonTest.Image")));
-            this.buttonTest.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.buttonTest.Name = "buttonTest";
-            this.buttonTest.Size = new System.Drawing.Size(23, 22);
-            this.buttonTest.Text = "toolStripButton1";
-            this.buttonTest.Click += new System.EventHandler(this.buttonTest_Click);
             // 
             // FormMain
             // 
@@ -304,6 +310,7 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripButton buttonTest;
+        private System.ComponentModel.BackgroundWorker backgroundWorker;
     }
 }
 

@@ -12,7 +12,8 @@ namespace Nippori
 {
     public partial class FormMain : Form
     {
-        #region Private Fields
+
+        #region .: Private Fields :.
 
         private FormWaitPlease formWaitPlease;
         
@@ -29,7 +30,7 @@ namespace Nippori
 
         #endregion
 
-        #region Constructor
+        #region .: Constructor :.
         
         /// <summary>
         /// Konstruktor formuláře.
@@ -46,7 +47,7 @@ namespace Nippori
 
         #endregion
 
-        #region Private Methods
+        #region .: Private Methods :.
 
         private void EvaluateAnswer(bool newVocabulary)
         {
@@ -159,7 +160,9 @@ namespace Nippori
 
         #endregion
 
-        #region Event Handlers
+        #region .: Event Handlers :.
+
+        #region ... Toolbar Buttons
 
         private void buttonAnswer_Click(object sender, EventArgs e)
         {
@@ -181,27 +184,19 @@ namespace Nippori
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 this.UseWaitCursor = true;
-                Vocabulary.ReadFile(openFileDialog.FileName);
-                this.UseWaitCursor = false;
-                
-                labelFileName.Text = Path.GetFileNameWithoutExtension(openFileDialog.FileName);
-                labelFileName.Enabled = true;
-                labelFileName.Font = new Font(labelFileName.Font, FontStyle.Bold);
-
-                FillTypes();
-                FillGroups();
-
-                buttonTypes.Enabled = true;
-                buttonGroups.Enabled = true;
-                buttonStart.Enabled = true;
+                backgroundWorker.RunWorkerAsync(openFileDialog.FileName);
+                formWaitPlease.ShowDialog();
             }
         }
 
         private void buttonTest_Click(object sender, EventArgs e)
         {
             /* sem zapiš testovací kód */
-            formWaitPlease.ShowDialog();
         }
+
+        #endregion
+
+        #region ... Toolbar Menu
 
         private void toolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -225,10 +220,36 @@ namespace Nippori
 
         #endregion
 
+        #region ... BackgroundWorker
 
+        private void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            string fileName = e.Argument.ToString();
 
+            Vocabulary.ReadFile(fileName);
+        }
 
+        private void backgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            this.UseWaitCursor = false;
 
+            labelFileName.Text = Path.GetFileNameWithoutExtension(openFileDialog.FileName);
+            labelFileName.Enabled = true;
+            labelFileName.Font = new Font(labelFileName.Font, FontStyle.Bold);
+
+            FillTypes();
+            FillGroups();
+
+            buttonTypes.Enabled = true;
+            buttonGroups.Enabled = true;
+            buttonStart.Enabled = true;
+
+            formWaitPlease.Close();
+        }
+
+        #endregion
+
+        #endregion
 
     }
 
