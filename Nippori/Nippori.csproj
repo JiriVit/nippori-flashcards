@@ -75,6 +75,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="VocableField.resx">
+      <DependentUpon>VocableField.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="app.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -84,6 +87,12 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="VocableField.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="VocableField.Designer.cs">
+      <DependentUpon>VocableField.cs</DependentUpon>
     </Compile>
     <Compile Include="Vocabulary.cs" />
   </ItemGroup>
@@ -136,6 +145,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Ok.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Open_6529.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\startwithoutdebugging_6556.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\BreakpointEnabled_6584_16x.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

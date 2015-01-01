@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,14 @@ namespace Nippori
     /// </summary>
     public static class Vocabulary
     {
+        #region Constants
+
+        const int COL_TYPES_OFFSET = 1;
+        const int COL_GROUPS_OFFSET = 2;
+        const int COL_ACTIVE_OFFSET = 3;
+
+        #endregion
+
         #region Properties
 
         /// <summary>
@@ -22,101 +31,22 @@ namespace Nippori
         /// Konfigurace.
         /// </summary>
         public static Dictionary<string, string> Configuration;
+        public static NameValueCollection Groups;
+        public static List<VocableType> Types;
 
         #endregion
 
         #region Private Fields
 
-        private static Vocable[] internalList;
-        private static Dictionary<string, VocableType> vocableTypes;
-        private static VocableType[] typeList;
+        public static List<Vocable> vocables;
         private static Random random;
-
         private static List<Vocable> vocableStack;
         private static Queue<Vocable> vocableQueue;
+        private static int itemColumns;
 
         #endregion
 
         #region Private Methods
-
-        /// <summary>
-        /// Načte typy slovíček z excelového listu a uloží je do slovníku.
-        /// </summary>
-        /// <param name="sheet">Excelovský list, z něhož se čtou typy.</param>
-        private static void ImportTypes(Worksheet sheet)
-        {
-            int row, rowCount, column;
-            List<string> localList;
-
-            rowCount = sheet.UsedRange.Rows.Count;
-            localList = new List<string>(5);
-            vocableTypes = new Dictionary<string, VocableType>(rowCount - 1);
-
-            /* procházím řádky a čtu typy */
-            for (row = 2; row <= rowCount; row++)
-            {
-                localList.Clear();
-
-                /* procházím sloupce a čtu jména překladů */
-                for (column = 2; column <= 6; column++)
-                {
-                    if (sheet.Cells[row, column].Value != null)
-                        localList.Add(sheet.Cells[row, column].Value.ToString());
-                    else
-                        break;
-                }
-                
-                /* ze seznamu jmen překladů vytvořím nový typ a založím ho do slovníku */
-                vocableTypes.Add(sheet.Cells[row, 1].Value.ToString(), new VocableType(localList.ToArray()));
-            }
-        }
-
-        /// <summary>
-        /// Načte slovíčka z excelového listu a uloží je do slovníku.
-        /// </summary>
-        /// <param name="sheet">Excelovský list, z něhož se čtou slovíčka.</param>
-        private static void ImportVocables(Worksheet sheet)
-        {
-            int row, rowCount, column;
-            string czech, typeId;
-            List<Vocable> localList;
-            List<string> transList;
-
-            rowCount = sheet.UsedRange.Rows.Count;
-            localList = new List<Vocable>(rowCount);
-            transList = new List<string>(5);
-
-            /* procházím řádky a čtu slovíčka */
-            for (row = 2; row <= rowCount; row++)
-            {
-                /* je-li slovíčko vůbec aktivní */
-                if ((null != sheet.Cells[row, 8].Value) && 
-                    (!sheet.Cells[row, 8].Value.ToString().Equals("1")))
-                    continue;
-                
-                czech = sheet.Cells[row, 1].Value.ToString();
-                if (null == sheet.Cells[row, 7].Value)
-                    typeId = "1";
-                else
-                    typeId = sheet.Cells[row, 7].Value.ToString();                
-                transList.Clear();
-
-                /* procházím sloupce a čtu překlady */
-                for (column = 2; column <= 6; column++)
-                {
-                    if (sheet.Cells[row, column].Value != null)
-                        transList.Add(sheet.Cells[row, column].Value.ToString());
-                    else
-                        break;
-                }
-
-                /* ze všech údajů vytvořím nové slovíčko a založím ho do seznamu */
-                localList.Add(new Vocable(vocableTypes[typeId], czech, transList.ToArray()));
-            }
-
-            internalList = localList.ToArray();
-            Trace.WriteLine(String.Format("Načítám {0} slovíček ze souboru.", localList.Count));
-        }
 
         /// <summary>
         /// Načte konfiguraci z excelového listu a uloží ji do slovníku.
@@ -132,7 +62,111 @@ namespace Nippori
             /* procházím řádky a čtu dvojice klíč + hodnota */
             for (row = 2; row <= rowCount; row++)
             {
-                Configuration.Add(sheet.Cells[row, 1].Value.ToString(), sheet.Cells[row, 2].Value.ToString());
+                /* eliminace prázdných buněk zahrnutých do UsedRange */
+                if (sheet.Cells[row, 1].Value == null)
+                    break;
+
+                Configuration.Add(sheet.Cells[row, 1].Value.ToString(),
+                    sheet.Cells[row, 2].Value.ToString());
+            }
+
+            itemColumns = Int32.Parse(Configuration["columns"]);
+        }
+
+        private static void ImportGroups(Worksheet sheet)
+        {
+            int row, rowCount;
+
+            rowCount = sheet.UsedRange.Rows.Count;
+            Groups = new NameValueCollection(rowCount);
+
+            /* procházím řádky a čtu dvojice klíč + hodnota */
+            for (row = 2; row <= rowCount; row++)
+            {
+                /* eliminace prázdných buněk zahrnutých do UsedRange */
+                if (sheet.Cells[row, 1].Value == null)
+                    break;
+
+                Groups.Add(sheet.Cells[row, 1].Value.ToString(),
+                    sheet.Cells[row, 2].Value.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Načte typy slovíček z excelového listu a uloží je do slovníku.
+        /// </summary>
+        /// <param name="sheet">Excelovský list, z něhož se čtou typy.</param>
+        private static void ImportTypes(Worksheet sheet)
+        {
+            VocableType importedType;
+            int row, rowCount;
+            string[] outputColumns;
+
+            rowCount = sheet.UsedRange.Rows.Count;
+            Types = new List<VocableType>(rowCount - 1);
+
+            for (row = 2; row <= rowCount; row++)
+            {
+                /* eliminace prázdných buněk zahrnutých do UsedRange */
+                if (sheet.Cells[row, 1].Value == null)
+                    break;
+
+                importedType = new VocableType();
+
+                importedType.Name = sheet.Cells[row, 2].Value.ToString();
+                importedType.InputColumn = Convert.ToInt32(sheet.Cells[row, 3].Value.ToString());
+                outputColumns = sheet.Cells[row, 4].Value.ToString().Split(';');
+                importedType.OutputColumns = outputColumns.Select(Int32.Parse).ToArray();
+
+                Types.Add(importedType);
+            }
+        }
+
+        /// <summary>
+        /// Načte slovíčka z excelového listu a uloží je do slovníku.
+        /// </summary>
+        /// <param name="sheet">Excelovský list, z něhož se čtou slovíčka.</param>
+        private static void ImportVocables(Worksheet sheet)
+        {
+            Vocable importedVocable;
+            int row, rowCount, col;
+            string[] importedColumns;
+            
+
+            rowCount = sheet.UsedRange.Rows.Count;
+            vocables = new List<Vocable>(rowCount - 1);
+
+            for (row = 2; row <= rowCount; row++)
+            {
+                /* eliminace prázdných buněk zahrnutých do UsedRange */
+                if (sheet.Cells[row, 1].Value == null)
+                    break;
+
+                if ( (sheet.Cells[row, itemColumns + COL_ACTIVE_OFFSET].Value != null) &&
+                     (!sheet.Cells[row, itemColumns + COL_ACTIVE_OFFSET].Value.ToString().Equals("1")))
+                    continue;
+
+                importedVocable = new Vocable();
+                importedVocable.ID = row - 2;
+                importedVocable.Items = new string[itemColumns];
+
+                for (col = 1; col <= itemColumns; col++)
+                    importedVocable.Items[col - 1] = sheet.Cells[row, col].Value.ToString();
+                if (sheet.Cells[row, itemColumns + COL_TYPES_OFFSET].Value == null)
+                {
+                    importedVocable.Types = new int[] { 1 };
+                }
+                else
+                {
+                    importedColumns = sheet.Cells[row, itemColumns + COL_TYPES_OFFSET].Value.ToString().Split(';');
+                    importedVocable.Types = importedColumns.Select(Int32.Parse).ToArray();
+                }
+                if (sheet.Cells[row, itemColumns + COL_GROUPS_OFFSET].Value == null)
+                    importedVocable.Groups = new string[] { Groups.Keys[0] };
+                else
+                    importedVocable.Groups = sheet.Cells[row, itemColumns + COL_GROUPS_OFFSET].Value.ToString().Split(';');
+
+                vocables.Add(importedVocable);
             }
         }
 
@@ -151,9 +185,11 @@ namespace Nippori
             try
             {
                 excel.Workbooks.Open(fileName);
-                ImportTypes(excel.ActiveWorkbook.Worksheets[2]);
-                ImportVocables(excel.ActiveWorkbook.Worksheets[1]);
-                ImportConfiguration(excel.ActiveWorkbook.Worksheets[3]);
+
+                ImportConfiguration(excel.ActiveWorkbook.Worksheets["CONFIG"]);
+                ImportTypes(excel.ActiveWorkbook.Worksheets["TYPES"]);
+                ImportGroups(excel.ActiveWorkbook.Worksheets["GROUPS"]);
+                ImportVocables(excel.ActiveWorkbook.Worksheets["LIST"]);
             }
             finally
             {
@@ -171,18 +207,18 @@ namespace Nippori
 
             random = new Random();
 
-            types.Add(new VocableType(new string[] {"Česky", "Deutsch"}));
-            types.Add(new VocableType(new string[] {"Česky", "Singular", "Plural"}));
+            //types.Add(new VocableType(new string[] {"Česky", "Deutsch"}));
+            //types.Add(new VocableType(new string[] {"Česky", "Singular", "Plural"}));
 
-            typeList = types.ToArray();
+            //typeList = types.ToArray();
 
-            list.Add(new Vocable(typeList[0], "rád", new string[] {"gern"}));
-            list.Add(new Vocable(typeList[0], "přirozeně", new string[] {"natürlich"}));
+            //list.Add(new Vocable(typeList[0], "rád", new string[] {"gern"}));
+            //list.Add(new Vocable(typeList[0], "přirozeně", new string[] {"natürlich"}));
 
-            internalList = list.ToArray();
+            //internalList = list.ToArray();
 
-            vocableStack = new List<Vocable>(internalList);
-            vocableQueue = new Queue<Vocable>(2);
+            //vocableStack = new List<Vocable>(internalList);
+            //vocableQueue = new Queue<Vocable>(2);
         }
 
         /// <summary>
@@ -236,7 +272,7 @@ namespace Nippori
         {
             Trace.WriteLine("Obnovuji seznam.");
             vocableStack.Clear();
-            vocableStack.AddRange(internalList);
+            //vocableStack.AddRange(internalList);
         }
 
         public static bool IsEmpty()
@@ -260,80 +296,57 @@ namespace Nippori
     {
         #region .: Properties :.
 
+        public int ID { get; set; }
         /// <summary>
         /// Typ slovíčka.
         /// </summary>
         public VocableType Type { get; set; }
         /// <summary>
-        /// Český překlad.
+        /// Položky.
         /// </summary>
-        public string Czech { get; set; }
-        /// <summary>
-        /// Cizí překlady.
-        /// </summary>
-        public string[] Translation { get; set; }
-
-        #endregion
-
-        #region .: Constructor :.
-
-        /// <summary>
-        /// Vytvoří novou instanci třídy Vocable.
-        /// </summary>
-        /// <param name="type">Typ slovíčka.</param>
-        /// <param name="czech">Český překlad.</param>
-        /// <param name="translation">Cizí překlady.</param>
-        public Vocable(VocableType type, string czech, string[] translation)
-        {
-            this.Type = type;
-            this.Czech = czech;
-            this.Translation = (string[])translation.Clone();
-        }
+        public string[] Items { get; set; }
+        public int[] Types { get; set; }
+        public string[] Groups { get; set; }
 
         #endregion
 
         #region .: Public Overriden Methods :.
 
-        public override string ToString()
-        {
-            return String.Format("'{0}'", Czech);
-        }
-
         public override bool Equals(object obj)
         {
             if (obj is Vocable)
-                return ((Vocable)obj).Czech.Equals(this.Czech);
+                return ((Vocable)obj).ID.Equals(this.ID);
             else
                 return false;
         }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            return String.Format("{0}: {1}", ID, Items[0]);
+        }
+
 
         #endregion
     }
 
     /// <summary>
-    /// Reprezentuje typ slovíčka, neboli seznam jmen různých překladů.
+    /// Reprezentuje typ slovíčka.
     /// </summary>
     public class VocableType
     {
-        /// <summary>
-        /// Název zadání.
-        /// </summary>
-        public string InputName { get; set; }
+        public string Name { get; set; }
+        public int InputColumn { get; set; }
+        public int[] OutputColumns { get; set; }
 
-        /// <summary>
-        /// Pole jmen překladů.
-        /// </summary>
-        public string[] Name { get; set; }
-
-        /// <summary>
-        /// Konstruktor, vytvoří nový typ z předaného pole jmen.
-        /// </summary>
-        /// <param name="names">Pole jmen překladů, na prvním místě je jméno zadání.</param>
-        public VocableType(string[] names)
+        public override string ToString()
         {
-            InputName = names[0];
-            Name = new string[names.Length - 1];
-            Array.Copy(names, 1, Name, 0, names.Length - 1);
+            return String.Format("{0} | {1} | {2}", Name, InputColumn, 
+                String.Join(",", OutputColumns.Select(x => x.ToString())));
         }
     }
 
