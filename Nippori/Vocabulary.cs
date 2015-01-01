@@ -31,8 +31,17 @@ namespace Nippori
         /// Konfigurace.
         /// </summary>
         public static Dictionary<string, string> Configuration;
+        /// <summary>
+        /// Skupiny.
+        /// </summary>
         public static NameValueCollection Groups;
+        /// <summary>
+        /// Typy.
+        /// </summary>
         public static List<VocableType> Types;
+
+        public static string[] EnabledGroups;
+        public static int[] EnabledTypes;
 
         #endregion
 
@@ -73,6 +82,10 @@ namespace Nippori
             itemColumns = Int32.Parse(Configuration["columns"]);
         }
 
+        /// <summary>
+        /// Načte skupiny slovíček z excelového listu a uloží je do kolekce.
+        /// </summary>
+        /// <param name="sheet">Excelovský list, z něhož se čtou skupiny.</param>
         private static void ImportGroups(Worksheet sheet)
         {
             int row, rowCount;

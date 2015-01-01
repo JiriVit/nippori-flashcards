@@ -16,7 +16,9 @@ namespace Nippori
         #region .: Private Fields :.
 
         private FormWaitPlease formWaitPlease;
-        
+
+        private string currentFileName;
+
         private Label[] labelTransl;
         private Label[] labelCorr;
         private Label[] labelCorrect;
@@ -122,15 +124,22 @@ namespace Nippori
 
         }
 
+        /// <summary>
+        /// Přepíše dostupné skupiny ze slovníku do menu.
+        /// </summary>
         private void FillGroups()
         {
+            ToolStripItem addedItem;
             buttonGroups.DropDownItems.Clear();
 
             foreach (string key in Vocabulary.Groups.Keys)
-                buttonGroups.DropDownItems.Add(Vocabulary.Groups[key]);
+            {
+                addedItem = buttonGroups.DropDownItems.Add(Vocabulary.Groups[key]);
+                addedItem.Tag = key;
+            }
 
             foreach (ToolStripMenuItem item in buttonGroups.DropDownItems)
-            {
+            {                
                 item.CheckOnClick = false;
                 item.MouseEnter += new EventHandler(toolStripMenuItem_MouseEnter);
                 item.MouseLeave += new EventHandler(toolStripMenuItem_MouseLeave);
@@ -140,6 +149,9 @@ namespace Nippori
             ((ToolStripMenuItem)buttonGroups.DropDownItems[0]).Checked = true;
         }
 
+        /// <summary>
+        /// Přepíše dostupné typy ze slovníku do menu.
+        /// </summary>
         private void FillTypes()
         {
             buttonTypes.DropDownItems.Clear();
@@ -156,6 +168,23 @@ namespace Nippori
             }
 
             ((ToolStripMenuItem)buttonTypes.DropDownItems[0]).Checked = true;
+        }
+
+        /// <summary>
+        /// Aktualizuje ve slovníku povolené skupiny a tipy na základě volby v menu.
+        /// </summary>
+        private void UpdateEnabledTypesAndGroups()
+        {
+            var checkedGroups = from item in buttonGroups.DropDownItems.OfType<ToolStripMenuItem>()
+                                where item.Checked
+                                select item.Tag.ToString();
+
+            var checkedTypes = from item in buttonTypes.DropDownItems.OfType<ToolStripMenuItem>()
+                               where item.Checked
+                               select buttonTypes.DropDownItems.IndexOf(item);
+
+            Vocabulary.EnabledGroups = checkedGroups.ToArray();
+            Vocabulary.EnabledTypes = checkedTypes.ToArray();
         }
 
         #endregion
@@ -181,17 +210,28 @@ namespace Nippori
 
         private void buttonOpen_Click(object sender, EventArgs e)
         {
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                this.UseWaitCursor = true;
-                backgroundWorker.RunWorkerAsync(openFileDialog.FileName);
-                formWaitPlease.ShowDialog();
-            }
+            string defaultFile = @"D:\Dokumenty\Office\Excel\Vocabulary\NCPR-12 slovíčka - pinyin (nová verze).xlsx";
+
+            currentFileName = defaultFile;
+
+            this.UseWaitCursor = true;
+            backgroundWorker.RunWorkerAsync(defaultFile);
+            formWaitPlease.ShowDialog();
+
+            //if (openFileDialog.ShowDialog() == DialogResult.OK)
+            //{
+            //    currentFileName = openFileDialog.FileName;
+            //    this.UseWaitCursor = true;
+            //    MyTrace.WriteLine("info", currentFileName);
+            //    backgroundWorker.RunWorkerAsync(currentFileName);
+            //    formWaitPlease.ShowDialog();
+            //}
         }
 
         private void buttonTest_Click(object sender, EventArgs e)
         {
             /* sem zapiš testovací kód */
+            UpdateEnabledTypesAndGroups();
         }
 
         #endregion
@@ -206,6 +246,8 @@ namespace Nippori
             {
                 item.Checked = item.Equals(sender);
             }
+
+            UpdateEnabledTypesAndGroups();
         }
 
         private void toolStripMenuItem_MouseEnter(object sender, EventArgs e)
@@ -233,7 +275,7 @@ namespace Nippori
         {
             this.UseWaitCursor = false;
 
-            labelFileName.Text = Path.GetFileNameWithoutExtension(openFileDialog.FileName);
+            labelFileName.Text = Path.GetFileNameWithoutExtension(currentFileName);
             labelFileName.Enabled = true;
             labelFileName.Font = new Font(labelFileName.Font, FontStyle.Bold);
 

@@ -5,3 +5,5 @@
 JIŽ HOTOVO
 ================================================================================
 - Zobrazit čekací okno po dobu, kdy se načítají data z Excelu.
+- Načtení dat z Excelu do příslušných datových struktur.
+- Propojit UI a slovník v oblasti vybraných skupin a typů.
