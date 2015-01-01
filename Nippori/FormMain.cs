@@ -14,6 +14,8 @@ namespace Nippori
     {
         #region Private Fields
 
+        private FormWaitPlease formWaitPlease;
+        
         private Label[] labelTransl;
         private Label[] labelCorr;
         private Label[] labelCorrect;
@@ -35,6 +37,8 @@ namespace Nippori
         public FormMain()
         {
             InitializeComponent();
+
+            formWaitPlease = new FormWaitPlease();
 
             Vocabulary.Init();
             //Vocabulary.GetRandomItem();
@@ -193,6 +197,12 @@ namespace Nippori
             }
         }
 
+        private void buttonTest_Click(object sender, EventArgs e)
+        {
+            /* sem zapiš testovací kód */
+            formWaitPlease.ShowDialog();
+        }
+
         private void toolStripMenuItem_Click(object sender, EventArgs e)
         {
             ToolStripDropDownMenu menu = (ToolStripDropDownMenu)(((ToolStripItem)sender).Owner);
@@ -214,6 +224,7 @@ namespace Nippori
         }
 
         #endregion
+
 
 
 

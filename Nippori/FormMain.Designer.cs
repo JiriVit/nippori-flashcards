@@ -32,21 +32,22 @@
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.buttonOpen = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.labelFileName = new System.Windows.Forms.ToolStripLabel();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.buttonTypes = new System.Windows.Forms.ToolStripDropDownButton();
             this.item1ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.buttonGroups = new System.Windows.Forms.ToolStripDropDownButton();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.buttonStart = new System.Windows.Forms.ToolStripButton();
             this.buttonStop = new System.Windows.Forms.ToolStripButton();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.label1 = new System.Windows.Forms.Label();
             this.buttonAnswer = new System.Windows.Forms.Button();
             this.labelCzech = new System.Windows.Forms.Label();
-            this.labelFileName = new System.Windows.Forms.ToolStripLabel();
             this.vocableField1 = new Nippori.VocableField();
             this.vocableField2 = new Nippori.VocableField();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.buttonTest = new System.Windows.Forms.ToolStripButton();
             this.toolStrip1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
@@ -68,7 +69,8 @@
             this.buttonGroups,
             this.toolStripSeparator3,
             this.buttonStart,
-            this.buttonStop});
+            this.buttonStop,
+            this.buttonTest});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.ShowItemToolTips = false;
@@ -85,6 +87,23 @@
             this.buttonOpen.Size = new System.Drawing.Size(23, 22);
             this.buttonOpen.Text = "Otevřít soubor...";
             this.buttonOpen.Click += new System.EventHandler(this.buttonOpen_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
+            // 
+            // labelFileName
+            // 
+            this.labelFileName.Enabled = false;
+            this.labelFileName.Name = "labelFileName";
+            this.labelFileName.Size = new System.Drawing.Size(86, 22);
+            this.labelFileName.Text = "(žádný soubor)";
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 25);
             // 
             // buttonTypes
             // 
@@ -114,6 +133,11 @@
             this.buttonGroups.Name = "buttonGroups";
             this.buttonGroups.Size = new System.Drawing.Size(62, 22);
             this.buttonGroups.Text = "Skupiny";
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 25);
             // 
             // buttonStart
             // 
@@ -200,13 +224,6 @@
             this.labelCzech.TabIndex = 1;
             this.labelCzech.Text = "孙悟空";
             // 
-            // labelFileName
-            // 
-            this.labelFileName.Enabled = false;
-            this.labelFileName.Name = "labelFileName";
-            this.labelFileName.Size = new System.Drawing.Size(86, 22);
-            this.labelFileName.Text = "(žádný soubor)";
-            // 
             // vocableField1
             // 
             this.vocableField1.CorrectAnswer = "odpoved";
@@ -235,20 +252,16 @@
             this.vocableField2.Size = new System.Drawing.Size(1054, 75);
             this.vocableField2.TabIndex = 8;
             // 
-            // toolStripSeparator1
+            // buttonTest
             // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
-            // 
-            // toolStripSeparator2
-            // 
-            this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 25);
-            // 
-            // toolStripSeparator3
-            // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 25);
+            this.buttonTest.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.buttonTest.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.buttonTest.Image = ((System.Drawing.Image)(resources.GetObject("buttonTest.Image")));
+            this.buttonTest.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonTest.Name = "buttonTest";
+            this.buttonTest.Size = new System.Drawing.Size(23, 22);
+            this.buttonTest.Text = "toolStripButton1";
+            this.buttonTest.Click += new System.EventHandler(this.buttonTest_Click);
             // 
             // FormMain
             // 
@@ -290,6 +303,7 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.ToolStripButton buttonTest;
     }
 }
 
