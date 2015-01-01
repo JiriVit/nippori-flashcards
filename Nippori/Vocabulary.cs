@@ -13,6 +13,7 @@ namespace Nippori
     /// </summary>
     public static class Vocabulary
     {
+
         #region Constants
 
         const int COL_TYPES_OFFSET = 1;
@@ -47,7 +48,8 @@ namespace Nippori
 
         #region Private Fields
 
-        public static List<Vocable> vocables;
+        public static List<Vocable> allVocables;
+        private static List<Vocable> enabledVocables;
         private static Random random;
         private static List<Vocable> vocableStack;
         private static Queue<Vocable> vocableQueue;
@@ -147,7 +149,7 @@ namespace Nippori
             
 
             rowCount = sheet.UsedRange.Rows.Count;
-            vocables = new List<Vocable>(rowCount - 1);
+            allVocables = new List<Vocable>(rowCount - 1);
 
             for (row = 2; row <= rowCount; row++)
             {
@@ -179,8 +181,44 @@ namespace Nippori
                 else
                     importedVocable.Groups = sheet.Cells[row, itemColumns + COL_GROUPS_OFFSET].Value.ToString().Split(';');
 
-                vocables.Add(importedVocable);
+                allVocables.Add(importedVocable);
             }
+        }
+
+        /// <summary>
+        /// Zjistí, jestli je slovíčko povolené, tedy v souladu s aktuálně nastavenými
+        /// povolenými skupinami a typy.
+        /// </summary>
+        /// <param name="vocable">Slovíčko k posouzení.</param>
+        /// <returns>Je-li slovíčko povolené.</returns>
+        private static bool IsVocableEnabled(Vocable vocable)
+        {
+            bool matchType = false;
+
+            foreach (int t in EnabledTypes)
+                if (matchType = vocable.Types.Contains(t))
+                    break;
+
+            if (!matchType)
+                return false;
+
+            foreach (string g in EnabledGroups)
+                if (vocable.Groups.Contains(g))
+                    return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// Vybere povolená slovíčka na základě povolených typů a skupin.
+        /// </summary>
+        private static void SelectEnabledVocables()
+        {
+            var _enabledVocables = from vocable in allVocables
+                                   where IsVocableEnabled(vocable)
+                                   select vocable;
+
+            enabledVocables = new List<Vocable>(_enabledVocables);
         }
 
         #endregion
@@ -296,6 +334,15 @@ namespace Nippori
         public static bool IsItemInQueue()
         {
             return vocableQueue.Contains(CurrentItem);
+        }
+
+        /// <summary>
+        /// Zahájí zkoušení, tj. vynuluje všechny statistiky a aktualizuje seznam
+        /// povolených slovíček.
+        /// </summary>
+        public static void Start()
+        {
+            SelectEnabledVocables();
         }
 
         #endregion

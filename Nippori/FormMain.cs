@@ -181,7 +181,7 @@ namespace Nippori
 
             var checkedTypes = from item in buttonTypes.DropDownItems.OfType<ToolStripMenuItem>()
                                where item.Checked
-                               select buttonTypes.DropDownItems.IndexOf(item);
+                               select buttonTypes.DropDownItems.IndexOf(item) + 1;
 
             Vocabulary.EnabledGroups = checkedGroups.ToArray();
             Vocabulary.EnabledTypes = checkedTypes.ToArray();
@@ -231,7 +231,7 @@ namespace Nippori
         private void buttonTest_Click(object sender, EventArgs e)
         {
             /* sem zapiš testovací kód */
-            UpdateEnabledTypesAndGroups();
+            Vocabulary.Start();
         }
 
         #endregion
@@ -281,6 +281,7 @@ namespace Nippori
 
             FillTypes();
             FillGroups();
+            UpdateEnabledTypesAndGroups();
 
             buttonTypes.Enabled = true;
             buttonGroups.Enabled = true;
