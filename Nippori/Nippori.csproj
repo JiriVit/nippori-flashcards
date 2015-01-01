@@ -66,6 +66,7 @@
     <Compile Include="FormWaitPlease.Designer.cs">
       <DependentUpon>FormWaitPlease.cs</DependentUpon>
     </Compile>
+    <Compile Include="MyTrace.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="FormMain.resx">

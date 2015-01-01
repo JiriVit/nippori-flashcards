@@ -38,7 +38,7 @@ namespace Nippori
         public FormMain()
         {
             InitializeComponent();
-
+            MyTrace.Init();
             formWaitPlease = new FormWaitPlease();
 
             Vocabulary.Init();
@@ -245,6 +245,15 @@ namespace Nippori
             buttonStart.Enabled = true;
 
             formWaitPlease.Close();
+        }
+
+        #endregion
+
+        #region ... Form
+
+        private void FormMain_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            MyTrace.Close();
         }
 
         #endregion
