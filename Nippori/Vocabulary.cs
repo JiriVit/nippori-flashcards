@@ -147,7 +147,6 @@ namespace Nippori
             int row, rowCount, col;
             string[] importedColumns;
             
-
             rowCount = sheet.UsedRange.Rows.Count;
             allVocables = new List<Vocable>(rowCount - 1);
 
@@ -169,7 +168,7 @@ namespace Nippori
                     importedVocable.Items[col - 1] = sheet.Cells[row, col].Value.ToString();
                 if (sheet.Cells[row, itemColumns + COL_TYPES_OFFSET].Value == null)
                 {
-                    importedVocable.Types = new int[] { 1 };
+                    importedVocable.Types = Enumerable.Range(1, Types.Count).ToArray();
                 }
                 else
                 {

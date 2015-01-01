@@ -4,7 +4,6 @@
   jedním škrtátkem označit všechny.
 - Přesunout odpovídající údaje do konfiguračního souboru (výchozí adresář se
   slovíčky, jména listů v sešitech, ...).
-- Slovíčkům bez definovaného typu nastavit, že má všechny typy.
 
 JIŽ HOTOVO
 ================================================================================
@@ -13,3 +12,4 @@ JIŽ HOTOVO
 - Propojit UI a slovník v oblasti vybraných skupin a typů.
 - Sestavení interního seznamu povolených slovíček na základě vybraných skupin a
   typů.
+- Slovíčkům bez uvedeného typu nastavit, že mají všechny typy.
