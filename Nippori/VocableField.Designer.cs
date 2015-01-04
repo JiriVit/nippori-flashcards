@@ -31,9 +31,9 @@
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.labelItemName = new System.Windows.Forms.Label();
             this.labelCaptionCorrectAnswer = new System.Windows.Forms.Label();
+            this.pictureBox = new System.Windows.Forms.PictureBox();
             this.textBoxAnswer = new System.Windows.Forms.TextBox();
             this.labelCorrectAnswer = new System.Windows.Forms.Label();
-            this.pictureBox = new System.Windows.Forms.PictureBox();
             this.tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).BeginInit();
             this.SuspendLayout();
@@ -42,7 +42,7 @@
             // 
             this.tableLayoutPanel1.ColumnCount = 3;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 49F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 50F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel1.Controls.Add(this.labelItemName, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.labelCaptionCorrectAnswer, 2, 0);
@@ -74,11 +74,20 @@
             this.labelCaptionCorrectAnswer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.labelCaptionCorrectAnswer.AutoSize = true;
             this.labelCaptionCorrectAnswer.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.labelCaptionCorrectAnswer.Location = new System.Drawing.Point(275, 1);
+            this.labelCaptionCorrectAnswer.Location = new System.Drawing.Point(276, 1);
             this.labelCaptionCorrectAnswer.Name = "labelCaptionCorrectAnswer";
             this.labelCaptionCorrectAnswer.Size = new System.Drawing.Size(116, 17);
             this.labelCaptionCorrectAnswer.TabIndex = 1;
             this.labelCaptionCorrectAnswer.Text = "Správná odpověď:";
+            // 
+            // pictureBox
+            // 
+            this.pictureBox.Location = new System.Drawing.Point(226, 20);
+            this.pictureBox.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.pictureBox.Name = "pictureBox";
+            this.pictureBox.Size = new System.Drawing.Size(32, 32);
+            this.pictureBox.TabIndex = 2;
+            this.pictureBox.TabStop = false;
             // 
             // textBoxAnswer
             // 
@@ -98,21 +107,12 @@
             // 
             this.labelCorrectAnswer.AutoSize = true;
             this.labelCorrectAnswer.Font = new System.Drawing.Font("Segoe UI", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.labelCorrectAnswer.Location = new System.Drawing.Point(275, 23);
+            this.labelCorrectAnswer.Location = new System.Drawing.Point(276, 23);
             this.labelCorrectAnswer.Margin = new System.Windows.Forms.Padding(3, 5, 3, 0);
             this.labelCorrectAnswer.Name = "labelCorrectAnswer";
             this.labelCorrectAnswer.Size = new System.Drawing.Size(88, 25);
             this.labelCorrectAnswer.TabIndex = 1;
             this.labelCorrectAnswer.Text = "odpověď";
-            // 
-            // pictureBox
-            // 
-            this.pictureBox.Location = new System.Drawing.Point(226, 20);
-            this.pictureBox.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.pictureBox.Name = "pictureBox";
-            this.pictureBox.Size = new System.Drawing.Size(31, 27);
-            this.pictureBox.TabIndex = 2;
-            this.pictureBox.TabStop = false;
             // 
             // VocableField
             // 

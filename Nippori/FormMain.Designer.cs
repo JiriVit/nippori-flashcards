@@ -125,7 +125,7 @@
             // item1ToolStripMenuItem
             // 
             this.item1ToolStripMenuItem.Name = "item1ToolStripMenuItem";
-            this.item1ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.item1ToolStripMenuItem.Size = new System.Drawing.Size(104, 22);
             this.item1ToolStripMenuItem.Text = "Item1";
             this.item1ToolStripMenuItem.Click += new System.EventHandler(this.toolStripMenuItem_Click);
             // 
@@ -270,7 +270,6 @@
             this.vocableField1.Name = "vocableField1";
             this.vocableField1.Size = new System.Drawing.Size(1054, 75);
             this.vocableField1.TabIndex = 7;
-            this.vocableField1.Visible = false;
             // 
             // vocableField2
             // 
