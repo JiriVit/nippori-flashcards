@@ -16,9 +16,9 @@ namespace Nippori
 
         #region Constants
 
-        const int COL_TYPES_OFFSET = 1;
-        const int COL_GROUPS_OFFSET = 2;
-        const int COL_ACTIVE_OFFSET = 3;
+        public const int COL_TYPES_OFFSET = 1;
+        public const int COL_GROUPS_OFFSET = 2;
+        public const int COL_ACTIVE_OFFSET = 3;
 
         const int QUEUE_LEN = 2;
 
@@ -65,6 +65,8 @@ namespace Nippori
                 return vocableQueue.Count;
             }
         }
+
+        public static int ItemColumnCount { get { return itemColumns; } }
 
         #endregion
 
@@ -184,8 +186,8 @@ namespace Nippori
         private static void ImportVocables(Worksheet sheet)
         {
             Vocable importedVocable;
+            bool usedRow;
             int row, rowCount, col;
-            string[] importedColumns;
             
             rowCount = sheet.UsedRange.Rows.Count;
             allVocables = new List<Vocable>(rowCount - 1);
@@ -198,36 +200,14 @@ namespace Nippori
             /* načtení samotných slovíček */
             for (row = 2; row <= rowCount; row++)
             {
-                
-
-                /* eliminace prázdných buněk zahrnutých do UsedRange */
-                if (sheet.Cells[row, 1].Value == null)
-                    break;
-
                 if ( (sheet.Cells[row, itemColumns + COL_ACTIVE_OFFSET].Value != null) &&
                      (!sheet.Cells[row, itemColumns + COL_ACTIVE_OFFSET].Value.ToString().Equals("1")))
                     continue;
 
-                importedVocable = new Vocable();
-                importedVocable.ID = row;
-                importedVocable.Items = new string[itemColumns];
-
-                for (col = 1; col <= itemColumns; col++)
-                    importedVocable.Items[col - 1] = sheet.Cells[row, col].Value.ToString();
-                if (sheet.Cells[row, itemColumns + COL_TYPES_OFFSET].Value == null)
-                {
-                    importedVocable.Types = Enumerable.Range(1, Types.Count).ToArray();
-                }
-                else
-                {
-                    importedColumns = sheet.Cells[row, itemColumns + COL_TYPES_OFFSET].Value.ToString().Split(';');
-                    importedVocable.Types = importedColumns.Select(Int32.Parse).ToArray();
-                }
-                if (sheet.Cells[row, itemColumns + COL_GROUPS_OFFSET].Value == null)
-                    importedVocable.Groups = new string[] { Groups.Keys[0] };
-                else
-                    importedVocable.Groups = sheet.Cells[row, itemColumns + COL_GROUPS_OFFSET].Value.ToString().Split(';');
-
+                importedVocable = new Vocable(row);
+                usedRow = importedVocable.Import(sheet.Rows[row]);
+                if (!usedRow)
+                    break;
                 allVocables.Add(importedVocable);
             }
         }
@@ -383,17 +363,9 @@ namespace Nippori
         #region .: Properties :.
 
         /// <summary>
-        /// Čte a zapisuje ID slovíčka, neboli číslo řádku v Excelu.
-        /// </summary>
-        public int ID { get; set; }
-        /// <summary>
         /// Typ slovíčka.
         /// </summary>
         public VocableType Type { get; set; }
-        /// <summary>
-        /// Položky.
-        /// </summary>
-        public string[] Items { get; set; }
         /// <summary>
         /// Čte a zapisuje pole typů slovíčka. Je to údaj vyčtený z Excelu, který znamená,
         /// jaké všechny typy tento jeden záznam podporuje.
@@ -411,7 +383,7 @@ namespace Nippori
         {
             get
             {
-                return Items[Type.InputColumn - 1];
+                return items[Type.InputColumn - 1];
             }
         }
         /// <summary>
@@ -424,26 +396,99 @@ namespace Nippori
                 return Vocabulary.ColumnHeaders[Type.InputColumn - 1];
             }
         }
-
+        /// <summary>
+        /// Čte počet překladů slovíčka.
+        /// </summary>
         public int OutputCount { get { return Type.OutputColumns.Count(); } }
+        
+        #endregion
+
+        #region .: Private Fields :.
+
+        /// <summary>
+        /// Číslo řádku v Excelu, z kterého bylo slovíčko načteno.
+        /// </summary>
+        private int id;
+        /// <summary>
+        /// Pole všech překladů slovíčka.
+        /// </summary>
+        private string[] items;
+        
+        #endregion
+
+        #region .: Constructors :.
+
+        public Vocable(int id)
+        {
+            this.id = id;
+        }
+
         #endregion
 
         #region .: Public Methods :.
 
+        /// <summary>
+        /// Vrátí překlad slovíčka, jak je definovaný aktuálně nastaveným typem.
+        /// </summary>
+        /// <param name="index">Index překladu.</param>
+        /// <returns>Překlad slovíčka.</returns>
         public string GetOutput(int index)
         {
             if (index < Type.OutputColumns.Count())
-                return Items[Type.OutputColumns[index] - 1];
+                return items[Type.OutputColumns[index] - 1];
             else
                 return String.Empty;
         }
 
+        /// <summary>
+        /// Vrátí název překladu slovíčka, jak je definovaný aktuálně nastaveným typem.
+        /// </summary>
+        /// <param name="index">Index překladu.</param>
+        /// <returns>Název překladu slovíčka.</returns>
         public string GetOutputLabel(int index)
         {
             if (index < Type.OutputColumns.Count())
                 return Vocabulary.ColumnHeaders[Type.OutputColumns[index] - 1];
             else
                 return String.Empty;
+        }
+
+        /// <summary>
+        /// Importuje slovíčko z excelového řádku.
+        /// </summary>
+        /// <param name="excelRow">Excelový řádek.</param>
+        /// <returns>TRUE pokud bylo slovíčko importováno, FALSE pokud je řádek prázdný.</returns>
+        public bool Import(Range excelRow)
+        {
+            int col;
+
+            /* řádek je prázdný, nelze nic importovat */
+            if (excelRow.Cells[1, 1].Value == null)
+                return false;
+
+            /* načtení překladů */
+            items = new string[Vocabulary.ItemColumnCount];            
+            for (col = 1; col <= Vocabulary.ItemColumnCount; col++)
+                items[col - 1] = excelRow.Cells[1, col].Value.ToString();
+
+            /* načtení typů */
+            if (excelRow.Cells[1, Vocabulary.ItemColumnCount + Vocabulary.COL_TYPES_OFFSET].Value == null)
+            {
+                Types = Enumerable.Range(1, Vocabulary.Types.Count).ToArray();
+            }
+            else
+            {
+                items = excelRow.Cells[1, Vocabulary.ItemColumnCount + Vocabulary.COL_TYPES_OFFSET].Value.ToString().Split(';');
+                Types = items.Select(Int32.Parse).ToArray();
+            }
+            
+            /* načtení skupin */
+            if (excelRow.Cells[1, Vocabulary.ItemColumnCount + Vocabulary.COL_GROUPS_OFFSET].Value == null)
+                Groups = new string[] { Vocabulary.Groups.Keys[0] };
+            else
+                Groups = excelRow.Cells[1, Vocabulary.ItemColumnCount + Vocabulary.COL_GROUPS_OFFSET].Value.ToString().Split(';');
+
+            return true;
         }
 
         #endregion
@@ -453,7 +498,7 @@ namespace Nippori
         public override bool Equals(object obj)
         {
             if (obj is Vocable)
-                return ((Vocable)obj).ID.Equals(this.ID);
+                return ((Vocable)obj).id.Equals(this.id);
             else
                 return false;
         }
@@ -465,7 +510,7 @@ namespace Nippori
 
         public override string ToString()
         {
-            return String.Format("{0}: {1}", ID, Items[0]);
+            return String.Format("{0}: {1}", id, items[0]);
         }
 
         #endregion
