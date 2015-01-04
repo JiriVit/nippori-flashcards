@@ -250,22 +250,16 @@ namespace Nippori
 
         private void buttonOpen_Click(object sender, EventArgs e)
         {
-            string defaultFile = @"D:\Dokumenty\Office\Excel\Vocabulary\NCPR-12 slovíčka - pinyin (nová verze).xlsx";
+            //string defaultFile = @"D:\Dokumenty\Office\Excel\Vocabulary\NCPR-12 slovíčka - pinyin (nová verze).xlsx";
 
-            currentFileName = defaultFile;
-
-            this.UseWaitCursor = true;
-            backgroundWorker.RunWorkerAsync(defaultFile);
-            formWaitPlease.ShowDialog();
-
-            //if (openFileDialog.ShowDialog() == DialogResult.OK)
-            //{
-            //    currentFileName = openFileDialog.FileName;
-            //    this.UseWaitCursor = true;
-            //    MyTrace.WriteLine("info", currentFileName);
-            //    backgroundWorker.RunWorkerAsync(currentFileName);
-            //    formWaitPlease.ShowDialog();
-            //}
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                currentFileName = openFileDialog.FileName;
+                this.UseWaitCursor = true;
+                MyTrace.WriteLine("info", currentFileName);
+                backgroundWorker.RunWorkerAsync(currentFileName);
+                formWaitPlease.ShowDialog();
+            }
         }
 
         private void buttonStart_Click(object sender, EventArgs e)
@@ -373,7 +367,6 @@ namespace Nippori
         }
 
         #endregion
-
 
     }
 }
