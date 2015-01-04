@@ -144,59 +144,30 @@ namespace Nippori
 
         #endregion
 
-        private void EvaluateAnswer(bool newVocabulary)
+        /// <summary>
+        /// Vyhodnotí odpověď, případně zařadí slovíčko do fronty a vybere další.
+        /// </summary>
+        private void EvaluateAnswer()
         {
-            int i;
             bool result = true;
 
             foreach (VocableField vocableField in vocableFields.Where(vf => vf.Visible))
-                result = result && vocableField.Evaluate();
+                result = vocableField.Evaluate() && result;
 
-            /* podle výsledků zvolím další slovíčko */
             if (result)
             {
-                Vocabulary.RemoveItem();
-                if (Vocabulary.IsEmpty())
-                {
-                    Vocabulary.ReloadList();
-                    do { Vocabulary.GetRandomItem(); } 
-                    while (Vocabulary.CurrentItem == previousVocable);
-                    previousVocable = Vocabulary.CurrentItem;
-                    return;
-                }
-                if (Vocabulary.GetQueueCount() > 0)
-                {
-                    Vocabulary.GetQueueItem();
-                    previousVocable = Vocabulary.CurrentItem;
-                    return;
-                }
-                do
-                {
-                    Vocabulary.GetRandomItem();
-
-                    if (Vocabulary.GetListCount() == 1)
-                        break;
-
-                    if (!Vocabulary.IsItemInQueue())
-                        break;
-
-                    if (!Vocabulary.CurrentItem.Equals(previousVocable))
-                        break;
-                }
-                while (Vocabulary.IsItemInQueue() && (Vocabulary.GetListCount() != 1));
-                previousVocable = Vocabulary.CurrentItem;
+                if (Vocabulary.QueueCount > 0)
+                    Vocabulary.DequeueVocable();
+                else
+                    Vocabulary.GetNextVocable();
             }
             else
             {
-                Vocabulary.PutToQueue();
-                if (Vocabulary.GetQueueCount() == 2)
-                {
-                    Vocabulary.GetQueueItem();
-                    previousVocable = Vocabulary.CurrentItem;
-                    return;
-                }
-                Vocabulary.GetRandomItem();
-                previousVocable = Vocabulary.CurrentItem;
+                Vocabulary.EnqueueCurrentVocable();
+                if (Vocabulary.QueueCount > 1)
+                    Vocabulary.DequeueVocable();
+                else
+                    Vocabulary.GetNextVocable();
             }
         }
 
@@ -206,8 +177,8 @@ namespace Nippori
         private void ShowNextVocable()
         {            
             Vocable vocable;
-            
-            vocable = Vocabulary.GetRandomItem();
+
+            vocable = Vocabulary.CurrentVocable;
 
             labelAssignment.Text = vocable.InputLabel;
             labelCzech.Text = vocable.Input;
@@ -235,6 +206,7 @@ namespace Nippori
             labelCzech.Visible = true;
 
             Vocabulary.Start();
+            Vocabulary.GetNextVocable();
             ShowNextVocable();
             evaluating = false;
         }
@@ -387,7 +359,7 @@ namespace Nippori
         {
             if (!evaluating)
             {
-                EvaluateAnswer(true);
+                EvaluateAnswer();
                 buttonAnswer.Text = "Další";
                 evaluating = true;
             }

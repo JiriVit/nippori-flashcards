@@ -20,6 +20,8 @@ namespace Nippori
         const int COL_GROUPS_OFFSET = 2;
         const int COL_ACTIVE_OFFSET = 3;
 
+        const int QUEUE_LEN = 2;
+
         #endregion
 
         #region Properties
@@ -27,7 +29,7 @@ namespace Nippori
         /// <summary>
         /// Aktuálně vybrané slovíčko.
         /// </summary>
-        public static Vocable CurrentItem;
+        public static Vocable CurrentVocable;
         /// <summary>
         /// Konfigurace.
         /// </summary>
@@ -53,21 +55,27 @@ namespace Nippori
         /// Povolený typ slovíček, který se teď má zkoušet. Číslováno od jedničky.
         /// </summary>
         public static int EnabledType;
+        /// <summary>
+        /// Čte počet slovíček ve frontě.
+        /// </summary>
+        public static int QueueCount
+        {
+            get
+            {
+                return vocableQueue.Count;
+            }
+        }
 
         #endregion
 
         #region Private Fields
 
+        private static Random random;
+
         /// <summary>
-        /// Seznam všech slovíček, která byla přečtena z Excelu.
+        /// Seznam všech slovíček z Excelu. Plní se ve chvíli, kdy čteme Excel.
         /// </summary>
         private static List<Vocable> allVocables;
-        /// <summary>
-        /// Seznam povolených slovíček, tedy podmnožiny, která vyhovuje omezením zadaným uživatelem
-        /// (povolený typ a povolené skupiny).
-        /// </summary>
-        private static List<Vocable> enabledVocables;
-        private static Random random;
         /// <summary>
         /// Zásobník slovíček, z něj se vytahují slovíčka na formulář a po správném zodpovězení se z něj vyhodí.
         /// Když je zásobník prázdný, znovu se naplní.
@@ -88,6 +96,8 @@ namespace Nippori
         #endregion
 
         #region Private Methods
+
+        #region ... Data Import
 
         /// <summary>
         /// Načte konfiguraci z excelového listu a uloží ji do slovníku.
@@ -197,7 +207,7 @@ namespace Nippori
                     continue;
 
                 importedVocable = new Vocable();
-                importedVocable.ID = row - 2;
+                importedVocable.ID = row;
                 importedVocable.Items = new string[itemColumns];
 
                 for (col = 1; col <= itemColumns; col++)
@@ -220,6 +230,8 @@ namespace Nippori
             }
         }
 
+        #endregion
+
         /// <summary>
         /// Zjistí, jestli je slovíčko povolené, tedy v souladu s aktuálně nastavenými
         /// povolenými skupinami a typy.
@@ -239,20 +251,90 @@ namespace Nippori
         }
 
         /// <summary>
-        /// Vybere povolená slovíčka na základě povolených typů a skupin.
+        /// Naplní zásobník slovíčky vyhovujícími požadavkům uživatele.
         /// </summary>
-        private static void SelectEnabledVocables()
+        private static void RefillStack()
         {
-            var _enabledVocables = from vocable in allVocables
+            var enabledVocables = from vocable in allVocables
                                    where IsVocableEnabled(vocable)
                                    select vocable;
 
-            enabledVocables = new List<Vocable>(_enabledVocables);
+            vocableStack = new List<Vocable>(enabledVocables);
+
+            Trace.WriteLine(String.Format("[zásobník] Naplňuji {0} slovy.",
+                vocableStack.Count));            
         }
 
         #endregion
 
         #region Public Methods
+
+        /// <summary>
+        /// Vytáhne slovíčko z fronty špatně zodpovězených a nastaví jako aktuální.
+        /// <returns>Slovíčko vytažené z fronty.</returns>
+        /// </summary>
+        public static Vocable DequeueVocable()
+        {
+            CurrentVocable = vocableQueue.Dequeue();            
+            Trace.WriteLine(String.Format("[fronta] Vytahuji \"{0}\", nyní {1} slov.", 
+                CurrentVocable, vocableQueue.Count));
+            return CurrentVocable;
+        }
+
+        /// <summary>
+        /// Vloží chybně zodpovězené slovíčko do fronty.
+        /// </summary>
+        public static void EnqueueCurrentVocable()
+        {
+            vocableQueue.Enqueue(CurrentVocable);
+            Trace.WriteLine(String.Format("[fronta] Vkládám \"{0}\", nyní {1} slov.", 
+                CurrentVocable, vocableQueue.Count));
+        }
+
+        /// <summary>
+        /// Vytáhne ze zásobníku náhodně vybrané slovíčko, které není ve frontě.
+        /// Slovíčko je ze zásobníku odstraněno. Pokud se tím zásobník vyprázdní,
+        /// je znovu naplněn.
+        /// <returns>Vytažené slovíčko.</returns>
+        /// </summary>
+        public static Vocable GetNextVocable()
+        {
+            Vocable candidateVocable;
+
+            while (true)
+            {
+                candidateVocable = vocableStack[random.Next(vocableStack.Count)];
+                if (candidateVocable.Equals(CurrentVocable))
+                    continue;
+                if (vocableQueue.Contains(candidateVocable))
+                    continue;
+                break;
+            }
+
+            vocableStack.Remove(candidateVocable);
+            candidateVocable.Type = Types[EnabledType - 1];
+            CurrentVocable = candidateVocable;
+            Trace.WriteLine(String.Format("[zásobník] Vytahuji \"{0}\", zbývá {1}.", 
+                CurrentVocable, vocableStack.Count));
+
+            if (vocableStack.Count == 0)
+                RefillStack();
+
+            return candidateVocable;
+        }
+
+        /// <summary>
+        /// Inicializace slovníku.
+        /// </summary>
+        public static void Init()
+        {
+            List<VocableType> types = new List<VocableType>();
+            List<Vocable> list = new List<Vocable>();
+
+            random = new Random();
+
+            vocableQueue = new Queue<Vocable>(QUEUE_LEN);
+        }
 
         /// <summary>
         /// Načte slovíčka ze souboru. Nedělá nic jiného - refresh se musí provést ručně.
@@ -278,113 +360,12 @@ namespace Nippori
         }
 
         /// <summary>
-        /// Inicializace slovníku.
-        /// </summary>
-        public static void Init()
-        {
-            List<VocableType> types = new List<VocableType>();
-            List<Vocable> list = new List<Vocable>();
-
-            random = new Random();
-
-            vocableQueue = new Queue<Vocable>(2);
-        }
-
-        /// <summary>
-        /// Náhodně vytáhne jedno ze slovíček na zásobníku.
-        /// <returns>Vytažené slovíčko.</returns>
-        /// </summary>
-        public static Vocable GetRandomItem()
-        {
-            CurrentItem = vocableStack[random.Next(vocableStack.Count)];
-            CurrentItem.Type = Types[EnabledType - 1];
-            Trace.WriteLine(String.Format("Vytahuji slovo {0}, zbývá jich {1}.", CurrentItem, vocableStack.Count));
-            return CurrentItem;
-        }
-
-        /// <summary>
-        /// Odstraní současné slovíčko ze zásobníku. Volat poté, co je slovíčko správně
-        /// zodpovězeno.
-        /// </summary>
-        public static void RemoveItem()
-        {
-            Trace.WriteLine(String.Format("Odstraňuji slovo {0}.", CurrentItem));
-            vocableStack.Remove(CurrentItem);            
-        }
-
-        /// <summary>
-        /// Vytáhne slovíčko z fronty špatně zodpovězených a nastaví jako aktuální.
-        /// </summary>
-        public static void GetQueueItem()
-        {
-            CurrentItem = vocableQueue.Dequeue();
-            Trace.WriteLine(String.Format("Vytahuji z fronty slovo {0}, ve frontě zbývá {1}.", CurrentItem, vocableQueue.Count));
-        }
-
-        /// <summary>
-        /// Zjistí počet slovíček ve frontě.
-        /// </summary>
-        /// <returns>Počet slovíček ve frontě.</returns>
-        public static int GetQueueCount()
-        {
-            return vocableQueue.Count();
-        }
-
-        /// <summary>
-        /// Zjistí počet slovíček v zásobníku.
-        /// </summary>
-        /// <returns></returns>
-        public static int GetListCount()
-        {
-            return vocableStack.Count;
-        }
-
-        /// <summary>
-        /// Vloží chybně zodpovězené slovíčko do fronty.
-        /// </summary>
-        public static void PutToQueue()
-        {
-            vocableQueue.Enqueue(CurrentItem);
-            Trace.WriteLine(String.Format("Dávám do fronty slovo {0}, ve frontě je {1}.", CurrentItem, vocableQueue.Count));
-        }
-
-        /// <summary>
-        /// Obnoví zásobník slovíček.
-        /// </summary>
-        public static void ReloadList()
-        {
-            Trace.WriteLine("Obnovuji seznam.");
-            vocableStack.Clear();
-            vocableStack.AddRange(enabledVocables);
-        }
-
-        /// <summary>
-        /// Zjistí, jestli je zásobník prázdný.
-        /// </summary>
-        /// <returns></returns>
-        public static bool IsEmpty()
-        {
-            return vocableStack.Count == 0;
-        }
-
-        /// <summary>
-        /// Zjistí, jestli je současné slovíčko ve frontě.
-        /// </summary>
-        /// <returns></returns>
-        public static bool IsItemInQueue()
-        {
-            return vocableQueue.Contains(CurrentItem);
-        }
-
-        /// <summary>
         /// Zahájí zkoušení, tj. vynuluje všechny statistiky a aktualizuje seznam
         /// povolených slovíček.
         /// </summary>
         public static void Start()
         {
-            SelectEnabledVocables();
-            vocableStack = new List<Vocable>(enabledVocables.Count);
-            ReloadList();
+            RefillStack();
         }
 
         #endregion
@@ -488,7 +469,6 @@ namespace Nippori
         {
             return String.Format("{0}: {1}", ID, Items[0]);
         }
-
 
         #endregion
 
