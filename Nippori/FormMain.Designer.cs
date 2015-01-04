@@ -119,12 +119,13 @@
             this.buttonTypes.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.buttonTypes.Name = "buttonTypes";
             this.buttonTypes.Size = new System.Drawing.Size(46, 22);
+            this.buttonTypes.Tag = "T";
             this.buttonTypes.Text = "Typy";
             // 
             // item1ToolStripMenuItem
             // 
             this.item1ToolStripMenuItem.Name = "item1ToolStripMenuItem";
-            this.item1ToolStripMenuItem.Size = new System.Drawing.Size(104, 22);
+            this.item1ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.item1ToolStripMenuItem.Text = "Item1";
             this.item1ToolStripMenuItem.Click += new System.EventHandler(this.toolStripMenuItem_Click);
             // 
@@ -136,6 +137,7 @@
             this.buttonGroups.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.buttonGroups.Name = "buttonGroups";
             this.buttonGroups.Size = new System.Drawing.Size(62, 22);
+            this.buttonGroups.Tag = "G";
             this.buttonGroups.Text = "Skupiny";
             // 
             // toolStripSeparator3

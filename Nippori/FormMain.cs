@@ -119,8 +119,6 @@ namespace Nippori
             foreach (ToolStripMenuItem item in buttonTypes.DropDownItems)
             {
                 item.CheckOnClick = false;
-                item.MouseEnter += new EventHandler(toolStripMenuItem_MouseEnter);
-                item.MouseLeave += new EventHandler(toolStripMenuItem_MouseLeave);
                 item.Click += new EventHandler(toolStripMenuItem_Click);
             }
 
