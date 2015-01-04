@@ -46,12 +46,12 @@
             this.labelAssignment = new System.Windows.Forms.Label();
             this.labelCzech = new System.Windows.Forms.Label();
             this.buttonAnswer = new System.Windows.Forms.Button();
+            this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
             this.vocableField1 = new Nippori.VocableField();
             this.vocableField2 = new Nippori.VocableField();
             this.vocableField3 = new Nippori.VocableField();
             this.vocableField4 = new Nippori.VocableField();
             this.vocableField5 = new Nippori.VocableField();
-            this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
             this.toolStrip1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
@@ -139,6 +139,7 @@
             this.buttonGroups.Size = new System.Drawing.Size(62, 22);
             this.buttonGroups.Tag = "G";
             this.buttonGroups.Text = "Skupiny";
+            this.buttonGroups.DropDownClosed += new System.EventHandler(this.buttonGroups_DropDownClosed);
             // 
             // toolStripSeparator3
             // 
@@ -249,6 +250,11 @@
             this.buttonAnswer.UseVisualStyleBackColor = true;
             this.buttonAnswer.Click += new System.EventHandler(this.buttonAnswer_Click);
             // 
+            // backgroundWorker
+            // 
+            this.backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker_DoWork);
+            this.backgroundWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker_RunWorkerCompleted);
+            // 
             // vocableField1
             // 
             this.vocableField1.AssignedVocable = null;
@@ -329,11 +335,6 @@
             this.vocableField5.Size = new System.Drawing.Size(1054, 77);
             this.vocableField5.TabIndex = 11;
             this.vocableField5.Visible = false;
-            // 
-            // backgroundWorker
-            // 
-            this.backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker_DoWork);
-            this.backgroundWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker_RunWorkerCompleted);
             // 
             // FormMain
             // 

@@ -97,13 +97,11 @@ namespace Nippori
 
             foreach (ToolStripMenuItem item in buttonGroups.DropDownItems)
             {
-                item.CheckOnClick = false;
+                item.CheckOnClick = true;
+                item.Checked = true;
                 item.MouseEnter += new EventHandler(toolStripMenuItem_MouseEnter);
                 item.MouseLeave += new EventHandler(toolStripMenuItem_MouseLeave);
-                item.Click += new EventHandler(toolStripMenuItem_Click);
             }
-
-            ((ToolStripMenuItem)buttonGroups.DropDownItems[0]).Checked = true;
         }
 
         /// <summary>
@@ -290,6 +288,11 @@ namespace Nippori
 
         #region ... Toolbar Menu
 
+        private void buttonGroups_DropDownClosed(object sender, EventArgs e)
+        {
+            UpdateEnabledTypesAndGroups();
+        }
+
         private void toolStripMenuItem_Click(object sender, EventArgs e)
         {
             ToolStripDropDownMenu menu = (ToolStripDropDownMenu)(((ToolStripItem)sender).Owner);
@@ -370,6 +373,7 @@ namespace Nippori
         }
 
         #endregion
+
 
     }
 }
