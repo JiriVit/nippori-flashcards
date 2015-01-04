@@ -1,5 +1,6 @@
 ﻿TODO LIST
 ================================================================================
+- Přepínání fontu zadání podle jazyka.
 - Předělat vybírání skupin tak, aby jich šlo označit více najednou + aby šly
   jedním škrtátkem označit všechny.
 - Přesunout odpovídající údaje do konfiguračního souboru (výchozí adresář se

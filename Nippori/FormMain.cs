@@ -12,6 +12,12 @@ namespace Nippori
 {
     public partial class FormMain : Form
     {
+        #region .: Constants :.
+
+        private Font FontChinese = new Font("Microsoft JhengHei", 40);
+        private Font FontDefault = new Font("Segoe UI Semibold", 30);
+
+        #endregion
 
         #region .: Private Fields :.
 
@@ -42,6 +48,8 @@ namespace Nippori
             InitializeComponent();
             MyTrace.Init();
             formWaitPlease = new FormWaitPlease();
+
+            SetAssignmentFont();
 
             Vocabulary.Init();
             //Vocabulary.GetRandomItem();
@@ -171,6 +179,33 @@ namespace Nippori
         }
 
         /// <summary>
+        /// Zjistí, jestli zadaný znak je z čínské abecedy.
+        /// </summary>
+        /// <param name="c">Znak k posouzení.</param>
+        /// <returns>TRUE nebo FALSE.</returns>
+        private bool IsChineseCharacter(char c)
+        {
+            return (c >= 0x4E00 && c <= 0x9FCC) ||
+                   (c >= 0x3400 && c <= 0x4DB5);
+        }
+
+        /// <summary>
+        /// Nastaví font zadání slovíčka podle použitého jazyka.
+        /// </summary>
+        private void SetAssignmentFont()
+        {
+            Font newFont;
+
+            if (labelCzech.Text.Any(c => IsChineseCharacter(c)))
+                newFont = FontChinese;
+            else
+                newFont = FontDefault;
+
+            if (!labelCzech.Font.Equals(newFont))
+                labelCzech.Font = newFont;
+        }
+
+        /// <summary>
         /// Aktualizuje ve slovníku povolené skupiny a tipy na základě volby v menu.
         /// </summary>
         private void UpdateEnabledTypesAndGroups()
@@ -231,7 +266,7 @@ namespace Nippori
         private void buttonTest_Click(object sender, EventArgs e)
         {
             /* sem zapiš testovací kód */
-            Vocabulary.Start();
+            SetAssignmentFont();
         }
 
         #endregion

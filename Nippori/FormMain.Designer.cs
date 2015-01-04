@@ -46,9 +46,9 @@
             this.label1 = new System.Windows.Forms.Label();
             this.buttonAnswer = new System.Windows.Forms.Button();
             this.labelCzech = new System.Windows.Forms.Label();
+            this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
             this.vocableField1 = new Nippori.VocableField();
             this.vocableField2 = new Nippori.VocableField();
-            this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
             this.toolStrip1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
@@ -229,12 +229,17 @@
             // labelCzech
             // 
             this.labelCzech.AutoSize = true;
-            this.labelCzech.Font = new System.Drawing.Font("SimSun", 50F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.labelCzech.Font = new System.Drawing.Font("Segoe UI Semibold", 30F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.labelCzech.Location = new System.Drawing.Point(3, 33);
             this.labelCzech.Name = "labelCzech";
-            this.labelCzech.Size = new System.Drawing.Size(230, 67);
+            this.labelCzech.Size = new System.Drawing.Size(433, 54);
             this.labelCzech.TabIndex = 1;
-            this.labelCzech.Text = "孙悟空";
+            this.labelCzech.Text = "Příšerně žluťoučký kůň";
+            // 
+            // backgroundWorker
+            // 
+            this.backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker_DoWork);
+            this.backgroundWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker_RunWorkerCompleted);
             // 
             // vocableField1
             // 
@@ -264,11 +269,6 @@
             this.vocableField2.Size = new System.Drawing.Size(1054, 75);
             this.vocableField2.TabIndex = 8;
             // 
-            // backgroundWorker
-            // 
-            this.backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker_DoWork);
-            this.backgroundWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker_RunWorkerCompleted);
-            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -277,6 +277,7 @@
             this.Controls.Add(this.tableLayoutPanel1);
             this.Controls.Add(this.toolStrip1);
             this.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "FormMain";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Slovíčka";
