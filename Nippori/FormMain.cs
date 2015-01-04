@@ -25,16 +25,9 @@ namespace Nippori
 
         private string currentFileName;
 
-        private Label[] labelTransl;
-        private Label[] labelCorr;
-        private Label[] labelCorrect;
-        private PictureBox[] pictureBox;
-        private TextBox[] textBoxTransl;
-
+        private bool running = false;
         private bool Evaluate = false;
         private Vocable previousVocable;
-
-        private bool insideCheckedChanged = false;
 
         #endregion
 
@@ -206,6 +199,34 @@ namespace Nippori
         }
 
         /// <summary>
+        /// Spustí zkoušení.
+        /// </summary>
+        private void Start()
+        {
+            running = true;
+
+            buttonOpen.Enabled = false;
+            buttonTypes.Enabled = false;
+            buttonGroups.Enabled = false;
+            buttonStart.Enabled = false;
+            buttonStop.Enabled = true;
+        }
+
+        /// <summary>
+        /// Zastaví zkoušení.
+        /// </summary>
+        private void Stop()
+        {
+            running = false;
+
+            buttonOpen.Enabled = true;
+            buttonTypes.Enabled = true;
+            buttonGroups.Enabled = true;
+            buttonStart.Enabled = true;
+            buttonStop.Enabled = false;
+        }
+
+        /// <summary>
         /// Aktualizuje ve slovníku povolené skupiny a tipy na základě volby v menu.
         /// </summary>
         private void UpdateEnabledTypesAndGroups()
@@ -261,6 +282,16 @@ namespace Nippori
             //    backgroundWorker.RunWorkerAsync(currentFileName);
             //    formWaitPlease.ShowDialog();
             //}
+        }
+
+        private void buttonStart_Click(object sender, EventArgs e)
+        {
+            Start();
+        }
+
+        private void buttonStop_Click(object sender, EventArgs e)
+        {
+            Stop();
         }
 
         private void buttonTest_Click(object sender, EventArgs e)

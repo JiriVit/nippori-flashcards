@@ -1,6 +1,5 @@
 ﻿TODO LIST
 ================================================================================
-- Přepínání fontu zadání podle jazyka.
 - Předělat vybírání skupin tak, aby jich šlo označit více najednou + aby šly
   jedním škrtátkem označit všechny.
 - Přesunout odpovídající údaje do konfiguračního souboru (výchozí adresář se
@@ -14,3 +13,4 @@ JIŽ HOTOVO
 - Sestavení interního seznamu povolených slovíček na základě vybraných skupin a
   typů.
 - Slovíčkům bez uvedeného typu nastavit, že mají všechny typy.
+- Přepínání fontu zadání podle jazyka.

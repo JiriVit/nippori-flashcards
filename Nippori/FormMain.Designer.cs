@@ -46,9 +46,9 @@
             this.label1 = new System.Windows.Forms.Label();
             this.buttonAnswer = new System.Windows.Forms.Button();
             this.labelCzech = new System.Windows.Forms.Label();
-            this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
             this.vocableField1 = new Nippori.VocableField();
             this.vocableField2 = new Nippori.VocableField();
+            this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
             this.toolStrip1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
@@ -149,6 +149,7 @@
             this.buttonStart.Name = "buttonStart";
             this.buttonStart.Size = new System.Drawing.Size(23, 22);
             this.buttonStart.Text = "Start";
+            this.buttonStart.Click += new System.EventHandler(this.buttonStart_Click);
             // 
             // buttonStop
             // 
@@ -159,6 +160,7 @@
             this.buttonStop.Name = "buttonStop";
             this.buttonStop.Size = new System.Drawing.Size(23, 22);
             this.buttonStop.Text = "Stop";
+            this.buttonStop.Click += new System.EventHandler(this.buttonStop_Click);
             // 
             // buttonTest
             // 
@@ -236,11 +238,6 @@
             this.labelCzech.TabIndex = 1;
             this.labelCzech.Text = "Příšerně žluťoučký kůň";
             // 
-            // backgroundWorker
-            // 
-            this.backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker_DoWork);
-            this.backgroundWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker_RunWorkerCompleted);
-            // 
             // vocableField1
             // 
             this.vocableField1.CorrectAnswer = "odpoved";
@@ -268,6 +265,11 @@
             this.vocableField2.Name = "vocableField2";
             this.vocableField2.Size = new System.Drawing.Size(1054, 75);
             this.vocableField2.TabIndex = 8;
+            // 
+            // backgroundWorker
+            // 
+            this.backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker_DoWork);
+            this.backgroundWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker_RunWorkerCompleted);
             // 
             // FormMain
             // 
