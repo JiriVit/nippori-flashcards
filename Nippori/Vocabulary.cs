@@ -198,6 +198,8 @@ namespace Nippori
             /* načtení samotných slovíček */
             for (row = 2; row <= rowCount; row++)
             {
+                
+
                 /* eliminace prázdných buněk zahrnutých do UsedRange */
                 if (sheet.Cells[row, 1].Value == null)
                     break;
@@ -423,6 +425,7 @@ namespace Nippori
             }
         }
 
+        public int OutputCount { get { return Type.OutputColumns.Count(); } }
         #endregion
 
         #region .: Public Methods :.
@@ -433,11 +436,6 @@ namespace Nippori
                 return Items[Type.OutputColumns[index] - 1];
             else
                 return String.Empty;
-        }
-
-        public int GetOutputCount()
-        {
-            return Type.OutputColumns.Count();
         }
 
         public string GetOutputLabel(int index)

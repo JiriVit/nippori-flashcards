@@ -97,7 +97,7 @@ namespace Nippori
                     Icon = VocableFieldIcon.ICON_NONE;
                     GivenAnswer = String.Empty;
                     CorrectAnswer = String.Empty;
-                    Visible = (ItemIndex < assignedVocable.GetOutputCount());
+                    Visible = (ItemIndex < assignedVocable.OutputCount);
                 }
                 else
                 {
