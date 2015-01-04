@@ -40,19 +40,49 @@ namespace Nippori
         /// Typy.
         /// </summary>
         public static List<VocableType> Types;
-
+        /// <summary>
+        /// Nadpisy sloupců v tabulce slovíček, musí se zobrazit na formuláři nad poli
+        /// pro zadání odpovědí.
+        /// </summary>
+        public static List<string> ColumnHeaders;
+        /// <summary>
+        /// Pole povolených skupin, podle kterých se vybírají slovíčka na zkoušení.
+        /// </summary>
         public static string[] EnabledGroups;
+        /// <summary>
+        /// Povolený typ slovíček, který se teď má zkoušet. Číslováno od jedničky.
+        /// </summary>
         public static int EnabledType;
 
         #endregion
 
         #region Private Fields
 
-        public static List<Vocable> allVocables;
+        /// <summary>
+        /// Seznam všech slovíček, která byla přečtena z Excelu.
+        /// </summary>
+        private static List<Vocable> allVocables;
+        /// <summary>
+        /// Seznam povolených slovíček, tedy podmnožiny, která vyhovuje omezením zadaným uživatelem
+        /// (povolený typ a povolené skupiny).
+        /// </summary>
         private static List<Vocable> enabledVocables;
         private static Random random;
+        /// <summary>
+        /// Zásobník slovíček, z něj se vytahují slovíčka na formulář a po správném zodpovězení se z něj vyhodí.
+        /// Když je zásobník prázdný, znovu se naplní.
+        /// </summary>
+        /// <remarks>
+        /// Sloučit s enabledVocables, tyto dva seznamy mají shodnou funkci, stačí nám jeden.
+        /// </remarks>
         private static List<Vocable> vocableStack;
+        /// <summary>
+        /// Fronta špatně zodpovězených slovíček.
+        /// </summary>
         private static Queue<Vocable> vocableQueue;
+        /// <summary>
+        /// Počet datových sloupců v tabulce slovíček (tj. vyjma informací o typech apod.).
+        /// </summary>
         private static int itemColumns;
 
         #endregion
@@ -149,7 +179,13 @@ namespace Nippori
             
             rowCount = sheet.UsedRange.Rows.Count;
             allVocables = new List<Vocable>(rowCount - 1);
+            ColumnHeaders = new List<string>(itemColumns);
 
+            /* načtení hlaviček sloupců */
+            for (col = 1; col <= itemColumns; col++)
+                ColumnHeaders.Add(sheet.Cells[1, col].Value.ToString());
+
+            /* načtení samotných slovíček */
             for (row = 2; row <= rowCount; row++)
             {
                 /* eliminace prázdných buněk zahrnutých do UsedRange */
@@ -251,31 +287,24 @@ namespace Nippori
 
             random = new Random();
 
-            //types.Add(new VocableType(new string[] {"Česky", "Deutsch"}));
-            //types.Add(new VocableType(new string[] {"Česky", "Singular", "Plural"}));
-
-            //typeList = types.ToArray();
-
-            //list.Add(new Vocable(typeList[0], "rád", new string[] {"gern"}));
-            //list.Add(new Vocable(typeList[0], "přirozeně", new string[] {"natürlich"}));
-
-            //internalList = list.ToArray();
-
-            //vocableStack = new List<Vocable>(internalList);
-            //vocableQueue = new Queue<Vocable>(2);
+            vocableQueue = new Queue<Vocable>(2);
         }
 
         /// <summary>
-        /// Náhodně vytáhne jedno ze zbývajících slovíček a označí je jako vybrané.
+        /// Náhodně vytáhne jedno ze slovíček na zásobníku.
+        /// <returns>Vytažené slovíčko.</returns>
         /// </summary>
-        public static void GetRandomItem()
+        public static Vocable GetRandomItem()
         {
             CurrentItem = vocableStack[random.Next(vocableStack.Count)];
+            CurrentItem.Type = Types[EnabledType - 1];
             Trace.WriteLine(String.Format("Vytahuji slovo {0}, zbývá jich {1}.", CurrentItem, vocableStack.Count));
+            return CurrentItem;
         }
 
         /// <summary>
-        /// Odstraní ze seznamu vybrané slovíčko.
+        /// Odstraní současné slovíčko ze zásobníku. Volat poté, co je slovíčko správně
+        /// zodpovězeno.
         /// </summary>
         public static void RemoveItem()
         {
@@ -301,29 +330,47 @@ namespace Nippori
             return vocableQueue.Count();
         }
 
+        /// <summary>
+        /// Zjistí počet slovíček v zásobníku.
+        /// </summary>
+        /// <returns></returns>
         public static int GetListCount()
         {
             return vocableStack.Count;
         }
 
+        /// <summary>
+        /// Vloží chybně zodpovězené slovíčko do fronty.
+        /// </summary>
         public static void PutToQueue()
         {
             vocableQueue.Enqueue(CurrentItem);
             Trace.WriteLine(String.Format("Dávám do fronty slovo {0}, ve frontě je {1}.", CurrentItem, vocableQueue.Count));
         }
 
+        /// <summary>
+        /// Obnoví zásobník slovíček.
+        /// </summary>
         public static void ReloadList()
         {
             Trace.WriteLine("Obnovuji seznam.");
             vocableStack.Clear();
-            //vocableStack.AddRange(internalList);
+            vocableStack.AddRange(enabledVocables);
         }
 
+        /// <summary>
+        /// Zjistí, jestli je zásobník prázdný.
+        /// </summary>
+        /// <returns></returns>
         public static bool IsEmpty()
         {
             return vocableStack.Count == 0;
         }
 
+        /// <summary>
+        /// Zjistí, jestli je současné slovíčko ve frontě.
+        /// </summary>
+        /// <returns></returns>
         public static bool IsItemInQueue()
         {
             return vocableQueue.Contains(CurrentItem);
@@ -336,6 +383,8 @@ namespace Nippori
         public static void Start()
         {
             SelectEnabledVocables();
+            vocableStack = new List<Vocable>(enabledVocables.Count);
+            ReloadList();
         }
 
         #endregion
@@ -347,8 +396,12 @@ namespace Nippori
     /// </summary>
     public class Vocable
     {
+
         #region .: Properties :.
 
+        /// <summary>
+        /// Čte a zapisuje ID slovíčka, neboli číslo řádku v Excelu.
+        /// </summary>
         public int ID { get; set; }
         /// <summary>
         /// Typ slovíčka.
@@ -358,8 +411,61 @@ namespace Nippori
         /// Položky.
         /// </summary>
         public string[] Items { get; set; }
+        /// <summary>
+        /// Čte a zapisuje pole typů slovíčka. Je to údaj vyčtený z Excelu, který znamená,
+        /// jaké všechny typy tento jeden záznam podporuje.
+        /// </summary>
         public int[] Types { get; set; }
+        /// <summary>
+        /// Čte a zapisuje pole skupin slovíčka. Je to údaj vyčtený z Excelu, který říká,
+        /// do jakých všech skupin toto slovíčko patří.
+        /// </summary>
         public string[] Groups { get; set; }
+        /// <summary>
+        /// Čte zadání slovíčka (např. český překlad, zkouší-li se překlad z češtiny).
+        /// </summary>
+        public string Input
+        {
+            get
+            {
+                return Items[Type.InputColumn - 1];
+            }
+        }
+        /// <summary>
+        /// Čte popisek zadání slovíčka.
+        /// </summary>
+        public string InputLabel
+        {
+            get
+            {
+                return Vocabulary.ColumnHeaders[Type.InputColumn - 1];
+            }
+        }
+
+        #endregion
+
+        #region .: Public Methods :.
+
+        public string GetOutput(int index)
+        {
+            if (index < Type.OutputColumns.Count())
+                return Items[Type.OutputColumns[index] - 1];
+            else
+                return String.Empty;
+        }
+
+        public int GetOutputCount()
+        {
+            return Type.OutputColumns.Count();
+        }
+
+        public string GetOutputLabel(int index)
+        {
+            if (index < Type.OutputColumns.Count())
+                return Vocabulary.ColumnHeaders[Type.OutputColumns[index] - 1];
+            else
+                return String.Empty;
+        }
 
         #endregion
 
@@ -385,6 +491,7 @@ namespace Nippori
 
 
         #endregion
+
     }
 
     /// <summary>

@@ -43,11 +43,14 @@
             this.buttonStop = new System.Windows.Forms.ToolStripButton();
             this.buttonTest = new System.Windows.Forms.ToolStripButton();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.label1 = new System.Windows.Forms.Label();
-            this.buttonAnswer = new System.Windows.Forms.Button();
+            this.labelAssignment = new System.Windows.Forms.Label();
             this.labelCzech = new System.Windows.Forms.Label();
+            this.buttonAnswer = new System.Windows.Forms.Button();
             this.vocableField1 = new Nippori.VocableField();
             this.vocableField2 = new Nippori.VocableField();
+            this.vocableField3 = new Nippori.VocableField();
+            this.vocableField4 = new Nippori.VocableField();
+            this.vocableField5 = new Nippori.VocableField();
             this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
             this.toolStrip1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
@@ -177,11 +180,14 @@
             // 
             this.tableLayoutPanel1.ColumnCount = 1;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Controls.Add(this.label1, 0, 0);
-            this.tableLayoutPanel1.Controls.Add(this.buttonAnswer, 0, 7);
+            this.tableLayoutPanel1.Controls.Add(this.labelAssignment, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.labelCzech, 0, 1);
+            this.tableLayoutPanel1.Controls.Add(this.buttonAnswer, 0, 7);
             this.tableLayoutPanel1.Controls.Add(this.vocableField1, 0, 2);
             this.tableLayoutPanel1.Controls.Add(this.vocableField2, 0, 3);
+            this.tableLayoutPanel1.Controls.Add(this.vocableField3, 0, 4);
+            this.tableLayoutPanel1.Controls.Add(this.vocableField4, 0, 5);
+            this.tableLayoutPanel1.Controls.Add(this.vocableField5, 0, 6);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 25);
             this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
@@ -203,23 +209,35 @@
             this.tableLayoutPanel1.Size = new System.Drawing.Size(1060, 576);
             this.tableLayoutPanel1.TabIndex = 10;
             // 
-            // label1
+            // labelAssignment
             // 
-            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.label1.Location = new System.Drawing.Point(3, 16);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(47, 17);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "Zadání";
+            this.labelAssignment.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.labelAssignment.AutoSize = true;
+            this.labelAssignment.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.labelAssignment.Location = new System.Drawing.Point(3, 16);
+            this.labelAssignment.Name = "labelAssignment";
+            this.labelAssignment.Size = new System.Drawing.Size(47, 17);
+            this.labelAssignment.TabIndex = 0;
+            this.labelAssignment.Text = "Zadání";
+            this.labelAssignment.Visible = false;
+            // 
+            // labelCzech
+            // 
+            this.labelCzech.AutoSize = true;
+            this.labelCzech.Font = new System.Drawing.Font("Segoe UI", 30F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.labelCzech.Location = new System.Drawing.Point(3, 33);
+            this.labelCzech.Name = "labelCzech";
+            this.labelCzech.Size = new System.Drawing.Size(425, 54);
+            this.labelCzech.TabIndex = 1;
+            this.labelCzech.Text = "Příšerně žluťoučký kůň";
+            this.labelCzech.Visible = false;
             // 
             // buttonAnswer
             // 
+            this.buttonAnswer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonAnswer.Enabled = false;
-            this.buttonAnswer.Image = global::Nippori.Properties.Resources.settings;
             this.buttonAnswer.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.buttonAnswer.Location = new System.Drawing.Point(3, 533);
+            this.buttonAnswer.Location = new System.Drawing.Point(925, 533);
             this.buttonAnswer.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.buttonAnswer.Name = "buttonAnswer";
             this.buttonAnswer.Size = new System.Drawing.Size(132, 38);
@@ -227,44 +245,88 @@
             this.buttonAnswer.Text = "Odpovědět";
             this.buttonAnswer.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.buttonAnswer.UseVisualStyleBackColor = true;
-            // 
-            // labelCzech
-            // 
-            this.labelCzech.AutoSize = true;
-            this.labelCzech.Font = new System.Drawing.Font("Segoe UI Semibold", 30F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.labelCzech.Location = new System.Drawing.Point(3, 33);
-            this.labelCzech.Name = "labelCzech";
-            this.labelCzech.Size = new System.Drawing.Size(433, 54);
-            this.labelCzech.TabIndex = 1;
-            this.labelCzech.Text = "Příšerně žluťoučký kůň";
+            this.buttonAnswer.Click += new System.EventHandler(this.buttonAnswer_Click);
             // 
             // vocableField1
             // 
+            this.vocableField1.AssignedVocable = null;
             this.vocableField1.CorrectAnswer = "odpoved";
             this.vocableField1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.vocableField1.Font = new System.Drawing.Font("Trebuchet MS", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.vocableField1.GivenAnswer = "odpověď";
             this.vocableField1.Icon = Nippori.VocableFieldIcon.ICON_NONE;
+            this.vocableField1.ItemIndex = 0;
             this.vocableField1.ItemName = "(název sloupce)";
             this.vocableField1.Location = new System.Drawing.Point(3, 120);
             this.vocableField1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.vocableField1.Name = "vocableField1";
             this.vocableField1.Size = new System.Drawing.Size(1054, 75);
             this.vocableField1.TabIndex = 7;
+            this.vocableField1.Visible = false;
             // 
             // vocableField2
             // 
+            this.vocableField2.AssignedVocable = null;
             this.vocableField2.CorrectAnswer = "odpověď";
             this.vocableField2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.vocableField2.Font = new System.Drawing.Font("Trebuchet MS", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.vocableField2.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.vocableField2.GivenAnswer = "odpověď";
             this.vocableField2.Icon = Nippori.VocableFieldIcon.ICON_NONE;
+            this.vocableField2.ItemIndex = 1;
             this.vocableField2.ItemName = "(název sloupce)";
-            this.vocableField2.Location = new System.Drawing.Point(3, 203);
-            this.vocableField2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.vocableField2.Location = new System.Drawing.Point(3, 202);
             this.vocableField2.Name = "vocableField2";
-            this.vocableField2.Size = new System.Drawing.Size(1054, 75);
+            this.vocableField2.Size = new System.Drawing.Size(1054, 77);
             this.vocableField2.TabIndex = 8;
+            this.vocableField2.Visible = false;
+            // 
+            // vocableField3
+            // 
+            this.vocableField3.AssignedVocable = null;
+            this.vocableField3.CorrectAnswer = "odpověď";
+            this.vocableField3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.vocableField3.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.vocableField3.GivenAnswer = "odpověď";
+            this.vocableField3.Icon = Nippori.VocableFieldIcon.ICON_NONE;
+            this.vocableField3.ItemIndex = 2;
+            this.vocableField3.ItemName = "(název sloupce)";
+            this.vocableField3.Location = new System.Drawing.Point(3, 285);
+            this.vocableField3.Name = "vocableField3";
+            this.vocableField3.Size = new System.Drawing.Size(1054, 77);
+            this.vocableField3.TabIndex = 9;
+            this.vocableField3.Visible = false;
+            // 
+            // vocableField4
+            // 
+            this.vocableField4.AssignedVocable = null;
+            this.vocableField4.CorrectAnswer = "odpověď";
+            this.vocableField4.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.vocableField4.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.vocableField4.GivenAnswer = "odpověď";
+            this.vocableField4.Icon = Nippori.VocableFieldIcon.ICON_NONE;
+            this.vocableField4.ItemIndex = 3;
+            this.vocableField4.ItemName = "(název sloupce)";
+            this.vocableField4.Location = new System.Drawing.Point(3, 368);
+            this.vocableField4.Name = "vocableField4";
+            this.vocableField4.Size = new System.Drawing.Size(1054, 77);
+            this.vocableField4.TabIndex = 10;
+            this.vocableField4.Visible = false;
+            // 
+            // vocableField5
+            // 
+            this.vocableField5.AssignedVocable = null;
+            this.vocableField5.CorrectAnswer = "odpověď";
+            this.vocableField5.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.vocableField5.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.vocableField5.GivenAnswer = "odpověď";
+            this.vocableField5.Icon = Nippori.VocableFieldIcon.ICON_NONE;
+            this.vocableField5.ItemIndex = 4;
+            this.vocableField5.ItemName = "(název sloupce)";
+            this.vocableField5.Location = new System.Drawing.Point(3, 451);
+            this.vocableField5.Name = "vocableField5";
+            this.vocableField5.Size = new System.Drawing.Size(1054, 77);
+            this.vocableField5.TabIndex = 11;
+            this.vocableField5.Visible = false;
             // 
             // backgroundWorker
             // 
@@ -298,11 +360,10 @@
         private System.Windows.Forms.OpenFileDialog openFileDialog;
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label labelAssignment;
         private System.Windows.Forms.Button buttonAnswer;
         private System.Windows.Forms.Label labelCzech;
         private VocableField vocableField1;
-        private VocableField vocableField2;
         private System.Windows.Forms.ToolStripButton buttonOpen;
         private System.Windows.Forms.ToolStripDropDownButton buttonTypes;
         private System.Windows.Forms.ToolStripDropDownButton buttonGroups;
@@ -315,6 +376,10 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripButton buttonTest;
         private System.ComponentModel.BackgroundWorker backgroundWorker;
+        private VocableField vocableField2;
+        private VocableField vocableField3;
+        private VocableField vocableField4;
+        private VocableField vocableField5;
     }
 }
 

@@ -14,7 +14,13 @@ namespace Nippori
     {
         #region .: Constants :.
 
-        private Font FontChinese = new Font("Microsoft JhengHei", 40);
+        /// <summary>
+        /// Font určený pro asijské texty.
+        /// </summary>
+        private Font FontAsian = new Font("Microsoft JhengHei", 40);
+        /// <summary>
+        /// Font určený pro neasijské texty (tj. latinku a azbuku).
+        /// </summary>
         private Font FontDefault = new Font("Segoe UI Semibold", 30);
 
         #endregion
@@ -22,11 +28,11 @@ namespace Nippori
         #region .: Private Fields :.
 
         private FormWaitPlease formWaitPlease;
+        private VocableField[] vocableFields;
 
         private string currentFileName;
 
-        private bool running = false;
-        private bool Evaluate = false;
+        private bool evaluating = false;
         private Vocable previousVocable;
 
         #endregion
@@ -41,39 +47,110 @@ namespace Nippori
             InitializeComponent();
             MyTrace.Init();
             formWaitPlease = new FormWaitPlease();
+            CreateVocableFields();
 
             SetAssignmentFont();
 
             Vocabulary.Init();
-            //Vocabulary.GetRandomItem();
         }
 
         #endregion
 
         #region .: Private Methods :.
 
+        #region ... Controls
+
+        private void CreateVocableFields()
+        {
+            vocableFields = new VocableField[] { vocableField1, vocableField2, vocableField3, vocableField4, vocableField5 };
+        }
+
+        /// <summary>
+        /// Nastaví font zadání slovíčka podle použitého jazyka.
+        /// </summary>
+        private void SetAssignmentFont()
+        {
+            Font newFont;
+
+            if (labelCzech.Text.Any(c => IsAsianCharacter(c)))
+                newFont = FontAsian;
+            else
+                newFont = FontDefault;
+
+            if (!labelCzech.Font.Equals(newFont))
+                labelCzech.Font = newFont;
+        }
+
+        /// <summary>
+        /// Přepíše dostupné skupiny ze slovníku do menu.
+        /// </summary>
+        private void FillGroups()
+        {
+            ToolStripItem addedItem;
+            buttonGroups.DropDownItems.Clear();
+
+            foreach (string key in Vocabulary.Groups.Keys)
+            {
+                addedItem = buttonGroups.DropDownItems.Add(Vocabulary.Groups[key]);
+                addedItem.Tag = key;
+            }
+
+            foreach (ToolStripMenuItem item in buttonGroups.DropDownItems)
+            {
+                item.CheckOnClick = false;
+                item.MouseEnter += new EventHandler(toolStripMenuItem_MouseEnter);
+                item.MouseLeave += new EventHandler(toolStripMenuItem_MouseLeave);
+                item.Click += new EventHandler(toolStripMenuItem_Click);
+            }
+
+            ((ToolStripMenuItem)buttonGroups.DropDownItems[0]).Checked = true;
+        }
+
+        /// <summary>
+        /// Přepíše dostupné typy ze slovníku do menu.
+        /// </summary>
+        private void FillTypes()
+        {
+            buttonTypes.DropDownItems.Clear();
+
+            foreach (VocableType type in Vocabulary.Types)
+                buttonTypes.DropDownItems.Add(type.Name);
+
+            foreach (ToolStripMenuItem item in buttonTypes.DropDownItems)
+            {
+                item.CheckOnClick = false;
+                item.MouseEnter += new EventHandler(toolStripMenuItem_MouseEnter);
+                item.MouseLeave += new EventHandler(toolStripMenuItem_MouseLeave);
+                item.Click += new EventHandler(toolStripMenuItem_Click);
+            }
+
+            ((ToolStripMenuItem)buttonTypes.DropDownItems[0]).Checked = true;
+        }
+
+        #endregion
+
+        #region ... Utils
+
+        /// <summary>
+        /// Zjistí, jestli zadaný znak je z oblasti asijských znaků.
+        /// </summary>
+        /// <param name="c">Znak k posouzení.</param>
+        /// <returns>TRUE nebo FALSE.</returns>
+        private bool IsAsianCharacter(char c)
+        {
+            return (c >= 0x4E00 && c <= 0x9FCC) ||
+                   (c >= 0x3400 && c <= 0x4DB5);
+        }
+
+        #endregion
+
         private void EvaluateAnswer(bool newVocabulary)
         {
             int i;
             bool result = true;
 
-            /* přetisknu správné odpovědi do příslušných polí */
-            for (i = 0; i < 5; i++)
-            {
-                if (i < Vocabulary.CurrentItem.Type.Name.Length)
-                {
-                    //if (textBoxTransl[i].Text.Equals(Vocabulary.CurrentItem.Translation[i]))
-                    //{
-                    //    SetItemState(i, ItemState.Correct);
-                    //}
-                    //else
-                    //{
-                    //    SetCorrectAnswerVisible(i, true);
-                    //    SetItemState(i, ItemState.Wrong);
-                    //    result = false;
-                    //}
-                }
-            }
+            foreach (VocableField vocableField in vocableFields.Where(vf => vf.Visible))
+                result = result && vocableField.Evaluate();
 
             /* podle výsledků zvolím další slovíčko */
             if (result)
@@ -121,81 +198,26 @@ namespace Nippori
                 Vocabulary.GetRandomItem();
                 previousVocable = Vocabulary.CurrentItem;
             }
-
-
         }
 
         /// <summary>
-        /// Přepíše dostupné skupiny ze slovníku do menu.
+        /// Vybere ze slovníku další slovíčko a zobrazí ho.
         /// </summary>
-        private void FillGroups()
-        {
-            ToolStripItem addedItem;
-            buttonGroups.DropDownItems.Clear();
+        private void ShowNextVocable()
+        {            
+            Vocable vocable;
+            
+            vocable = Vocabulary.GetRandomItem();
 
-            foreach (string key in Vocabulary.Groups.Keys)
-            {
-                addedItem = buttonGroups.DropDownItems.Add(Vocabulary.Groups[key]);
-                addedItem.Tag = key;
-            }
+            labelAssignment.Text = vocable.InputLabel;
+            labelCzech.Text = vocable.Input;
+            SetAssignmentFont();
 
-            foreach (ToolStripMenuItem item in buttonGroups.DropDownItems)
-            {                
-                item.CheckOnClick = false;
-                item.MouseEnter += new EventHandler(toolStripMenuItem_MouseEnter);
-                item.MouseLeave += new EventHandler(toolStripMenuItem_MouseLeave);
-                item.Click += new EventHandler(toolStripMenuItem_Click);
-            }
+            foreach (VocableField vocableField in vocableFields)
+                vocableField.AssignedVocable = vocable;
 
-            ((ToolStripMenuItem)buttonGroups.DropDownItems[0]).Checked = true;
-        }
-
-        /// <summary>
-        /// Přepíše dostupné typy ze slovníku do menu.
-        /// </summary>
-        private void FillTypes()
-        {
-            buttonTypes.DropDownItems.Clear();
-
-            foreach (VocableType type in Vocabulary.Types)
-                buttonTypes.DropDownItems.Add(type.Name);
-
-            foreach (ToolStripMenuItem item in buttonTypes.DropDownItems)
-            {
-                item.CheckOnClick = false;
-                item.MouseEnter += new EventHandler(toolStripMenuItem_MouseEnter);
-                item.MouseLeave += new EventHandler(toolStripMenuItem_MouseLeave);
-                item.Click += new EventHandler(toolStripMenuItem_Click);
-            }
-
-            ((ToolStripMenuItem)buttonTypes.DropDownItems[0]).Checked = true;
-        }
-
-        /// <summary>
-        /// Zjistí, jestli zadaný znak je z čínské abecedy.
-        /// </summary>
-        /// <param name="c">Znak k posouzení.</param>
-        /// <returns>TRUE nebo FALSE.</returns>
-        private bool IsChineseCharacter(char c)
-        {
-            return (c >= 0x4E00 && c <= 0x9FCC) ||
-                   (c >= 0x3400 && c <= 0x4DB5);
-        }
-
-        /// <summary>
-        /// Nastaví font zadání slovíčka podle použitého jazyka.
-        /// </summary>
-        private void SetAssignmentFont()
-        {
-            Font newFont;
-
-            if (labelCzech.Text.Any(c => IsChineseCharacter(c)))
-                newFont = FontChinese;
-            else
-                newFont = FontDefault;
-
-            if (!labelCzech.Font.Equals(newFont))
-                labelCzech.Font = newFont;
+            buttonAnswer.Enabled = true;
+            vocableFields[0].Focus();
         }
 
         /// <summary>
@@ -203,13 +225,18 @@ namespace Nippori
         /// </summary>
         private void Start()
         {
-            running = true;
-
+            buttonAnswer.Visible = true;
             buttonOpen.Enabled = false;
             buttonTypes.Enabled = false;
             buttonGroups.Enabled = false;
             buttonStart.Enabled = false;
             buttonStop.Enabled = true;
+            labelAssignment.Visible = true;
+            labelCzech.Visible = true;
+
+            Vocabulary.Start();
+            ShowNextVocable();
+            evaluating = false;
         }
 
         /// <summary>
@@ -217,13 +244,17 @@ namespace Nippori
         /// </summary>
         private void Stop()
         {
-            running = false;
-
+            buttonAnswer.Visible = false;
             buttonOpen.Enabled = true;
             buttonTypes.Enabled = true;
             buttonGroups.Enabled = true;
             buttonStart.Enabled = true;
             buttonStop.Enabled = false;
+            labelAssignment.Visible = false;
+            labelCzech.Visible = false;
+
+            foreach (VocableField vf in vocableFields)
+                vf.Hide();
         }
 
         /// <summary>
@@ -248,21 +279,6 @@ namespace Nippori
         #region .: Event Handlers :.
 
         #region ... Toolbar Buttons
-
-        private void buttonAnswer_Click(object sender, EventArgs e)
-        {
-            if (!Evaluate)
-            {
-                EvaluateAnswer(true);
-                buttonAnswer.Text = "Další";
-                Evaluate = true;
-            }
-            else
-            {
-                buttonAnswer.Text = "Odpovědět";
-                Evaluate = false;
-            }
-        }
 
         private void buttonOpen_Click(object sender, EventArgs e)
         {
@@ -367,18 +383,23 @@ namespace Nippori
 
         #endregion
 
+        private void buttonAnswer_Click(object sender, EventArgs e)
+        {
+            if (!evaluating)
+            {
+                EvaluateAnswer(true);
+                buttonAnswer.Text = "Další";
+                evaluating = true;
+            }
+            else
+            {
+                buttonAnswer.Text = "Odpovědět";
+                evaluating = false;
+                ShowNextVocable();
+            }
+        }
+
         #endregion
 
     }
-
-    public enum ItemState
-    {
-        Hidden,
-        Empty,
-        Typing,
-        Check,
-        Correct,
-        Wrong
-    }
-
 }

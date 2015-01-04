@@ -17,7 +17,8 @@ namespace Nippori
         #region .: Properties :.
 
         /// <summary>
-        /// Čte a zapisuje obsah popisku se správnou odpovědí a nastavuje jeho viditelnost.
+        /// Čte a zapisuje obsah popisku se správnou odpovědí. Současně nastavuje jeho viditelnost
+        /// podle toho, je-li vložen prázdný řetězec.
         /// </summary>
         public string CorrectAnswer
         {
@@ -81,19 +82,78 @@ namespace Nippori
             set { labelItemName.Text = value; }
         }
 
+        /// <summary>
+        /// Čte a zapisuje slovíčko přiřazené tomuto poli.
+        /// </summary>
+        public Vocable AssignedVocable {
+            get { return assignedVocable; }
+            set
+            {
+                assignedVocable = value;
+
+                if (assignedVocable != null)
+                {
+                    ItemName = assignedVocable.GetOutputLabel(ItemIndex);
+                    Icon = VocableFieldIcon.ICON_NONE;
+                    GivenAnswer = String.Empty;
+                    CorrectAnswer = String.Empty;
+                    Visible = (ItemIndex < assignedVocable.GetOutputCount());
+                }
+                else
+                {
+                    Visible = false;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Čte a zapisuje index položky slovíčka (neboli sloupce v tabulce slovíček).
+        /// </summary>
+        public int ItemIndex { get; set; }
+
         #endregion
 
         #region .: Private Fields :.
 
         private VocableFieldIcon myIcon = VocableFieldIcon.ICON_NONE;
+        private Vocable assignedVocable;
 
         #endregion
 
         #region .: Constructors :.
 
+        /// <summary>
+        /// Vytvoří novou instanci třídy.
+        /// </summary>
         public VocableField()
         {
             InitializeComponent();
+        }
+
+        #endregion
+
+        #region .: Public Methods :.
+
+        /// <summary>
+        /// Vyhodnotí správnost zadaného slovíčka, podle toho zobrazí ikonu a správnou odpověď.
+        /// </summary>
+        /// <returns>Správnost zadaného slovíčka.</returns>
+        public bool Evaluate()
+        {
+            if (!Visible)
+                return true;
+
+            if (GivenAnswer.Equals(assignedVocable.GetOutput(ItemIndex)))
+            {
+                Icon = VocableFieldIcon.ICON_OK;
+                return true;
+            }
+            else
+            {
+                Icon = VocableFieldIcon.ICON_FAIL;
+                CorrectAnswer = assignedVocable.GetOutput(ItemIndex);
+                return false;
+            }
         }
 
         #endregion
@@ -102,8 +162,8 @@ namespace Nippori
 
         private void textBoxAnswer_KeyDown(object sender, KeyEventArgs e)
         {
-            /* zatim nic, sem je potreba dopsat spravnou reakci na stisknuti
-             * enteru */
+            /* TODO Dopsat správnou reakci na stisknutí Enteru, aby to nevydalo
+             * chybový zvuk a aby to poskočilo na další pole. */
         }
 
         #endregion
