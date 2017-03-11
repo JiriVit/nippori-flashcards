@@ -2,3 +2,5 @@ Nippori/bin
 Nippori/obj
 NipporiTester/bin
 NipporiTester/obj
+
+*.suo
