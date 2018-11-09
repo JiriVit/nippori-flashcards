@@ -5,8 +5,16 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:NipporiWpf"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
+        Title="Nippori" Height="450" Width="800" 
+        WindowStartupLocation="CenterScreen"
+        KeyDown="Window_KeyDown">
+    <DockPanel>
+        <ToolBar DockPanel.Dock="Top">
+            <Button Content="prdel"/>
+        </ToolBar>
+        <StatusBar DockPanel.Dock="Bottom">
+            <TextBlock Text="prdel" />
+        </StatusBar>
+        <Frame Source="Pages/FlashcardPage.xaml" />
+    </DockPanel>
 </Window>

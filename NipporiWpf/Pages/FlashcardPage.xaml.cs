@@ -14,31 +14,17 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace NipporiWpf
+namespace NipporiWpf.Pages
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for FlashcardPage.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class FlashcardPage : Page
     {
-        public MainWindow()
+        public FlashcardPage()
         {
             InitializeComponent();
-            App.MyViewModel = new ViewModel();
             DataContext = App.MyViewModel;
-        }
-
-        private void Window_KeyDown(object sender, KeyEventArgs e)
-        {
-            switch (e.Key)
-            {
-                case Key.Space:
-                    App.MyViewModel.Confirm();
-                    break;
-                case Key.Enter:
-                    App.MyViewModel.Reject();
-                    break;
-            }
         }
     }
 }
