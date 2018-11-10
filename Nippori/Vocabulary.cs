@@ -215,21 +215,34 @@ namespace Nippori
         #endregion
 
         /// <summary>
-        /// Zjistí, jestli je slovíčko povolené, tedy v souladu s aktuálně nastavenými
-        /// povolenými skupinami a typy.
+        /// Finds out if the vocable is enabled according to current settings
+        /// of enabled types and groups.
         /// </summary>
-        /// <param name="vocable">Slovíčko k posouzení.</param>
-        /// <returns>Je-li slovíčko povolené.</returns>
+        /// <param name="vocable">Vocable to be checked.</param>
+        /// <returns>Vocable enabled or not.</returns>
         private static bool IsVocableEnabled(Vocable vocable)
         {
-            if (!(vocable.Types.Contains(EnabledType)))
-                return false;
+            bool isEnabled = false;
 
-            foreach (string g in EnabledGroups)
-                if (vocable.Groups.Contains(g))
-                    return true;
+            if (vocable.Types.Contains(EnabledType))
+            {
+                if ((EnabledGroups == null) || (EnabledGroups.Length == 0))
+                {
+                    isEnabled = true;
+                }
+                else
+                {
+                    foreach (string g in EnabledGroups)
+                    {
+                        if (vocable.Groups.Contains(g))
+                        {
+                            isEnabled = true;
+                        }
+                    }
+                }
+            }
 
-            return false;
+            return isEnabled;
         }
 
         /// <summary>
