@@ -338,6 +338,7 @@ namespace Nippori
             finally
             {
                 excel.Workbooks.Close();
+                excel.Quit();
             }
         }
 
@@ -469,7 +470,8 @@ namespace Nippori
             /* načtení překladů */
             items = new string[Vocabulary.ItemColumnCount];            
             for (col = 1; col <= Vocabulary.ItemColumnCount; col++)
-                items[col - 1] = excelRow.Cells[1, col].Value.ToString();
+                if (excelRow.Cells[1, col].Value != null)
+                    items[col - 1] = excelRow.Cells[1, col].Value.ToString();
 
             /* načtení typů */
             if (excelRow.Cells[1, Vocabulary.ItemColumnCount + Vocabulary.COL_TYPES_OFFSET].Value == null)
