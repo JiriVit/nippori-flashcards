@@ -110,7 +110,6 @@ namespace NipporiWpf
             Vocabulary.ReadFile(OpenedFileName);
             ProgressBarVisibility = Visibility.Hidden;
 
-            Vocabulary.EnabledGroups = new string[] { "nouns", "verbs", "other" };
             Vocabulary.EnabledType = 2;
             Vocabulary.Start();
             Vocabulary.GetNextVocable();
