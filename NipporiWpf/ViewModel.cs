@@ -22,6 +22,9 @@ namespace NipporiWpf
         private Visibility visibility1 = Visibility.Hidden;
         private Visibility visibility2 = Visibility.Hidden;
 
+        private Visibility progressBarVisibility = Visibility.Hidden;
+        private string openedFileName;
+
         private int state = 0;
 
         #endregion
@@ -35,6 +38,9 @@ namespace NipporiWpf
         public string Answer2 { get { return answer2; } set { answer2 = value; NotifyPropertyChanged("Answer2"); } }
         public Visibility Visibility1 { get { return visibility1; } set { visibility1 = value; NotifyPropertyChanged("Visibility1"); } }
         public Visibility Visibility2 { get { return visibility2; } set { visibility2 = value; NotifyPropertyChanged("Visibility2"); } }
+
+        public string OpenedFileName { get { return openedFileName; } set { openedFileName = value; NotifyPropertyChanged("OpenedFileName"); } }
+        public Visibility ProgressBarVisibility { get { return progressBarVisibility; } set { progressBarVisibility = value; NotifyPropertyChanged("ProgressBarVisibility"); } }
 
         #endregion
 
@@ -51,23 +57,72 @@ namespace NipporiWpf
 
         public void Confirm()
         {
-            Question = "ひらがな";
-            Answer1 = "hiragana";
-            Answer2 = "prdel";
+            if (state == 0)
+            {
+                state = 1;
+            }
+            else
+            {
+                if (Vocabulary.QueueCount > 0)
+                    Vocabulary.DequeueVocable();
+                else
+                    Vocabulary.GetNextVocable();
 
-            state = (state + 1) % 3;
+                ShowVocable();
+                state = 0;
+            }
             UpdateVisibility();
         }
 
         public void Reject()
         {
-            state = (Math.Abs(state + 3) - 1) % 3;
+            if (state == 0)
+            {
+                state = 1;
+            }
+            else
+            {
+                Vocabulary.EnqueueCurrentVocable();
+                if (Vocabulary.QueueCount > 1)
+                    Vocabulary.DequeueVocable();
+                else
+                    Vocabulary.GetNextVocable();
+
+                ShowVocable();
+                state = 0;
+            }
             UpdateVisibility();
+        }
+
+        public void OpenFile(string fileName)
+        {
+            OpenedFileName = fileName;
+            new Task(() => LoadDataTaskFunc()).Start();
         }
 
         #endregion
 
         #region .: Private Methods :.
+
+        private void LoadDataTaskFunc()
+        {
+            ProgressBarVisibility = Visibility.Visible;
+            Vocabulary.ReadFile(OpenedFileName);
+            ProgressBarVisibility = Visibility.Hidden;
+
+            Vocabulary.EnabledGroups = new string[] { "nouns", "verbs", "other" };
+            Vocabulary.EnabledType = 2;
+            Vocabulary.Start();
+            Vocabulary.GetNextVocable();
+            ShowVocable();
+            UpdateVisibility();
+        }
+
+        private void ShowVocable()
+        {
+            Question = Vocabulary.CurrentVocable.Input;
+            Answer1 = Vocabulary.CurrentVocable.GetOutput(0);
+        }
 
         private void UpdateVisibility()
         {
@@ -80,10 +135,6 @@ namespace NipporiWpf
                 case 1:
                     Visibility1 = Visibility.Visible;
                     Visibility2 = Visibility.Hidden;
-                    break;
-                case 2:
-                    Visibility1 = Visibility.Visible;
-                    Visibility2 = Visibility.Visible;
                     break;
             }
         }

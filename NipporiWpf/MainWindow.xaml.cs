@@ -14,6 +14,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using Microsoft.Win32;
+
 namespace NipporiWpf
 {
     /// <summary>
@@ -39,6 +41,19 @@ namespace NipporiWpf
                     App.MyViewModel.Reject();
                     break;
             }
+        }
+
+        private void ButtonLoad_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                Filter = "Excel sheets|*.xls;*.xlsx",
+                FilterIndex = 1,
+                Multiselect = false,
+            };
+
+            if (openFileDialog.ShowDialog() == true)
+                App.MyViewModel.OpenFile(openFileDialog.FileName);
         }
     }
 }

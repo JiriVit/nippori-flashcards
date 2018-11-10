@@ -10,10 +10,11 @@
         KeyDown="Window_KeyDown">
     <DockPanel>
         <ToolBar DockPanel.Dock="Top">
-            <Button Content="prdel"/>
+            <Button Content="Load" Click="ButtonLoad_Click" />
         </ToolBar>
         <StatusBar DockPanel.Dock="Bottom">
-            <TextBlock Text="prdel" />
+            <ProgressBar Width="100" Height="18" Visibility="{Binding ProgressBarVisibility}" IsIndeterminate="True"/>
+            <TextBox Text="{Binding OpenedFileName, FallbackValue='no file loaded'}" IsReadOnly="True"/>
         </StatusBar>
         <Frame Source="Pages/FlashcardPage.xaml" />
     </DockPanel>
