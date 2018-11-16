@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-using Nippori;
+using NipporiWpf.Vocables;
 
 namespace NipporiWpf
 {
@@ -25,6 +26,9 @@ namespace NipporiWpf
         private Visibility progressBarVisibility = Visibility.Hidden;
         private string openedFileName;
 
+        private ObservableCollection<CheckableItem> types;
+        private ObservableCollection<CheckableItem> groups;
+
         private int state = 0;
 
         #endregion
@@ -41,6 +45,9 @@ namespace NipporiWpf
 
         public string OpenedFileName { get { return openedFileName; } set { openedFileName = value; NotifyPropertyChanged("OpenedFileName"); } }
         public Visibility ProgressBarVisibility { get { return progressBarVisibility; } set { progressBarVisibility = value; NotifyPropertyChanged("ProgressBarVisibility"); } }
+
+        public ObservableCollection<CheckableItem> Types { get { return types; } set { types = value; NotifyPropertyChanged("Types"); } }
+        public ObservableCollection<CheckableItem> Groups { get { return groups; } set { groups = value; NotifyPropertyChanged("Groups"); } }
 
         #endregion
 
@@ -110,7 +117,14 @@ namespace NipporiWpf
             Vocabulary.ReadFile(OpenedFileName);
             ProgressBarVisibility = Visibility.Hidden;
 
-            Vocabulary.EnabledType = 2;
+            Vocabulary.EnabledType = (VocableType)Vocabulary.TypesCollection[1].Data;
+            foreach (CheckableItem item in Vocabulary.GroupsCollection)
+            {
+                item.IsChecked = true;
+            }
+
+            Types = Vocabulary.TypesCollection;
+            Groups = Vocabulary.GroupsCollection;
             Vocabulary.Start();
             Vocabulary.GetNextVocable();
             ShowVocable();

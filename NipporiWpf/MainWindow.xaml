@@ -9,9 +9,21 @@
         WindowStartupLocation="CenterScreen"
         KeyDown="Window_KeyDown">
     <DockPanel>
-        <ToolBar DockPanel.Dock="Top">
-            <Button Content="Load" Click="ButtonLoad_Click" />
-        </ToolBar>
+        <Menu DockPanel.Dock="Top">
+            <Menu.Resources>
+                <Style x:Key="TypesMenuItemStyle" TargetType="MenuItem">
+                    <Setter Property="Header" Value="{Binding Name}" />
+                    <Setter Property="IsChecked" Value="{Binding IsChecked}" />
+                    <Setter Property="IsCheckable" Value="True"/>
+                </Style>
+                <Style x:Key="GroupsMenuItemStyle" TargetType="MenuItem" BasedOn="{StaticResource TypesMenuItemStyle}">
+                    <Setter Property="StaysOpenOnClick" Value="True"/>
+                </Style>
+            </Menu.Resources>
+            <MenuItem Header="Load" Click="ButtonLoad_Click" />
+            <MenuItem Header="Types" ItemsSource="{Binding Types}" ItemContainerStyle="{StaticResource TypesMenuItemStyle}"/>
+            <MenuItem Header="Groups" ItemsSource="{Binding Groups}" ItemContainerStyle="{StaticResource GroupsMenuItemStyle}"/>
+        </Menu>
         <StatusBar DockPanel.Dock="Bottom">
             <ProgressBar Width="100" Height="18" Visibility="{Binding ProgressBarVisibility}" IsIndeterminate="True"/>
             <TextBox Text="{Binding OpenedFileName, FallbackValue='no file loaded'}" IsReadOnly="True"/>
