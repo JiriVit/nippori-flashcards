@@ -28,10 +28,17 @@ namespace NipporiWpf.Vocables
         public bool IsChecked
         {
             get { return isChecked; }
-            set { isChecked = value; OnIsCheckedChanged(); }
+            set
+            {
+                bool previousValue = isChecked;
+                isChecked = value;
+                NotifyPropertyChanged("IsChecked");
+                if (previousValue != isChecked)
+                {
+                    OnIsCheckedChanged();
+                }
+            }
         }
-
-        public object Data { set; get; }
 
         #endregion
 
@@ -58,5 +65,15 @@ namespace NipporiWpf.Vocables
         public event EventHandler IsCheckedChanged;
 
         #endregion
+    }
+
+    public class CheckableItem<T> : CheckableItem
+    {
+        public T Data { set; get; }
+
+        public CheckableItem(string name, T data) : base(name)
+        {
+            Data = data;
+        }
     }
 }

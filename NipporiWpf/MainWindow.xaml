@@ -21,8 +21,12 @@
                 </Style>
             </Menu.Resources>
             <MenuItem Header="Load" Click="ButtonLoad_Click" />
-            <MenuItem Header="Types" ItemsSource="{Binding Types}" ItemContainerStyle="{StaticResource TypesMenuItemStyle}"/>
-            <MenuItem Header="Groups" ItemsSource="{Binding Groups}" ItemContainerStyle="{StaticResource GroupsMenuItemStyle}"/>
+            <MenuItem Header="Types" 
+                      ItemsSource="{Binding Types}" ItemContainerStyle="{StaticResource TypesMenuItemStyle}"
+                      SubmenuClosed="MenuItem_SubmenuClosed"/>
+            <MenuItem Header="Groups" 
+                      ItemsSource="{Binding Groups}" ItemContainerStyle="{StaticResource GroupsMenuItemStyle}"
+                      SubmenuClosed="MenuItem_SubmenuClosed"/>
         </Menu>
         <StatusBar DockPanel.Dock="Bottom">
             <ProgressBar Width="100" Height="18" Visibility="{Binding ProgressBarVisibility}" IsIndeterminate="True"/>

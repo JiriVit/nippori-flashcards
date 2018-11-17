@@ -26,7 +26,7 @@ namespace NipporiWpf
         private Visibility progressBarVisibility = Visibility.Hidden;
         private string openedFileName;
 
-        private ObservableCollection<CheckableItem> types;
+        private ObservableCollection<CheckableItem<VocableType>> types;
         private ObservableCollection<CheckableItem> groups;
 
         private int state = 0;
@@ -46,7 +46,7 @@ namespace NipporiWpf
         public string OpenedFileName { get { return openedFileName; } set { openedFileName = value; NotifyPropertyChanged("OpenedFileName"); } }
         public Visibility ProgressBarVisibility { get { return progressBarVisibility; } set { progressBarVisibility = value; NotifyPropertyChanged("ProgressBarVisibility"); } }
 
-        public ObservableCollection<CheckableItem> Types { get { return types; } set { types = value; NotifyPropertyChanged("Types"); } }
+        public ObservableCollection<CheckableItem<VocableType>> Types { get { return types; } set { types = value; NotifyPropertyChanged("Types"); } }
         public ObservableCollection<CheckableItem> Groups { get { return groups; } set { groups = value; NotifyPropertyChanged("Groups"); } }
 
         #endregion
@@ -55,7 +55,6 @@ namespace NipporiWpf
 
         public ViewModel()
         {
-            Vocabulary.Init();
         }
 
         #endregion
@@ -107,6 +106,14 @@ namespace NipporiWpf
             new Task(() => LoadDataTaskFunc()).Start();
         }
 
+        public void StartExam()
+        {
+            Vocabulary.Start();
+            Vocabulary.GetNextVocable();
+            ShowVocable();
+            UpdateVisibility();
+        }
+
         #endregion
 
         #region .: Private Methods :.
@@ -117,18 +124,10 @@ namespace NipporiWpf
             Vocabulary.ReadFile(OpenedFileName);
             ProgressBarVisibility = Visibility.Hidden;
 
-            Vocabulary.EnabledType = (VocableType)Vocabulary.TypesCollection[1].Data;
-            foreach (CheckableItem item in Vocabulary.GroupsCollection)
-            {
-                item.IsChecked = true;
-            }
-
             Types = Vocabulary.TypesCollection;
             Groups = Vocabulary.GroupsCollection;
-            Vocabulary.Start();
-            Vocabulary.GetNextVocable();
-            ShowVocable();
-            UpdateVisibility();
+
+            StartExam();
         }
 
         private void ShowVocable()

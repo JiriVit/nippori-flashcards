@@ -40,10 +40,6 @@ namespace NipporiWpf.Vocables
         /// </summary>
         public static Dictionary<string, CheckableItem> GroupsDict;
         /// <summary>
-        /// Typy.
-        /// </summary>
-        public static List<CheckableItem> TypesDict;
-        /// <summary>
         /// Nadpisy sloupců v tabulce slovíček, musí se zobrazit na formuláři nad poli
         /// pro zadání odpovědí.
         /// </summary>
@@ -65,7 +61,7 @@ namespace NipporiWpf.Vocables
 
         public static int ItemColumnCount { get { return itemColumns; } }
 
-        public static ObservableCollection<CheckableItem> TypesCollection { get; set; }
+        public static ObservableCollection<CheckableItem<VocableType>> TypesCollection { get; set; }
         /// <summary>
         /// Observable collection of supported vocable groups.
         /// </summary>
@@ -100,9 +96,19 @@ namespace NipporiWpf.Vocables
 
         #endregion
 
-        #region Private Methods
+        #region .: Constructor :.
 
-        #region ... Data Import
+        static Vocabulary()
+        {
+            random = new Random();
+            vocableQueue = new Queue<Vocable>(QUEUE_LEN);
+        }
+
+        #endregion
+
+        #region .: Private Methods :.
+
+        #region .: Data Import :.
 
         /// <summary>
         /// Načte konfiguraci z excelového listu a uloží ji do slovníku.
@@ -142,7 +148,6 @@ namespace NipporiWpf.Vocables
             GroupsDict = new Dictionary<string, CheckableItem>(rowCount);
             GroupsCollection = new ObservableCollection<CheckableItem>();
 
-
             /* procházím řádky a čtu dvojice klíč + hodnota */
             for (row = 2; row <= rowCount; row++)
             {
@@ -153,6 +158,7 @@ namespace NipporiWpf.Vocables
                 key = sheet.Cells[row, 1].Value.ToString();
                 name = sheet.Cells[row, 2].Value.ToString();
                 CheckableItem item = new CheckableItem(name);
+                item.IsCheckedChanged += GroupItem_IsCheckedChanged;
                 GroupsDict.Add(key, item);
                 GroupsCollection.Add(item);
             }
@@ -169,7 +175,8 @@ namespace NipporiWpf.Vocables
             string[] outputColumns;
 
             rowCount = sheet.UsedRange.Rows.Count;
-            TypesCollection = new ObservableCollection<CheckableItem>();
+
+            TypesCollection = new ObservableCollection<CheckableItem<VocableType>>();
 
             for (row = 2; row <= rowCount; row++)
             {
@@ -184,7 +191,9 @@ namespace NipporiWpf.Vocables
                 outputColumns = sheet.Cells[row, 4].Value.ToString().Split(';');
                 importedType.OutputColumns = outputColumns.Select(Int32.Parse).ToArray();
 
-                CheckableItem item = new CheckableItem(importedType.Name) { Data = importedType };
+                CheckableItem<VocableType> item = new CheckableItem<VocableType>(importedType.Name, importedType);
+                item.IsCheckedChanged += TypeItem_IsCheckedChanged;
+
                 TypesCollection.Add(item);
             }
         }
@@ -319,22 +328,9 @@ namespace NipporiWpf.Vocables
         }
 
         /// <summary>
-        /// Inicializace slovníku.
+        /// Imports vocables and settings from Excel workbook.
         /// </summary>
-        public static void Init()
-        {
-            List<VocableType> types = new List<VocableType>();
-            List<Vocable> list = new List<Vocable>();
-
-            random = new Random();
-
-            vocableQueue = new Queue<Vocable>(QUEUE_LEN);
-        }
-
-        /// <summary>
-        /// Načte slovíčka ze souboru. Nedělá nic jiného - refresh se musí provést ručně.
-        /// </summary>
-        /// <param name="fileName">Jméno souboru.</param>
+        /// <param name="fileName">Name of the Excel file.</param>
         public static void ReadFile(string fileName)
         {
             Application excel = new Application();
@@ -347,6 +343,12 @@ namespace NipporiWpf.Vocables
                 ImportTypes(excel.ActiveWorkbook.Worksheets["TYPES"]);
                 ImportGroups(excel.ActiveWorkbook.Worksheets["GROUPS"]);
                 ImportVocables(excel.ActiveWorkbook.Worksheets["LIST"]);
+
+                TypesCollection[0].IsChecked = true;
+                foreach (CheckableItem item in GroupsCollection)
+                {
+                    item.IsChecked = true;
+                }
             }
             finally
             {
@@ -362,6 +364,44 @@ namespace NipporiWpf.Vocables
         public static void Start()
         {
             RefillStack();
+        }
+
+        #endregion
+
+        #region .: Event Handlers :.
+
+        /// <summary>
+        /// Unchecks all exercise types except of the one just checked (which raised the event)
+        /// and triggers stack refill (to reflect the change).
+        /// This is to make sure that only one exercise type is checked at a time.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private static void TypeItem_IsCheckedChanged(object sender, EventArgs e)
+        {
+            foreach (CheckableItem<VocableType> item in TypesCollection)
+            {
+                if (item != sender)
+                {
+                    item.IsChecked = false;
+                }
+                else
+                {
+                    EnabledType = item.Data;
+                }
+            }
+
+            //RefillStack();
+        }
+
+        /// <summary>
+        /// Triggers stack refill, to reflect change of enabled groups.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private static void GroupItem_IsCheckedChanged(object sender, EventArgs e)
+        {
+            //RefillStack();
         }
 
         #endregion
@@ -384,7 +424,7 @@ namespace NipporiWpf.Vocables
         /// Čte a zapisuje pole typů slovíčka. Je to údaj vyčtený z Excelu, který znamená,
         /// jaké všechny typy tento jeden záznam podporuje.
         /// </summary>
-        public List<CheckableItem> Types { get; set; }
+        public List<CheckableItem<VocableType>> Types { get; set; }
         /// <summary>
         /// Čte a zapisuje pole skupin slovíčka. Je to údaj vyčtený z Excelu, který říká,
         /// do jakých všech skupin toto slovíčko patří.
@@ -490,12 +530,12 @@ namespace NipporiWpf.Vocables
             if (excelRow.Cells[1, Vocabulary.ItemColumnCount + Vocabulary.COL_TYPES_OFFSET].Value == null)
             {
                 // no type defined -> assign all of them
-                Types = new List<CheckableItem>(Vocabulary.TypesCollection);
+                Types = new List<CheckableItem<VocableType>>(Vocabulary.TypesCollection);
             }
             else
             {
                 List<string> typeNumbers = new List<string>(excelRow.Cells[1, Vocabulary.ItemColumnCount + Vocabulary.COL_TYPES_OFFSET].Value.ToString().Split(';'));
-                Types = new List<CheckableItem>(typeNumbers.Count);
+                Types = new List<CheckableItem<VocableType>>(typeNumbers.Count);
                 typeNumbers.ForEach(typeNumber => Types.Add(Vocabulary.TypesCollection[int.Parse(typeNumber) - 1]));
             }
 
