@@ -23,7 +23,7 @@
             <RowDefinition Height="2*"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <Label Content="{Binding Question}" Grid.Row="1" FontSize="120"/>
+        <TextBlock Text="{Binding Question}" Grid.Row="1" FontSize="90" HorizontalAlignment="Center" TextWrapping="Wrap"/>
         <Label Content="{Binding Answer1}" Visibility="{Binding Visibility1}" Grid.Row="2" FontSize="60"/>
         <Label Content="{Binding Answer2}" Visibility="{Binding Visibility2}" Grid.Row="3" FontSize="60"/>
     </Grid>

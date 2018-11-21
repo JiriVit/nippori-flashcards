@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:NipporiWpf"
         mc:Ignorable="d"
         Title="Nippori" Height="450" Width="800" 
-        WindowStartupLocation="CenterScreen"
+        WindowStartupLocation="CenterScreen" WindowState="Maximized"
         KeyDown="Window_KeyDown">
     <DockPanel>
         <Menu DockPanel.Dock="Top">
