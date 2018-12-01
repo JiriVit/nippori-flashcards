@@ -58,6 +58,10 @@ namespace NipporiWpf.Vocables
                 return vocableQueue.Count;
             }
         }
+        /// <summary>
+        /// Gets elapsed number of rounds, i.e. whole sets being examined.
+        /// </summary>
+        public static int Rounds { get; set; }
 
         public static int ItemColumnCount { get { return itemColumns; } }
 
@@ -322,7 +326,10 @@ namespace NipporiWpf.Vocables
                 CurrentVocable, vocableStack.Count));
 
             if (vocableStack.Count == 0)
+            {
                 RefillStack();
+                Rounds++;
+            }
 
             return candidateVocable;
         }
@@ -364,6 +371,7 @@ namespace NipporiWpf.Vocables
         public static void Start()
         {
             RefillStack();
+            Rounds = 0;
         }
 
         #endregion

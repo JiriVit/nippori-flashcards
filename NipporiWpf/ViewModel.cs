@@ -22,6 +22,7 @@ namespace NipporiWpf
         private string answer2;
         private Visibility visibility1 = Visibility.Hidden;
         private Visibility visibility2 = Visibility.Hidden;
+        private int rounds = 0;
 
         private Visibility progressBarVisibility = Visibility.Hidden;
         private string openedFileName;
@@ -42,6 +43,11 @@ namespace NipporiWpf
         public string Answer2 { get { return answer2; } set { answer2 = value; NotifyPropertyChanged("Answer2"); } }
         public Visibility Visibility1 { get { return visibility1; } set { visibility1 = value; NotifyPropertyChanged("Visibility1"); } }
         public Visibility Visibility2 { get { return visibility2; } set { visibility2 = value; NotifyPropertyChanged("Visibility2"); } }
+        public int Rounds
+        {
+            get => rounds;
+            set { rounds = value; NotifyPropertyChanged("Rounds"); }
+        }
 
         public string OpenedFileName { get { return openedFileName; } set { openedFileName = value; NotifyPropertyChanged("OpenedFileName"); } }
         public Visibility ProgressBarVisibility { get { return progressBarVisibility; } set { progressBarVisibility = value; NotifyPropertyChanged("ProgressBarVisibility"); } }
@@ -78,6 +84,7 @@ namespace NipporiWpf
                 state = 0;
             }
             UpdateVisibility();
+            Rounds = Vocabulary.Rounds;
         }
 
         public void Reject()
@@ -98,6 +105,7 @@ namespace NipporiWpf
                 state = 0;
             }
             UpdateVisibility();
+            Rounds = Vocabulary.Rounds;
         }
 
         public void OpenFile(string fileName)
@@ -112,6 +120,7 @@ namespace NipporiWpf
             Vocabulary.GetNextVocable();
             ShowVocable();
             UpdateVisibility();
+            Rounds = Vocabulary.Rounds;
         }
 
         #endregion
