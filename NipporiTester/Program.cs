@@ -5,7 +5,7 @@ using System.Text;
 
 using Nippori;
 
-namespace NipporiTester
+namespace ConsoleTester
 {
     class Program
     {

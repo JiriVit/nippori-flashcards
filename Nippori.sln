@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.28010.2041
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nippori", "Nippori\Nippori.csproj", "{63F5BF1F-DAA2-43A2-8468-ED0CD96E9898}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NipporiTester", "NipporiTester\NipporiTester.csproj", "{779E36CB-0F3C-49E4-8D79-FA382DA0751D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleTester", "NipporiTester\ConsoleTester.csproj", "{779E36CB-0F3C-49E4-8D79-FA382DA0751D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NipporiWpf", "NipporiWpf\NipporiWpf.csproj", "{603AFCFD-43BF-4342-8C73-ED13D7A50ED5}"
 EndProject
