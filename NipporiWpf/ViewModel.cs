@@ -69,11 +69,7 @@ namespace NipporiWpf
 
         public void Confirm()
         {
-            if (state == 0)
-            {
-                state = 1;
-            }
-            else
+            if (state == Vocabulary.CurrentVocable.Type.OutputColumns.Length)
             {
                 if (Vocabulary.QueueCount > 0)
                     Vocabulary.DequeueVocable();
@@ -82,6 +78,10 @@ namespace NipporiWpf
 
                 ShowVocable();
                 state = 0;
+            }
+            else
+            {
+                state++;
             }
             UpdateVisibility();
             Rounds = Vocabulary.Rounds;
@@ -143,6 +143,7 @@ namespace NipporiWpf
         {
             Question = Vocabulary.CurrentVocable.Input;
             Answer1 = Vocabulary.CurrentVocable.GetOutput(0);
+            Answer2 = Vocabulary.CurrentVocable.GetOutput(1);
         }
 
         private void UpdateVisibility()
@@ -156,6 +157,10 @@ namespace NipporiWpf
                 case 1:
                     Visibility1 = Visibility.Visible;
                     Visibility2 = Visibility.Hidden;
+                    break;
+                case 2:
+                    Visibility1 = Visibility.Visible;
+                    Visibility2 = Visibility.Visible;
                     break;
             }
         }
