@@ -48,6 +48,7 @@ namespace NipporiWpf
             get => rounds;
             set { rounds = value; NotifyPropertyChanged("Rounds"); }
         }
+        public int StackCount { get; set; }
 
         public string OpenedFileName { get { return openedFileName; } set { openedFileName = value; NotifyPropertyChanged("OpenedFileName"); } }
         public Visibility ProgressBarVisibility { get { return progressBarVisibility; } set { progressBarVisibility = value; NotifyPropertyChanged("ProgressBarVisibility"); } }
@@ -84,7 +85,8 @@ namespace NipporiWpf
                 state++;
             }
             UpdateVisibility();
-            Rounds = Vocabulary.Rounds;
+            StackCount = Vocabulary.StackCount;
+            NotifyPropertyChanged("StackCount");
         }
 
         public void Reject()
@@ -105,7 +107,8 @@ namespace NipporiWpf
                 state = 0;
             }
             UpdateVisibility();
-            Rounds = Vocabulary.Rounds;
+            StackCount = Vocabulary.StackCount;
+            NotifyPropertyChanged("StackCount");
         }
 
         public void OpenFile(string fileName)
@@ -120,7 +123,8 @@ namespace NipporiWpf
             Vocabulary.GetNextVocable();
             ShowVocable();
             UpdateVisibility();
-            Rounds = Vocabulary.Rounds;
+            StackCount = Vocabulary.StackCount;
+            NotifyPropertyChanged("StackCount");
         }
 
         #endregion

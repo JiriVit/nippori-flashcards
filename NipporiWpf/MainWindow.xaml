@@ -31,7 +31,7 @@
         <StatusBar DockPanel.Dock="Bottom">
             <ProgressBar Width="100" Height="18" Visibility="{Binding ProgressBarVisibility}" IsIndeterminate="True"/>
             <TextBox Text="{Binding OpenedFileName, FallbackValue='no file loaded'}" IsReadOnly="True"/>
-            <TextBox Text="{Binding Rounds, FallbackValue=--}" IsReadOnly="True"/>
+            <TextBox Text="{Binding StackCount, FallbackValue=--}" IsReadOnly="True"/>
         </StatusBar>
         <Frame Source="Pages/FlashcardPage.xaml" />
     </DockPanel>

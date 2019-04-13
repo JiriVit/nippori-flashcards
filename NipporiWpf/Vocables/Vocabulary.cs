@@ -62,7 +62,7 @@ namespace NipporiWpf.Vocables
         /// Gets elapsed number of rounds, i.e. whole sets being examined.
         /// </summary>
         public static int Rounds { get; set; }
-
+        public static int StackCount => vocableStack.Count;
         public static int ItemColumnCount { get { return itemColumns; } }
 
         public static ObservableCollection<CheckableItem<VocableType>> TypesCollection { get; set; }
