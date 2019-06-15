@@ -15,13 +15,24 @@ namespace NipporiWpf
     {
         #region .: Private Fields :.
 
-        private string debugText;
+        #region .: Backing for properties :.
 
         private string question;
         private string answer1;
         private string answer2;
         private Visibility visibility1 = Visibility.Hidden;
         private Visibility visibility2 = Visibility.Hidden;
+
+        #endregion
+
+        #region .: Status :.
+
+        private bool fileLoaded;
+
+        #endregion
+
+        private string debugText;
+
         private int rounds = 0;
 
         private Visibility progressBarVisibility = Visibility.Hidden;
@@ -36,11 +47,13 @@ namespace NipporiWpf
 
         #region .: Properties :.
 
-        public string DebugText { get { return debugText; } set { debugText = value; NotifyPropertyChanged("DebugText"); } }
-
         public string Question { get { return question; } set { question = value; NotifyPropertyChanged("Question"); } }
         public string Answer1 { get { return answer1; } set { answer1 = value; NotifyPropertyChanged("Answer1"); } }
         public string Answer2 { get { return answer2; } set { answer2 = value; NotifyPropertyChanged("Answer2"); } }
+        public string Note { get; set; }
+
+        public string DebugText { get { return debugText; } set { debugText = value; NotifyPropertyChanged("DebugText"); } }
+
         public Visibility Visibility1 { get { return visibility1; } set { visibility1 = value; NotifyPropertyChanged("Visibility1"); } }
         public Visibility Visibility2 { get { return visibility2; } set { visibility2 = value; NotifyPropertyChanged("Visibility2"); } }
         public int Rounds
@@ -48,7 +61,7 @@ namespace NipporiWpf
             get => rounds;
             set { rounds = value; NotifyPropertyChanged("Rounds"); }
         }
-        public int StackCount { get; set; }
+        public string StackCount { get => fileLoaded ? Vocabulary.StackCount.ToString() : "--"; }
 
         public string OpenedFileName { get { return openedFileName; } set { openedFileName = value; NotifyPropertyChanged("OpenedFileName"); } }
         public Visibility ProgressBarVisibility { get { return progressBarVisibility; } set { progressBarVisibility = value; NotifyPropertyChanged("ProgressBarVisibility"); } }
@@ -85,7 +98,6 @@ namespace NipporiWpf
                 state++;
             }
             UpdateVisibility();
-            StackCount = Vocabulary.StackCount;
             NotifyPropertyChanged("StackCount");
         }
 
@@ -107,7 +119,6 @@ namespace NipporiWpf
                 state = 0;
             }
             UpdateVisibility();
-            StackCount = Vocabulary.StackCount;
             NotifyPropertyChanged("StackCount");
         }
 
@@ -123,7 +134,6 @@ namespace NipporiWpf
             Vocabulary.GetNextVocable();
             ShowVocable();
             UpdateVisibility();
-            StackCount = Vocabulary.StackCount;
             NotifyPropertyChanged("StackCount");
         }
 
@@ -140,6 +150,7 @@ namespace NipporiWpf
             Types = Vocabulary.TypesCollection;
             Groups = Vocabulary.GroupsCollection;
 
+            fileLoaded = true;
             StartExam();
         }
 
@@ -168,6 +179,20 @@ namespace NipporiWpf
                     break;
             }
         }
+
+        #region .: Debug :.
+
+        private void ShowSampleData()
+        {
+            Question = "Lorem ipsum dolor sit amet, consectetuer adipiscing elit.";
+            Answer1 = "Lorem ipsum dolor sit amet, consectetuer adipiscing elit.";
+            Visibility1 = Visibility.Visible;
+            Answer2 = "Lorem ipsum dolor sit amet, consectetuer adipiscing elit.";
+            Visibility2 = Visibility.Visible;
+            Note = "Lorem ipsum dolor sit amet, consectetuer adipiscing elit.";
+        }
+
+        #endregion
 
         #endregion
 

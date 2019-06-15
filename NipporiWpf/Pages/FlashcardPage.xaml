@@ -15,16 +15,43 @@
         </Style>
     </Page.Resources>
     
-    <Grid>
+    <Grid Background="White">
         <Grid.RowDefinitions>
             <RowDefinition/>
-            <RowDefinition Height="2*"/>
+            <RowDefinition Height="3*"/>
             <RowDefinition Height="2*"/>
             <RowDefinition Height="2*"/>
             <RowDefinition/>
+            <RowDefinition/>
         </Grid.RowDefinitions>
-        <TextBlock Text="{Binding Question}" Grid.Row="1" FontSize="90" HorizontalAlignment="Center" TextWrapping="Wrap"/>
-        <Label Content="{Binding Answer1}" Visibility="{Binding Visibility1}" Grid.Row="2" FontSize="60"/>
-        <Label Content="{Binding Answer2}" Visibility="{Binding Visibility2}" Grid.Row="3" FontSize="60"/>
+        <Grid.Resources>
+            <Style TargetType="Border">
+                <Setter Property="Margin" Value="3" />
+            </Style>
+            <Style TargetType="TextBlock">
+                <Setter Property="TextWrapping" Value="Wrap"/>
+                <Setter Property="TextAlignment" Value="Center"/>
+                <Setter Property="VerticalAlignment" Value="Center" />
+            </Style>
+        </Grid.Resources>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="150"/>
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="{Binding StackCount}" FontSize="60" Background="LightGreen"/>
+        </Grid>
+        <Border Grid.Row="1">
+            <TextBlock Text="{Binding Question}" FontSize="80" Foreground="DarkBlue"/>
+        </Border>
+        <Border Grid.Row="2" Background="LightBlue">
+            <TextBlock Text="{Binding Answer1}" Visibility="{Binding Visibility1}" FontSize="60"/>
+        </Border>
+        <Border Grid.Row="3" Background="LightBlue">
+            <TextBlock Text="{Binding Answer2}" Visibility="{Binding Visibility2}" FontSize="60"/>
+        </Border>
+        <Border Grid.Row="4" Background="LightYellow">
+            <TextBlock Text="{Binding Note}" Visibility="{Binding Visibility2}" FontSize="40"/>
+        </Border>
     </Grid>
 </Page>
