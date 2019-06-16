@@ -75,6 +75,7 @@ namespace NipporiWpf
 
         public ViewModel()
         {
+            //OpenFile(@"c:\Users\jiriv\OneDrive\Dokumenty\Excel\Japonština\Genki 2-17.xml");
         }
 
         #endregion
@@ -144,7 +145,14 @@ namespace NipporiWpf
         private void LoadDataTaskFunc()
         {
             ProgressBarVisibility = Visibility.Visible;
-            Vocabulary.ReadFile(OpenedFileName);
+            if (OpenedFileName.EndsWith("xml"))
+            {
+                Vocabulary.ReadXmlFile(OpenedFileName);
+            }
+            else
+            {
+                Vocabulary.ReadFile(OpenedFileName);
+            }
             ProgressBarVisibility = Visibility.Hidden;
 
             Types = Vocabulary.TypesCollection;

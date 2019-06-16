@@ -5,6 +5,8 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Timers;
+using System.Xml;
 using Microsoft.Office.Interop.Excel;
 
 namespace NipporiWpf.Vocables
@@ -361,6 +363,82 @@ namespace NipporiWpf.Vocables
             {
                 excel.Workbooks.Close();
                 excel.Quit();
+            }
+        }
+
+        /// <summary>
+        /// Imports vocables and settings from XML file.
+        /// </summary>
+        /// <param name="filename">XML file.</param>
+        public static void ReadXmlFile(string filename)
+        {
+            XmlDocument xmlDoc;
+            XmlNode node;
+
+            xmlDoc = new XmlDocument();
+            xmlDoc.Load(filename);
+
+            /* import configuration */
+            node = xmlDoc.GetElementsByTagName("config")[0];
+            foreach (XmlNode child in node.ChildNodes)
+            {
+                if (child.Attributes["key"].Value.Equals("columns"))
+                {
+                    itemColumns = int.Parse(child.Attributes["value"].Value);
+                    break;
+                }
+            }
+
+            /* import vocable type definitions */
+            node = xmlDoc.GetElementsByTagName("types")[0];
+            TypesCollection = new ObservableCollection<CheckableItem<VocableType>>();
+            foreach (XmlNode child in node.ChildNodes)
+            {
+                VocableType type = new VocableType(child);
+
+                CheckableItem<VocableType> item = new CheckableItem<VocableType>(type.Name, type);
+                item.IsCheckedChanged += TypeItem_IsCheckedChanged;
+
+                TypesCollection.Add(item);
+            }
+
+            /* import group definitions */
+            node = xmlDoc.GetElementsByTagName("groups")[0];
+            GroupsDict = new Dictionary<string, CheckableItem>(node.ChildNodes.Count);
+            GroupsCollection = new ObservableCollection<CheckableItem>();
+            foreach (XmlNode child in node.ChildNodes)
+            {
+                CheckableItem item = new CheckableItem(child.Attributes["name"].Value);
+                item.IsCheckedChanged += GroupItem_IsCheckedChanged;
+
+                GroupsDict.Add(child.Attributes["key"].Value, item);
+                GroupsCollection.Add(item);
+            }
+
+            /* import vocables */
+            node = xmlDoc.GetElementsByTagName("vocabulary")[0];
+            allVocables = new List<Vocable>(node.ChildNodes.Count);
+            int i = 0;
+            foreach (XmlNode child in node.ChildNodes)
+            {
+                string attr;
+                Vocable vocable;
+
+                attr = $"field{itemColumns + COL_ACTIVE_OFFSET}";
+                if (child.Attributes[attr].Value.Equals("0"))
+                {
+                    // TODO change this, always load all vocables and filter them before testing
+                    continue;
+                }
+
+                vocable = new Vocable(i++, child);
+                allVocables.Add(vocable);
+            }
+
+            TypesCollection[0].IsChecked = true;
+            foreach (CheckableItem item in GroupsCollection)
+            {
+                item.IsChecked = true;
             }
         }
 

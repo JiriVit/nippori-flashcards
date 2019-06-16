@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 using Microsoft.Office.Interop.Excel;
 
@@ -85,6 +86,12 @@ namespace NipporiWpf.Vocables
             this.id = id;
         }
 
+        public Vocable(int id, XmlNode xmlNode)
+        {
+            this.id = id;
+            Import(xmlNode);
+        }
+
         #endregion
 
         #region .: Public Methods :.
@@ -156,6 +163,47 @@ namespace NipporiWpf.Vocables
             else
             {
                 List<string> groupKeys = new List<string>(excelRow.Cells[1, Vocabulary.ItemColumnCount + Vocabulary.COL_GROUPS_OFFSET].Value.ToString().Split(';'));
+                Groups = new List<CheckableItem>(groupKeys.Count);
+                groupKeys.ForEach(key => Groups.Add(Vocabulary.GroupsDict[key]));
+            }
+
+            return true;
+        }
+
+        public bool Import(XmlNode xmlNode)
+        {
+            int i;
+
+            // load translation fields
+            items = new string[Vocabulary.ItemColumnCount];
+            for (i = 1; i <= Vocabulary.ItemColumnCount; i++)
+            {
+                items[i - 1] = xmlNode.Attributes[$"field{i}"].Value;
+            }
+
+            // load types
+            if (xmlNode.Attributes[$"field{i}"].Value.Equals(string.Empty))
+            {
+                // no type defined -> assign all of them
+                Types = new List<CheckableItem<VocableType>>(Vocabulary.TypesCollection);
+            }
+            else
+            {
+                List<string> typeNumbers = new List<string>(xmlNode.Attributes[$"field{i}"].Value.Split(';'));
+                Types = new List<CheckableItem<VocableType>>(typeNumbers.Count);
+                typeNumbers.ForEach(typeNumber => Types.Add(Vocabulary.TypesCollection[int.Parse(typeNumber) - 1]));
+            }
+            i++;
+
+            // load groups
+            if (xmlNode.Attributes[$"field{i}"].Value.Equals(string.Empty))
+            {
+                // no group defined -> assign the first one
+                Groups = new List<CheckableItem>(new CheckableItem[] { Vocabulary.GroupsCollection[0] });
+            }
+            else
+            {
+                List<string> groupKeys = new List<string>(xmlNode.Attributes[$"field{i}"].Value.Split(';'));
                 Groups = new List<CheckableItem>(groupKeys.Count);
                 groupKeys.ForEach(key => Groups.Add(Vocabulary.GroupsDict[key]));
             }
