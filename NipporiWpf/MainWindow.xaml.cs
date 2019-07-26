@@ -56,6 +56,11 @@ namespace NipporiWpf
                 App.MyViewModel.OpenFile(openFileDialog.FileName);
         }
 
+        private void ButtonTest_Click(object sender, RoutedEventArgs e)
+        {
+            App.MyViewModel.Test();
+        }
+
         private void MenuItem_SubmenuClosed(object sender, RoutedEventArgs e)
         {
             // TODO do this only if changes were made, not for each submenu closed

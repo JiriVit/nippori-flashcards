@@ -69,13 +69,21 @@ namespace NipporiWpf
         public ObservableCollection<CheckableItem<VocableType>> Types { get { return types; } set { types = value; NotifyPropertyChanged("Types"); } }
         public ObservableCollection<CheckableItem> Groups { get { return groups; } set { groups = value; NotifyPropertyChanged("Groups"); } }
 
+        #region .: Debug & Test :.
+
+        public bool TestButtonVisible { get; private set; } = false;
+
+        #endregion
+
         #endregion
 
         #region .: Constructor :.
 
         public ViewModel()
         {
-            //OpenFile(@"c:\Users\jiriv\OneDrive\Dokumenty\Excel\Japonština\Genki 2-17.xml");
+#if DEBUG
+            TestButtonVisible = true;
+#endif
         }
 
         #endregion
@@ -136,6 +144,14 @@ namespace NipporiWpf
             ShowVocable();
             UpdateVisibility();
             NotifyPropertyChanged("StackCount");
+        }
+
+        /// <summary>
+        /// Invokes a test procedure.
+        /// </summary>
+        public void Test()
+        {
+            // right now do nothing
         }
 
         #endregion

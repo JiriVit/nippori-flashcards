@@ -8,6 +8,9 @@
         Title="Nippori" Height="450" Width="800" 
         WindowStartupLocation="CenterScreen" WindowState="Maximized"
         KeyDown="Window_KeyDown">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </Window.Resources>
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <Menu.Resources>
@@ -27,6 +30,9 @@
             <MenuItem Header="Groups" 
                       ItemsSource="{Binding Groups}" ItemContainerStyle="{StaticResource GroupsMenuItemStyle}"
                       SubmenuClosed="MenuItem_SubmenuClosed"/>
+            <MenuItem Header="TEST"
+                      HorizontalAlignment="Right" Visibility="{Binding TestButtonVisible, Converter={StaticResource BoolToVis}}"
+                      Click="ButtonTest_Click"/>
         </Menu>
         <StatusBar DockPanel.Dock="Bottom">
             <ProgressBar Width="100" Height="18" Visibility="{Binding ProgressBarVisibility}" IsIndeterminate="True"/>
