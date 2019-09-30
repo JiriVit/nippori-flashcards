@@ -10,24 +10,27 @@ namespace Nippori.Vocables
     /// <summary>
     /// Represents a vocable type in the meaning of its testing.
     /// A type defines which vocable field is presented as question and which ones are answers.
-    /// TODO Add support for output columns defined in format "2+3,4" which says that columns 2 and 3
-    /// are to be shown in one step and column 4 in the next one.
     /// </summary>
     public class VocableType
     {
-        public string Name { get; set; }
-        public int InputColumn { get; set; }
-        public int[] OutputColumns { get; set; }
-
-        #region .: Constructor :.
+        #region .: Properties :.
 
         /// <summary>
-        /// Creates new instance of <see cref="VocableType"/>.
+        /// Name of the type, shown in menu with type selection.
         /// </summary>
-        public VocableType()
-        {
+        public string Name { get; set; }
+        /// <summary>
+        /// Columns with fields to be shown for examination (as question).
+        /// </summary>
+        public int[] InputColumns { get; private set; }
+        /// <summary>
+        /// Columns with fields to be shown after examination (as answers).
+        /// </summary>
+        public int[] OutputColumns { get; private set; }
 
-        }
+        #endregion
+
+        #region .: Constructor :.
 
         /// <summary>
         /// Creates new instance of <see cref="VocableType"/> with data imported from an XML node.
@@ -36,16 +39,10 @@ namespace Nippori.Vocables
         public VocableType(XmlNode xmlNode)
         {
             Name = xmlNode.Attributes["name"].Value;
-            InputColumn = int.Parse(xmlNode.Attributes["in"].Value);
-            OutputColumns = xmlNode.Attributes["out"].Value.Split(';').Select(int.Parse).ToArray();
+            InputColumns = xmlNode.Attributes["in"].Value.Split(',').Select(int.Parse).ToArray();
+            OutputColumns = xmlNode.Attributes["out"].Value.Split(',').Select(int.Parse).ToArray();
         }
 
         #endregion
-
-        public override string ToString()
-        {
-            return String.Format("{0} | {1} | {2}", Name, InputColumn,
-                String.Join(",", OutputColumns.Select(x => x.ToString())));
-        }
     }
 }

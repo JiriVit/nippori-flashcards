@@ -42,16 +42,16 @@
             <TextBlock Text="{Binding StackCount}" FontSize="60" Background="LightGreen"/>
         </Grid>
         <Border Grid.Row="1">
-            <TextBlock Text="{Binding Question}" FontSize="80" Foreground="DarkBlue"/>
+            <TextBlock Text="{Binding Fields[0]}" Visibility="{Binding FieldsVisibility[0]}" FontSize="80" Foreground="DarkBlue"/>
         </Border>
         <Border Grid.Row="2" Background="LightBlue">
-            <TextBlock Text="{Binding Answer1}" Visibility="{Binding Visibility1}" FontSize="60"/>
+            <TextBlock Text="{Binding Fields[1]}" Visibility="{Binding FieldsVisibility[1]}" FontSize="60"/>
         </Border>
         <Border Grid.Row="3" Background="LightBlue">
-            <TextBlock Text="{Binding Answer2}" Visibility="{Binding Visibility2}" FontSize="60"/>
+            <TextBlock Text="{Binding Fields[2]}" Visibility="{Binding FieldsVisibility[2]}" FontSize="60"/>
         </Border>
         <Border Grid.Row="4" Background="LightYellow">
-            <TextBlock Text="{Binding Note}" Visibility="{Binding Visibility2}" FontSize="40"/>
+            <TextBlock Text="{Binding Fields[3]}" Visibility="{Binding FieldsVisibility[3]}" FontSize="40"/>
         </Border>
     </Grid>
 </Page>

@@ -19,33 +19,13 @@ namespace Nippori.Vocables
         public string[] Fields { get; private set; }
 
         /// <summary>
-        /// Typ slovíčka.
+        /// Lists types allowed for this vocable.
         /// </summary>
-        public VocableType Type { get; set; }
+        public List<CheckableItem<VocableType>> AllowedTypes { get; set; }
         /// <summary>
-        /// Čte a zapisuje pole typů slovíčka. Je to údaj vyčtený z Excelu, který znamená,
-        /// jaké všechny typy tento jeden záznam podporuje.
-        /// </summary>
-        public List<CheckableItem<VocableType>> Types { get; set; }
-        /// <summary>
-        /// Čte a zapisuje pole skupin slovíčka. Je to údaj vyčtený z Excelu, který říká,
-        /// do jakých všech skupin toto slovíčko patří.
+        /// Lists groups which this vocable belongs to.
         /// </summary>
         public List<CheckableItem> Groups { get; set; }
-        /// <summary>
-        /// Čte zadání slovíčka (např. český překlad, zkouší-li se překlad z češtiny).
-        /// </summary>
-        public string Input
-        {
-            get
-            {
-                return Fields[Type.InputColumn - 1];
-            }
-        }
-        /// <summary>
-        /// Čte počet překladů slovíčka.
-        /// </summary>
-        public int OutputCount { get { return Type.OutputColumns.Count(); } }
 
         #endregion
 
@@ -82,16 +62,17 @@ namespace Nippori.Vocables
         #region .: Public Methods :.
 
         /// <summary>
-        /// Vrátí překlad slovíčka, jak je definovaný aktuálně nastaveným typem.
+        /// Finds out if this vocable is of given vocable type.
+        /// It is evaluated if the type is listed among allowed types in the vocabulary and also if
+        /// the first input field defined by the type is not empty.
         /// </summary>
-        /// <param name="index">Index překladu.</param>
-        /// <returns>Překlad slovíčka.</returns>
-        public string GetOutput(int index)
+        /// <param name="vocableType">Vocable type to be checked against.</param>
+        /// <returns>Boolean result.</returns>
+        public bool IsType(VocableType vocableType)
         {
-            if (index < Type.OutputColumns.Count())
-                return Fields[Type.OutputColumns[index] - 1];
-            else
-                return String.Empty;
+            return 
+                (AllowedTypes.Any(type => type.Data == vocableType)) &&
+                (Fields[vocableType.InputColumns[0] - 1].Length > 0);
         }
 
         #endregion

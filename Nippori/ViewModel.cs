@@ -24,17 +24,17 @@ namespace Nippori
 
         #region .: Backing for properties :.
 
-        private string question;
-        private string answer1;
-        private string answer2;
-        private Visibility visibility1 = Visibility.Hidden;
-        private Visibility visibility2 = Visibility.Hidden;
-
         #endregion
 
         #region .: Status :.
 
         private bool fileLoaded;
+
+        #endregion
+
+        #region .: XML Import :.
+
+        XmlDocument xmlDocument;
 
         #endregion
 
@@ -61,15 +61,10 @@ namespace Nippori
 
         #region .: Properties :.
 
-        public string Question { get { return question; } set { question = value; NotifyPropertyChanged("Question"); } }
-        public string Answer1 { get { return answer1; } set { answer1 = value; NotifyPropertyChanged("Answer1"); } }
-        public string Answer2 { get { return answer2; } set { answer2 = value; NotifyPropertyChanged("Answer2"); } }
-        public string Note { get; set; }
-
         public string DebugText { get { return debugText; } set { debugText = value; NotifyPropertyChanged("DebugText"); } }
 
-        public Visibility Visibility1 { get { return visibility1; } set { visibility1 = value; NotifyPropertyChanged("Visibility1"); } }
-        public Visibility Visibility2 { get { return visibility2; } set { visibility2 = value; NotifyPropertyChanged("Visibility2"); } }
+        public string[] Fields { get; } = new string[4];
+        public Visibility[] FieldsVisibility { get; } = new Visibility[4];
         public int Rounds
         {
             get => rounds;
@@ -123,7 +118,7 @@ namespace Nippori
 
         public void Confirm()
         {
-            if (state == CurrentVocable.Type.OutputColumns.Length)
+            if (state == 1)
             {
                 GetNextVocable();
 
@@ -173,52 +168,25 @@ namespace Nippori
 
         #region .: Private Methods :.
 
-        #region .: Migrated from Vocabulary class :.
-
-        public Vocable GetNextVocable()
-        {
-            Vocable candidateVocable;
-
-            while (true)
-            {
-                candidateVocable = vocableStack[random.Next(vocableStack.Count)];
-                if (candidateVocable.Equals(CurrentVocable))
-                    continue;
-                break;
-            }
-
-            vocableStack.Remove(candidateVocable);
-            candidateVocable.Type = EnabledType;
-            CurrentVocable = candidateVocable;
-
-            if (vocableStack.Count == 0)
-            {
-                RefillStack();
-                Rounds++;
-            }
-
-            return candidateVocable;
-        }
+        #region .: XML Import :.
 
         /// <summary>
-        /// Finds out if the vocable is enabled according to current settings
-        /// of enabled types and groups.
+        /// Imports vocable type definitions from node 'types' in the XML document and stores them
+        /// to <see cref="TypesCollection"/>.
         /// </summary>
-        /// <param name="vocable">Vocable to be checked.</param>
-        /// <returns>Vocable enabled or not.</returns>
-        private bool IsVocableEnabled(Vocable vocable)
+        private void ImportVocableTypeDefinitions()
         {
-            bool isEnabled = false;
-
-            if (vocable.Types.Any(type => type.Data == EnabledType))
+            XmlNode typesNode = xmlDocument.GetElementsByTagName("types")[0];
+            TypesCollection = new ObservableCollection<CheckableItem<VocableType>>();
+            foreach (XmlNode child in typesNode.ChildNodes)
             {
-                if (vocable.Groups.Any(group => group.IsChecked))
-                {
-                    isEnabled = true;
-                }
-            }
+                VocableType type = new VocableType(child);
 
-            return isEnabled;
+                CheckableItem<VocableType> item = new CheckableItem<VocableType>(type.Name, type);
+                item.IsCheckedChanged += TypeItem_IsCheckedChanged;
+
+                TypesCollection.Add(item);
+            }
         }
 
         /// <summary>
@@ -227,15 +195,14 @@ namespace Nippori
         /// <param name="path">Path to the XML file.</param>
         private void ReadXmlFile(string path)
         {
-            XmlDocument xmlDoc;
             XmlNode node;
             int fieldsCount = 0;
 
-            xmlDoc = new XmlDocument();
-            xmlDoc.Load(path);
+            xmlDocument = new XmlDocument();
+            xmlDocument.Load(path);
 
             /* import configuration */
-            node = xmlDoc.GetElementsByTagName("config")[0];
+            node = xmlDocument.GetElementsByTagName("config")[0];
             foreach (XmlNode child in node.ChildNodes)
             {
                 if (child.Attributes["key"].Value.Equals("columns"))
@@ -245,21 +212,10 @@ namespace Nippori
                 }
             }
 
-            /* import vocable type definitions */
-            node = xmlDoc.GetElementsByTagName("types")[0];
-            TypesCollection = new ObservableCollection<CheckableItem<VocableType>>();
-            foreach (XmlNode child in node.ChildNodes)
-            {
-                VocableType type = new VocableType(child);
-
-                CheckableItem<VocableType> item = new CheckableItem<VocableType>(type.Name, type);
-                item.IsCheckedChanged += TypeItem_IsCheckedChanged;
-
-                TypesCollection.Add(item);
-            }
+            ImportVocableTypeDefinitions();
 
             /* import group definitions */
-            node = xmlDoc.GetElementsByTagName("groups")[0];
+            node = xmlDocument.GetElementsByTagName("groups")[0];
             GroupsDict = new Dictionary<string, CheckableItem>(node.ChildNodes.Count);
             GroupsCollection = new ObservableCollection<CheckableItem>();
             foreach (XmlNode child in node.ChildNodes)
@@ -272,7 +228,7 @@ namespace Nippori
             }
 
             /* import vocables */
-            node = xmlDoc.GetElementsByTagName("vocabulary")[0];
+            node = xmlDocument.GetElementsByTagName("vocabulary")[0];
             foreach (XmlNode child in node.ChildNodes)
             {
                 Vocable vocable = new Vocable(child, fieldsCount);
@@ -282,13 +238,13 @@ namespace Nippori
                 if (types.Equals(string.Empty))
                 {
                     // no type defined -> assign all of them
-                    vocable.Types = new List<CheckableItem<VocableType>>(TypesCollection);
+                    vocable.AllowedTypes = new List<CheckableItem<VocableType>>(TypesCollection);
                 }
                 else
                 {
                     List<string> typeNumbers = new List<string>(types.Split(';'));
-                    vocable.Types = new List<CheckableItem<VocableType>>(typeNumbers.Count);
-                    typeNumbers.ForEach(typeNumber => vocable.Types.Add(TypesCollection[int.Parse(typeNumber) - 1]));
+                    vocable.AllowedTypes = new List<CheckableItem<VocableType>>(typeNumbers.Count);
+                    typeNumbers.ForEach(typeNumber => vocable.AllowedTypes.Add(TypesCollection[int.Parse(typeNumber) - 1]));
                 }
 
                 // assign groups
@@ -314,6 +270,57 @@ namespace Nippori
                 item.IsChecked = true;
             }
         }
+
+
+        #endregion
+
+        #region .: Migrated from Vocabulary class :.
+
+        public Vocable GetNextVocable()
+        {
+            Vocable candidateVocable;
+
+            while (true)
+            {
+                candidateVocable = vocableStack[random.Next(vocableStack.Count)];
+                if (candidateVocable.Equals(CurrentVocable))
+                    continue;
+                break;
+            }
+
+            vocableStack.Remove(candidateVocable);
+            CurrentVocable = candidateVocable;
+
+            if (vocableStack.Count == 0)
+            {
+                RefillStack();
+                Rounds++;
+            }
+
+            return candidateVocable;
+        }
+
+        /// <summary>
+        /// Finds out if the vocable is enabled according to current settings
+        /// of enabled types and groups.
+        /// </summary>
+        /// <param name="vocable">Vocable to be checked.</param>
+        /// <returns>Vocable enabled or not.</returns>
+        private bool IsVocableEnabled(Vocable vocable)
+        {
+            bool isEnabled = false;
+
+            if (vocable.IsType(EnabledType))
+            {
+                if (vocable.Groups.Any(group => group.IsChecked))
+                {
+                    isEnabled = true;
+                }
+            }
+
+            return isEnabled;
+        }
+
 
         private void RefillStack()
         {
@@ -347,41 +354,53 @@ namespace Nippori
 
         private void ShowVocable()
         {
-            Question = CurrentVocable.Input;
-            Answer1 = CurrentVocable.GetOutput(0);
-            Answer2 = CurrentVocable.GetOutput(1);
+            int fieldsCount = EnabledType.InputColumns.Length + EnabledType.OutputColumns.Length;
+
+            for (int i = 0; i < Fields.Length; i++)
+            {
+                if (i < fieldsCount)
+                {
+                    if (i < EnabledType.InputColumns.Length)
+                    {
+                        Fields[i] = CurrentVocable.Fields[EnabledType.InputColumns[i] - 1];
+                    }
+                    else
+                    {
+                        Fields[i] = CurrentVocable.Fields[EnabledType.OutputColumns[i - EnabledType.InputColumns.Length] - 1];
+                    }
+                }
+                else
+                {
+                    Fields[i] = string.Empty;
+                }
+            }
+
+            NotifyPropertyChanged("Fields");
         }
+        
 
         private void UpdateVisibility()
         {
-            switch (state)
+            int visibleFields;
+
+            if (state == 0)
             {
-                case 0:
-                    Visibility1 = Visibility.Hidden;
-                    Visibility2 = Visibility.Hidden;
-                    break;
-                case 1:
-                    Visibility1 = Visibility.Visible;
-                    Visibility2 = Visibility.Hidden;
-                    break;
-                case 2:
-                    Visibility1 = Visibility.Visible;
-                    Visibility2 = Visibility.Visible;
-                    break;
+                visibleFields = EnabledType.InputColumns.Length;
             }
+            else
+            {
+                visibleFields = EnabledType.InputColumns.Length + EnabledType.OutputColumns.Length;
+            }
+
+            for (int i = 0; i < FieldsVisibility.Length; i++)
+            {
+                FieldsVisibility[i] = (i < visibleFields) ? Visibility.Visible : Visibility.Hidden;
+            }
+
+            NotifyPropertyChanged("FieldsVisibility");
         }
 
         #region .: Debug :.
-
-        private void ShowSampleData()
-        {
-            Question = "Lorem ipsum dolor sit amet, consectetuer adipiscing elit.";
-            Answer1 = "Lorem ipsum dolor sit amet, consectetuer adipiscing elit.";
-            Visibility1 = Visibility.Visible;
-            Answer2 = "Lorem ipsum dolor sit amet, consectetuer adipiscing elit.";
-            Visibility2 = Visibility.Visible;
-            Note = "Lorem ipsum dolor sit amet, consectetuer adipiscing elit.";
-        }
 
         #endregion
 
