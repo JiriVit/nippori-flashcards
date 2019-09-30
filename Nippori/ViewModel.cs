@@ -369,6 +369,10 @@ namespace Nippori
                         Fields[i] = CurrentVocable.Fields[EnabledType.OutputColumns[i - EnabledType.InputColumns.Length] - 1];
                     }
                 }
+                else if (i == (Fields.Length - 1))
+                {
+                    Fields[i] = CurrentVocable.Fields[CurrentVocable.Fields.Length - 1];
+                }
                 else
                 {
                     Fields[i] = string.Empty;
@@ -386,13 +390,15 @@ namespace Nippori
             if (state == 0)
             {
                 visibleFields = EnabledType.InputColumns.Length;
+                FieldsVisibility[FieldsVisibility.Length - 1] = Visibility.Hidden;
             }
             else
             {
                 visibleFields = EnabledType.InputColumns.Length + EnabledType.OutputColumns.Length;
+                FieldsVisibility[FieldsVisibility.Length - 1] = Visibility.Visible;
             }
 
-            for (int i = 0; i < FieldsVisibility.Length; i++)
+            for (int i = 0; i < (FieldsVisibility.Length - 1); i++)
             {
                 FieldsVisibility[i] = (i < visibleFields) ? Visibility.Visible : Visibility.Hidden;
             }

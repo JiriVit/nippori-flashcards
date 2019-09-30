@@ -51,7 +51,7 @@
             <TextBlock Text="{Binding Fields[2]}" Visibility="{Binding FieldsVisibility[2]}" FontSize="60"/>
         </Border>
         <Border Grid.Row="4" Background="LightYellow">
-            <TextBlock Text="{Binding Fields[3]}" Visibility="{Binding FieldsVisibility[3]}" FontSize="40"/>
+            <TextBlock Text="{Binding Fields[3]}" Visibility="{Binding FieldsVisibility[3]}" FontSize="40" FontStyle="Italic"/>
         </Border>
     </Grid>
 </Page>
