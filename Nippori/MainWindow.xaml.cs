@@ -16,7 +16,7 @@ using System.Windows.Shapes;
 
 using Microsoft.Win32;
 
-namespace NipporiWpf
+namespace Nippori
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

@@ -5,7 +5,7 @@ using System.Text;
 using System.Xml;
 using System.Threading.Tasks;
 
-namespace NipporiWpf.Vocables
+namespace Nippori.Vocables
 {
     /// <summary>
     /// Represents a vocable type in the meaning of its testing.

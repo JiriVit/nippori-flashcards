@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using NipporiWpf.Bases;
+using Nippori.Bases;
 
-namespace NipporiWpf.Vocables
+namespace Nippori.Vocables
 {
     public class CheckableItem : ModelBase
     {

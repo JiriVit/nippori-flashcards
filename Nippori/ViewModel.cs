@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Xml;
 
-using NipporiWpf.Vocables;
+using Nippori.Vocables;
 
-namespace NipporiWpf
+namespace Nippori
 {
     public class ViewModel : INotifyPropertyChanged
     {

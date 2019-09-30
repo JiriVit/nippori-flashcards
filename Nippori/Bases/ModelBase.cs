@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NipporiWpf.Bases
+namespace Nippori.Bases
 {
     public abstract class ModelBase : INotifyPropertyChanged
     {

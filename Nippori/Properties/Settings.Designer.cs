@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace NipporiWpf.Properties
+namespace Nippori.Properties
 {
 
 

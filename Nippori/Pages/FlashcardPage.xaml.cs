@@ -14,7 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace NipporiWpf.Pages
+namespace Nippori.Pages
 {
     /// <summary>
     /// Interaction logic for FlashcardPage.xaml

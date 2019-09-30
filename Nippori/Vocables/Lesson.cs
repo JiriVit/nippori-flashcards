@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NipporiWpf.Vocables
+namespace Nippori.Vocables
 {
     /// <summary>
     /// Represents a lesson which contains set of vocables.

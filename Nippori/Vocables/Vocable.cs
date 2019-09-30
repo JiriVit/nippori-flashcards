@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Xml;
 
 
-namespace NipporiWpf.Vocables
+namespace Nippori.Vocables
 {
     /// <summary>
     /// Represents a vocable.
