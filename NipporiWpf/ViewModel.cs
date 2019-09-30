@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Xml;
 
 using NipporiWpf.Vocables;
 
@@ -13,6 +14,12 @@ namespace NipporiWpf
 {
     public class ViewModel : INotifyPropertyChanged
     {
+        #region .: Constants :.
+
+        private const int ColOffsetActive = 3;
+
+        #endregion
+
         #region .: Private Fields :.
 
         #region .: Backing for properties :.
@@ -43,6 +50,13 @@ namespace NipporiWpf
 
         private int state = 0;
 
+        // this is migrated from Vocabulary class, to be ordered later
+
+        private List<Vocable> allVocables = new List<Vocable>();
+        private List<Vocable> vocableStack;
+
+        private Random random = new Random();
+
         #endregion
 
         #region .: Properties :.
@@ -61,13 +75,30 @@ namespace NipporiWpf
             get => rounds;
             set { rounds = value; NotifyPropertyChanged("Rounds"); }
         }
-        public string StackCount { get => fileLoaded ? Vocabulary.StackCount.ToString() : "--"; }
+        public string StackCount { get => fileLoaded ? vocableStack.Count.ToString() : "--"; }
 
         public string OpenedFileName { get { return openedFileName; } set { openedFileName = value; NotifyPropertyChanged("OpenedFileName"); } }
         public Visibility ProgressBarVisibility { get { return progressBarVisibility; } set { progressBarVisibility = value; NotifyPropertyChanged("ProgressBarVisibility"); } }
 
         public ObservableCollection<CheckableItem<VocableType>> Types { get { return types; } set { types = value; NotifyPropertyChanged("Types"); } }
         public ObservableCollection<CheckableItem> Groups { get { return groups; } set { groups = value; NotifyPropertyChanged("Groups"); } }
+
+        #region .: Migrated from Vocabulary class :.
+
+        /// <summary>
+        /// Observable collection of supported vocable types.
+        /// </summary>
+        public ObservableCollection<CheckableItem<VocableType>> TypesCollection { get; set; }
+        /// <summary>
+        /// Observable collection of supported vocable groups.
+        /// </summary>
+        public ObservableCollection<CheckableItem> GroupsCollection { get; set; }
+        public Dictionary<string, CheckableItem> GroupsDict;
+        public Vocable CurrentVocable { get; set; }
+
+        #endregion
+
+        public VocableType EnabledType { get; set; }
 
         #region .: Debug & Test :.
 
@@ -92,12 +123,9 @@ namespace NipporiWpf
 
         public void Confirm()
         {
-            if (state == Vocabulary.CurrentVocable.Type.OutputColumns.Length)
+            if (state == CurrentVocable.Type.OutputColumns.Length)
             {
-                if (Vocabulary.QueueCount > 0)
-                    Vocabulary.DequeueVocable();
-                else
-                    Vocabulary.GetNextVocable();
+                GetNextVocable();
 
                 ShowVocable();
                 state = 0;
@@ -112,23 +140,8 @@ namespace NipporiWpf
 
         public void Reject()
         {
-            if (state == 0)
-            {
-                state = 1;
-            }
-            else
-            {
-                Vocabulary.EnqueueCurrentVocable();
-                if (Vocabulary.QueueCount > 1)
-                    Vocabulary.DequeueVocable();
-                else
-                    Vocabulary.GetNextVocable();
-
-                ShowVocable();
-                state = 0;
-            }
-            UpdateVisibility();
-            NotifyPropertyChanged("StackCount");
+            // rejecting temporarily removed, to be added later and better
+            Confirm();
         }
 
         public void OpenFile(string fileName)
@@ -139,8 +152,8 @@ namespace NipporiWpf
 
         public void StartExam()
         {
-            Vocabulary.Start();
-            Vocabulary.GetNextVocable();
+            VocabularyStart();
+            GetNextVocable();
             ShowVocable();
             UpdateVisibility();
             NotifyPropertyChanged("StackCount");
@@ -151,28 +164,182 @@ namespace NipporiWpf
         /// </summary>
         public void Test()
         {
-            // right now do nothing
+            string path = @"C:\Users\jiriv\OneDrive\Dokumenty\Excel\Japonština\Genki 2-21.xml";
+
+            ReadXmlFile(path);
         }
 
         #endregion
 
         #region .: Private Methods :.
 
+        #region .: Migrated from Vocabulary class :.
+
+        public Vocable GetNextVocable()
+        {
+            Vocable candidateVocable;
+
+            while (true)
+            {
+                candidateVocable = vocableStack[random.Next(vocableStack.Count)];
+                if (candidateVocable.Equals(CurrentVocable))
+                    continue;
+                break;
+            }
+
+            vocableStack.Remove(candidateVocable);
+            candidateVocable.Type = EnabledType;
+            CurrentVocable = candidateVocable;
+
+            if (vocableStack.Count == 0)
+            {
+                RefillStack();
+                Rounds++;
+            }
+
+            return candidateVocable;
+        }
+
+        /// <summary>
+        /// Finds out if the vocable is enabled according to current settings
+        /// of enabled types and groups.
+        /// </summary>
+        /// <param name="vocable">Vocable to be checked.</param>
+        /// <returns>Vocable enabled or not.</returns>
+        private bool IsVocableEnabled(Vocable vocable)
+        {
+            bool isEnabled = false;
+
+            if (vocable.Types.Any(type => type.Data == EnabledType))
+            {
+                if (vocable.Groups.Any(group => group.IsChecked))
+                {
+                    isEnabled = true;
+                }
+            }
+
+            return isEnabled;
+        }
+
+        /// <summary>
+        /// Imports vocables and settings from an XML file.
+        /// </summary>
+        /// <param name="path">Path to the XML file.</param>
+        private void ReadXmlFile(string path)
+        {
+            XmlDocument xmlDoc;
+            XmlNode node;
+            int fieldsCount = 0;
+
+            xmlDoc = new XmlDocument();
+            xmlDoc.Load(path);
+
+            /* import configuration */
+            node = xmlDoc.GetElementsByTagName("config")[0];
+            foreach (XmlNode child in node.ChildNodes)
+            {
+                if (child.Attributes["key"].Value.Equals("columns"))
+                {
+                    fieldsCount = int.Parse(child.Attributes["value"].Value);
+                    break;
+                }
+            }
+
+            /* import vocable type definitions */
+            node = xmlDoc.GetElementsByTagName("types")[0];
+            TypesCollection = new ObservableCollection<CheckableItem<VocableType>>();
+            foreach (XmlNode child in node.ChildNodes)
+            {
+                VocableType type = new VocableType(child);
+
+                CheckableItem<VocableType> item = new CheckableItem<VocableType>(type.Name, type);
+                item.IsCheckedChanged += TypeItem_IsCheckedChanged;
+
+                TypesCollection.Add(item);
+            }
+
+            /* import group definitions */
+            node = xmlDoc.GetElementsByTagName("groups")[0];
+            GroupsDict = new Dictionary<string, CheckableItem>(node.ChildNodes.Count);
+            GroupsCollection = new ObservableCollection<CheckableItem>();
+            foreach (XmlNode child in node.ChildNodes)
+            {
+                CheckableItem item = new CheckableItem(child.Attributes["name"].Value);
+                item.IsCheckedChanged += GroupItem_IsCheckedChanged;
+
+                GroupsDict.Add(child.Attributes["key"].Value, item);
+                GroupsCollection.Add(item);
+            }
+
+            /* import vocables */
+            node = xmlDoc.GetElementsByTagName("vocabulary")[0];
+            foreach (XmlNode child in node.ChildNodes)
+            {
+                Vocable vocable = new Vocable(child, fieldsCount);
+
+                // assign types
+                string types = child.Attributes[$"field{fieldsCount + 1}"].Value;
+                if (types.Equals(string.Empty))
+                {
+                    // no type defined -> assign all of them
+                    vocable.Types = new List<CheckableItem<VocableType>>(TypesCollection);
+                }
+                else
+                {
+                    List<string> typeNumbers = new List<string>(types.Split(';'));
+                    vocable.Types = new List<CheckableItem<VocableType>>(typeNumbers.Count);
+                    typeNumbers.ForEach(typeNumber => vocable.Types.Add(TypesCollection[int.Parse(typeNumber) - 1]));
+                }
+
+                // assign groups
+                string groups = child.Attributes[$"field{fieldsCount + 2}"].Value;
+                if (groups.Equals(string.Empty))
+                {
+                    // no group defined -> assign the first one
+                    vocable.Groups = new List<CheckableItem>(new CheckableItem[] { GroupsCollection[0] });
+                }
+                else
+                {
+                    List<string> groupKeys = new List<string>(groups.Split(';'));
+                    vocable.Groups = new List<CheckableItem>(groupKeys.Count);
+                    groupKeys.ForEach(key => vocable.Groups.Add(GroupsDict[key]));
+                }
+
+                allVocables.Add(vocable);
+            }
+
+            TypesCollection[0].IsChecked = true;
+            foreach (CheckableItem item in GroupsCollection)
+            {
+                item.IsChecked = true;
+            }
+        }
+
+        private void RefillStack()
+        {
+            var enabledVocables = from vocable in allVocables
+                                  where IsVocableEnabled(vocable)
+                                  select vocable;
+
+            vocableStack = new List<Vocable>(enabledVocables);
+        }
+
+        public void VocabularyStart()
+        {
+            RefillStack();
+            Rounds = 0;
+        }
+
+        #endregion
+
         private void LoadDataTaskFunc()
         {
             ProgressBarVisibility = Visibility.Visible;
-            if (OpenedFileName.EndsWith("xml"))
-            {
-                Vocabulary.ReadXmlFile(OpenedFileName);
-            }
-            else
-            {
-                Vocabulary.ReadFile(OpenedFileName);
-            }
+            ReadXmlFile(OpenedFileName);
             ProgressBarVisibility = Visibility.Hidden;
 
-            Types = Vocabulary.TypesCollection;
-            Groups = Vocabulary.GroupsCollection;
+            Types = TypesCollection;
+            Groups = GroupsCollection;
 
             fileLoaded = true;
             StartExam();
@@ -180,9 +347,9 @@ namespace NipporiWpf
 
         private void ShowVocable()
         {
-            Question = Vocabulary.CurrentVocable.Input;
-            Answer1 = Vocabulary.CurrentVocable.GetOutput(0);
-            Answer2 = Vocabulary.CurrentVocable.GetOutput(1);
+            Question = CurrentVocable.Input;
+            Answer1 = CurrentVocable.GetOutput(0);
+            Answer2 = CurrentVocable.GetOutput(1);
         }
 
         private void UpdateVisibility()
@@ -217,6 +384,44 @@ namespace NipporiWpf
         }
 
         #endregion
+
+        #endregion
+
+        #region .: Event Handlers :.
+
+        /// <summary>
+        /// Unchecks all exercise types except of the one just checked (which raised the event)
+        /// and triggers stack refill (to reflect the change).
+        /// This is to make sure that only one exercise type is checked at a time.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TypeItem_IsCheckedChanged(object sender, EventArgs e)
+        {
+            foreach (CheckableItem<VocableType> item in TypesCollection)
+            {
+                if (item != sender)
+                {
+                    item.IsChecked = false;
+                }
+                else
+                {
+                    EnabledType = item.Data;
+                }
+            }
+
+            //RefillStack();
+        }
+
+        /// <summary>
+        /// Triggers stack refill, to reflect change of enabled groups.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void GroupItem_IsCheckedChanged(object sender, EventArgs e)
+        {
+            //RefillStack();
+        }
 
         #endregion
 

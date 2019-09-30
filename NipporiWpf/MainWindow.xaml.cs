@@ -47,7 +47,7 @@ namespace NipporiWpf
         {
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
-                Filter = "XML files (*.xml)|*.xml|Excel sheets|*.xls;*.xlsx",
+                Filter = "XML files (*.xml)|*.xml",
                 FilterIndex = 1,
                 Multiselect = false,
             };

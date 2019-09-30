@@ -76,9 +76,9 @@
     </Compile>
     <Compile Include="ViewModel.cs" />
     <Compile Include="Vocables\CheckableItem.cs" />
+    <Compile Include="Vocables\Lesson.cs" />
     <Compile Include="Vocables\VocableType.cs" />
     <Compile Include="Vocables\Vocable.cs" />
-    <Compile Include="Vocables\Vocabulary.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
