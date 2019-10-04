@@ -65,6 +65,7 @@ namespace Nippori
 
         public string[] Fields { get; } = new string[4];
         public Visibility[] FieldsVisibility { get; } = new Visibility[4];
+
         public int Rounds
         {
             get => rounds;
@@ -118,19 +119,22 @@ namespace Nippori
 
         public void Confirm()
         {
-            if (state == 1)
+            if (vocableStack.Count > 0)
             {
-                GetNextVocable();
+                if (state == 1)
+                {
+                    GetNextVocable();
 
-                ShowVocable();
-                state = 0;
+                    ShowVocable();
+                    state = 0;
+                }
+                else
+                {
+                    state++;
+                }
+                UpdateVisibility();
+                NotifyPropertyChanged("StackCount");
             }
-            else
-            {
-                state++;
-            }
-            UpdateVisibility();
-            NotifyPropertyChanged("StackCount");
         }
 
         public void Reject()
@@ -159,9 +163,6 @@ namespace Nippori
         /// </summary>
         public void Test()
         {
-            string path = @"C:\Users\jiriv\OneDrive\Dokumenty\Excel\Japonština\Genki 2-21.xml";
-
-            ReadXmlFile(path);
         }
 
         #endregion
@@ -276,28 +277,29 @@ namespace Nippori
 
         #region .: Migrated from Vocabulary class :.
 
-        public Vocable GetNextVocable()
+        public void GetNextVocable()
         {
             Vocable candidateVocable;
 
-            while (true)
+            if (vocableStack.Count > 0)
             {
-                candidateVocable = vocableStack[random.Next(vocableStack.Count)];
-                if (candidateVocable.Equals(CurrentVocable))
-                    continue;
-                break;
+                while (true)
+                {
+                    candidateVocable = vocableStack[random.Next(vocableStack.Count)];
+                    if (candidateVocable.Equals(CurrentVocable))
+                        continue;
+                    break;
+                }
+
+                vocableStack.Remove(candidateVocable);
+                CurrentVocable = candidateVocable;
+
+                if (vocableStack.Count == 0)
+                {
+                    RefillStack();
+                    Rounds++;
+                }
             }
-
-            vocableStack.Remove(candidateVocable);
-            CurrentVocable = candidateVocable;
-
-            if (vocableStack.Count == 0)
-            {
-                RefillStack();
-                Rounds++;
-            }
-
-            return candidateVocable;
         }
 
         /// <summary>
@@ -320,7 +322,6 @@ namespace Nippori
 
             return isEnabled;
         }
-
 
         private void RefillStack()
         {
@@ -354,53 +355,68 @@ namespace Nippori
 
         private void ShowVocable()
         {
-            int fieldsCount = EnabledType.InputColumns.Length + EnabledType.OutputColumns.Length;
-
-            for (int i = 0; i < Fields.Length; i++)
+            if (vocableStack.Count > 0)
             {
-                if (i < fieldsCount)
+                int fieldsCount = EnabledType.InputColumns.Length + EnabledType.OutputColumns.Length;
+
+                for (int i = 0; i < Fields.Length; i++)
                 {
-                    if (i < EnabledType.InputColumns.Length)
+                    if (i < fieldsCount)
                     {
-                        Fields[i] = CurrentVocable.Fields[EnabledType.InputColumns[i] - 1];
+                        if (i < EnabledType.InputColumns.Length)
+                        {
+                            Fields[i] = CurrentVocable.Fields[EnabledType.InputColumns[i] - 1];
+                        }
+                        else
+                        {
+                            Fields[i] = CurrentVocable.Fields[EnabledType.OutputColumns[i - EnabledType.InputColumns.Length] - 1];
+                        }
+                    }
+                    else if (i == (Fields.Length - 1))
+                    {
+                        Fields[i] = CurrentVocable.Fields[CurrentVocable.Fields.Length - 1];
                     }
                     else
                     {
-                        Fields[i] = CurrentVocable.Fields[EnabledType.OutputColumns[i - EnabledType.InputColumns.Length] - 1];
+                        Fields[i] = string.Empty;
                     }
                 }
-                else if (i == (Fields.Length - 1))
-                {
-                    Fields[i] = CurrentVocable.Fields[CurrentVocable.Fields.Length - 1];
-                }
-                else
-                {
-                    Fields[i] = string.Empty;
-                }
+            }
+            else
+            {
+                Fields[0] = "(no vocables in selected set)";
+                Fields[1] = Fields[2] = Fields[3];
             }
 
             NotifyPropertyChanged("Fields");
         }
         
-
         private void UpdateVisibility()
         {
             int visibleFields;
 
-            if (state == 0)
+            if (vocableStack.Count > 0)
             {
-                visibleFields = EnabledType.InputColumns.Length;
-                FieldsVisibility[FieldsVisibility.Length - 1] = Visibility.Hidden;
+                if (state == 0)
+                {
+                    visibleFields = EnabledType.InputColumns.Length;
+                    FieldsVisibility[FieldsVisibility.Length - 1] = Visibility.Hidden;
+                }
+                else
+                {
+                    visibleFields = EnabledType.InputColumns.Length + EnabledType.OutputColumns.Length;
+                    FieldsVisibility[FieldsVisibility.Length - 1] = Visibility.Visible;
+                }
+
+                for (int i = 0; i < (FieldsVisibility.Length - 1); i++)
+                {
+                    FieldsVisibility[i] = (i < visibleFields) ? Visibility.Visible : Visibility.Hidden;
+                }
             }
             else
             {
-                visibleFields = EnabledType.InputColumns.Length + EnabledType.OutputColumns.Length;
-                FieldsVisibility[FieldsVisibility.Length - 1] = Visibility.Visible;
-            }
-
-            for (int i = 0; i < (FieldsVisibility.Length - 1); i++)
-            {
-                FieldsVisibility[i] = (i < visibleFields) ? Visibility.Visible : Visibility.Hidden;
+                FieldsVisibility[0] = Visibility.Visible;
+                FieldsVisibility[1] = FieldsVisibility[2] = FieldsVisibility[3] = Visibility.Hidden;
             }
 
             NotifyPropertyChanged("FieldsVisibility");
