@@ -330,17 +330,10 @@ namespace Nippori
         /// <returns>Vocable enabled or not.</returns>
         private bool IsVocableEnabled(Vocable vocable)
         {
-            bool isEnabled = false;
-
-            if (vocable.IsType(EnabledType))
-            {
-                if (vocable.Groups.Any(group => group.IsChecked))
-                {
-                    isEnabled = true;
-                }
-            }
-
-            return isEnabled;
+            return 
+                vocable.Active && 
+                vocable.IsType(EnabledType) && 
+                (vocable.Groups.Any(group => group.IsChecked));
         }
 
         private void RefillStack()

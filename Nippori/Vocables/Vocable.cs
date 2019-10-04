@@ -26,6 +26,10 @@ namespace Nippori.Vocables
         /// Lists groups which this vocable belongs to.
         /// </summary>
         public List<CheckableItem> Groups { get; set; }
+        /// <summary>
+        /// Indicates if the vocable is active for exercising or not.
+        /// </summary>
+        public bool Active { get; private set; }
 
         #endregion
 
@@ -55,6 +59,10 @@ namespace Nippori.Vocables
             {
                 Fields[i - 1] = xmlNode.Attributes[$"field{i}"].Value;
             }
+
+            // read 'active' flag
+            string active = xmlNode.Attributes[$"field{fieldsCount + 3}"].Value;
+            Active = !(active.Equals("0"));
         }
 
         #endregion
