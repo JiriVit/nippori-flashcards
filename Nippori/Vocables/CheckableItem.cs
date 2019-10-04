@@ -40,6 +40,8 @@ namespace Nippori.Vocables
             }
         }
 
+        public bool ClearsAll { get; set; }
+
         #endregion
 
         #region .: Constructor :.

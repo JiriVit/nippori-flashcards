@@ -191,6 +191,39 @@ namespace Nippori
         }
 
         /// <summary>
+        /// Imports group definitions from node 'groups' in the XML document and stores them
+        /// to <see cref="GroupsCollection"/> and <see cref="GroupsDict"/>.
+        /// </summary>
+        private void ImportGroupDefinitions()
+        {
+            XmlNode groupsNode = xmlDocument.GetElementsByTagName("groups")[0];
+
+            // create special first item which works as a command for clearing selections
+            CheckableItem groupClearAll = new CheckableItem("Clear all")
+            {
+                ClearsAll = true,
+            };
+            groupClearAll.IsCheckedChanged += GroupItem_IsCheckedChanged;
+
+            // initialize dictionary and observable collection
+            GroupsDict = new Dictionary<string, CheckableItem>(groupsNode.ChildNodes.Count);
+            GroupsCollection = new ObservableCollection<CheckableItem>
+            {
+                groupClearAll
+            };
+
+            // fill in the groups from the XML file
+            foreach (XmlNode child in groupsNode.ChildNodes)
+            {
+                CheckableItem item = new CheckableItem(child.Attributes["name"].Value);
+                item.IsCheckedChanged += GroupItem_IsCheckedChanged;
+
+                GroupsDict.Add(child.Attributes["key"].Value, item);
+                GroupsCollection.Add(item);
+            }
+        }
+
+        /// <summary>
         /// Imports vocables and settings from an XML file.
         /// </summary>
         /// <param name="path">Path to the XML file.</param>
@@ -214,19 +247,7 @@ namespace Nippori
             }
 
             ImportVocableTypeDefinitions();
-
-            /* import group definitions */
-            node = xmlDocument.GetElementsByTagName("groups")[0];
-            GroupsDict = new Dictionary<string, CheckableItem>(node.ChildNodes.Count);
-            GroupsCollection = new ObservableCollection<CheckableItem>();
-            foreach (XmlNode child in node.ChildNodes)
-            {
-                CheckableItem item = new CheckableItem(child.Attributes["name"].Value);
-                item.IsCheckedChanged += GroupItem_IsCheckedChanged;
-
-                GroupsDict.Add(child.Attributes["key"].Value, item);
-                GroupsCollection.Add(item);
-            }
+            ImportGroupDefinitions();
 
             /* import vocables */
             node = xmlDocument.GetElementsByTagName("vocabulary")[0];
@@ -271,7 +292,6 @@ namespace Nippori
                 item.IsChecked = true;
             }
         }
-
 
         #endregion
 
@@ -450,8 +470,6 @@ namespace Nippori
                     EnabledType = item.Data;
                 }
             }
-
-            //RefillStack();
         }
 
         /// <summary>
@@ -461,7 +479,13 @@ namespace Nippori
         /// <param name="e"></param>
         private void GroupItem_IsCheckedChanged(object sender, EventArgs e)
         {
-            //RefillStack();
+            CheckableItem senderItem = (CheckableItem)sender;
+
+            // check for special 'group' item which is actually a command to clear selection 
+            if (senderItem.ClearsAll && senderItem.IsChecked)
+            {
+                GroupsCollection.ToList().ForEach(item => item.IsChecked = false);
+            }
         }
 
         #endregion
