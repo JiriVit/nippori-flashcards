@@ -28,6 +28,11 @@ namespace Nippori
             InitializeComponent();
             App.MyViewModel = new ViewModel();
             DataContext = App.MyViewModel;
+
+            if (App.Args != null)
+            {
+                App.MyViewModel.OpenFile(App.Args[0]);
+            }
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
