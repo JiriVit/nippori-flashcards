@@ -65,6 +65,7 @@ namespace Nippori
 
         public string[] Fields { get; } = new string[4];
         public Visibility[] FieldsVisibility { get; } = new Visibility[4];
+        public bool[] FieldsEmphasized { get; } = new bool[4];
 
         public int Rounds
         {
@@ -433,6 +434,21 @@ namespace Nippori
             }
 
             NotifyPropertyChanged("FieldsVisibility");
+
+            // nasty hack for emphasizing kanji
+            if ( (vocableStack.Count > 0) &&
+                 (TypesCollection[0].IsChecked) &&
+                 CurrentVocable.IsType(TypesCollection[2].Data)
+               )
+            {
+                FieldsEmphasized[1] = true;
+            }
+            else
+            {
+                FieldsEmphasized[1] = false;
+            }
+
+            NotifyPropertyChanged("FieldsEmphasized");
         }
 
         #region .: Debug :.

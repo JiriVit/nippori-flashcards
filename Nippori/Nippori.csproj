@@ -71,6 +71,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Bases\ModelBase.cs" />
+    <Compile Include="Converters\BoolToBrushConverter.cs" />
     <Compile Include="Pages\FlashcardPage.xaml.cs">
       <DependentUpon>FlashcardPage.xaml</DependentUpon>
     </Compile>
