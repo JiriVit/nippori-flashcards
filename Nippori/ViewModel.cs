@@ -204,13 +204,19 @@ namespace Nippori
             {
                 ClearsAll = true,
             };
+            CheckableItem groupCheckAll = new CheckableItem("Select all")
+            {
+                ChecksAll = true,
+            };
             groupClearAll.IsCheckedChanged += GroupItem_IsCheckedChanged;
+            groupCheckAll.IsCheckedChanged += GroupItem_IsCheckedChanged;
 
             // initialize dictionary and observable collection
             GroupsDict = new Dictionary<string, CheckableItem>(groupsNode.ChildNodes.Count);
             GroupsCollection = new ObservableCollection<CheckableItem>
             {
-                groupClearAll
+                groupClearAll,
+                groupCheckAll
             };
 
             // fill in the groups from the XML file
@@ -494,6 +500,10 @@ namespace Nippori
             if (senderItem.ClearsAll && senderItem.IsChecked)
             {
                 GroupsCollection.ToList().ForEach(item => item.IsChecked = false);
+            }
+            if (senderItem.ChecksAll && senderItem.IsChecked)
+            {
+                GroupsCollection.ToList().ForEach(item => item.IsChecked = (!item.ClearsAll && !item.ChecksAll));
             }
         }
 

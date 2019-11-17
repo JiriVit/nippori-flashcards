@@ -41,6 +41,7 @@ namespace Nippori.Vocables
         }
 
         public bool ClearsAll { get; set; }
+        public bool ChecksAll { get; set; }
 
         #endregion
 
