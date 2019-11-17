@@ -474,15 +474,20 @@ namespace Nippori
         /// <param name="e"></param>
         private void TypeItem_IsCheckedChanged(object sender, EventArgs e)
         {
-            foreach (CheckableItem<VocableType> item in TypesCollection)
+            CheckableItem<VocableType> senderItem = (CheckableItem<VocableType>)sender;
+
+            if (senderItem.IsChecked)
             {
-                if (item != sender)
+                foreach (CheckableItem<VocableType> item in TypesCollection)
                 {
-                    item.IsChecked = false;
-                }
-                else
-                {
-                    EnabledType = item.Data;
+                    if (item != sender)
+                    {
+                        item.IsChecked = false;
+                    }
+                    else
+                    {
+                        EnabledType = item.Data;
+                    }
                 }
             }
         }
