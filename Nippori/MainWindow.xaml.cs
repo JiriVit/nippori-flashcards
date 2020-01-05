@@ -43,7 +43,7 @@ namespace Nippori
                     App.MyViewModel.Confirm();
                     break;
                 case Key.Enter:
-                    App.MyViewModel.Reject();
+                    App.MyViewModel.Disable();
                     break;
             }
         }

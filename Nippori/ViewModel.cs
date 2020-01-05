@@ -144,6 +144,12 @@ namespace Nippori
             Confirm();
         }
 
+        public void Disable()
+        {
+            CurrentVocable.Active = false;
+            Confirm();
+        }
+
         public void OpenFile(string fileName)
         {
             OpenedFileName = fileName;

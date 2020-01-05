@@ -29,7 +29,7 @@ namespace Nippori.Vocables
         /// <summary>
         /// Indicates if the vocable is active for exercising or not.
         /// </summary>
-        public bool Active { get; private set; }
+        public bool Active { get; set; }
 
         #endregion
 
