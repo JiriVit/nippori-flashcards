@@ -509,19 +509,22 @@ namespace Nippori
 
             // nasty hack for emphasizing kanji
             // TODO Rework this so the field to be emphasized can be defined in Excel, not here.
-            if ( (vocableStack.Count > 0) &&
-                 (TypesCollection[0].IsChecked) &&
-                 CurrentVocable.IsType(TypesCollection[2].Data)
-               )
+            if (currentLanguage.Equals(Language.Japanese))
             {
-                FieldsEmphasized[1] = true;
-            }
-            else
-            {
-                FieldsEmphasized[1] = false;
-            }
+                if ((vocableStack.Count > 0) &&
+                     (TypesCollection[0].IsChecked) &&
+                     CurrentVocable.IsType(TypesCollection[2].Data)
+                   )
+                {
+                    FieldsEmphasized[1] = true;
+                }
+                else
+                {
+                    FieldsEmphasized[1] = false;
+                }
 
-            NotifyPropertyChanged("FieldsEmphasized");
+                NotifyPropertyChanged("FieldsEmphasized");
+            }
         }
 
         #region .: Debug :.
