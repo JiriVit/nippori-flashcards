@@ -18,6 +18,54 @@ namespace Nippori
 
         private const int ColOffsetActive = 3;
 
+        /// <summary>
+        /// Array with supported languages.
+        /// </summary>
+        private readonly Language[] SupportedLanguages = new Language[]
+        {
+            Language.Chinese,
+            Language.Japanese,
+        };
+
+        #endregion
+
+        #region .: Nested Classes :.
+
+        /// <summary>
+        /// Represents a language being examined, holds configuration specific for the language.
+        /// </summary>
+        public class Language
+        {
+            #region .: Constants :.
+
+            public static readonly Language Japanese = new Language()
+            {
+                Name = "Japanese",
+                Key = "jp",
+            };
+
+            public static readonly Language Chinese = new Language()
+            {
+                Name = "Chinese",
+                Key = "cn",
+            };
+
+            #endregion
+
+            #region .: Properties :.
+
+            /// <summary>
+            /// Gets name of the language.
+            /// </summary>
+            public string Name { get; private set; }
+            /// <summary>
+            /// Gets key, i.e. shortcut of the language, defined in Excel sheet.
+            /// </summary>
+            public string Key { get; private set; }
+
+            #endregion
+        }
+
         #endregion
 
         #region .: Private Fields :.
@@ -56,6 +104,7 @@ namespace Nippori
         private List<Vocable> vocableStack;
 
         private Random random = new Random();
+        private Language currentLanguage;
 
         #endregion
 
@@ -255,7 +304,18 @@ namespace Nippori
                 if (child.Attributes["key"].Value.Equals("columns"))
                 {
                     fieldsCount = int.Parse(child.Attributes["value"].Value);
-                    break;
+                }
+                if (child.Attributes["key"].Value.Equals("lang"))
+                {
+                    string key = child.Attributes["value"].Value;
+                    foreach (Language lang in SupportedLanguages)
+                    {
+                        if (lang.Key.Equals(key))
+                        {
+                            currentLanguage = lang;
+                            break;
+                        }
+                    }
                 }
             }
 
@@ -448,6 +508,7 @@ namespace Nippori
             NotifyPropertyChanged("FieldsVisibility");
 
             // nasty hack for emphasizing kanji
+            // TODO Rework this so the field to be emphasized can be defined in Excel, not here.
             if ( (vocableStack.Count > 0) &&
                  (TypesCollection[0].IsChecked) &&
                  CurrentVocable.IsType(TypesCollection[2].Data)
