@@ -8,11 +8,12 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Xml;
 
+using Nippori.Bases;
 using Nippori.Vocables;
 
 namespace Nippori
 {
-    public class ViewModel : INotifyPropertyChanged
+    public class FlashCardsViewModel : ModelBase
     {
         #region .: Constants :.
 
@@ -70,13 +71,12 @@ namespace Nippori
 
         #region .: Private Fields :.
 
-        #region .: Backing for properties :.
-
-        #endregion
-
         #region .: Status :.
 
+        private string openedFileName;
         private bool fileLoaded;
+        private int rounds = 0;
+        private int state = 0;
 
         #endregion
 
@@ -86,23 +86,21 @@ namespace Nippori
 
         #endregion
 
+        #region .: Collections :.
+
+        private Dictionary<string, CheckableItemBase> groupsDict;
+
+        #endregion
+
+        #region .: Debug :.
+
         private string debugText;
 
-        private int rounds = 0;
+        #endregion
 
         private Visibility progressBarVisibility = Visibility.Hidden;
-        private string openedFileName;
-
-        private ObservableCollection<CheckableItem<VocableType>> types;
-        private ObservableCollection<CheckableItem> groups;
-
-        private int state = 0;
-
-        // this is migrated from Vocabulary class, to be ordered later
-
         private List<Vocable> allVocables = new List<Vocable>();
         private List<Vocable> vocableStack;
-
         private Random random = new Random();
         private Language currentLanguage;
 
@@ -110,53 +108,47 @@ namespace Nippori
 
         #region .: Properties :.
 
-        public string DebugText { get { return debugText; } set { debugText = value; NotifyPropertyChanged("DebugText"); } }
+        #region .: Status :.
 
-        public string[] Fields { get; } = new string[4];
-        public Visibility[] FieldsVisibility { get; } = new Visibility[4];
-        public bool[] FieldsEmphasized { get; } = new bool[4];
-
-        public int Rounds
-        {
-            get => rounds;
-            set { rounds = value; NotifyPropertyChanged("Rounds"); }
-        }
         public string StackCount { get => fileLoaded ? vocableStack.Count.ToString() : "--"; }
+        public int Rounds { get => rounds; set { rounds = value; NotifyPropertyChanged("Rounds"); } }
+        public string OpenedFileName { get => openedFileName; set { openedFileName = value; NotifyPropertyChanged("OpenedFileName"); } }
 
-        public string OpenedFileName { get { return openedFileName; } set { openedFileName = value; NotifyPropertyChanged("OpenedFileName"); } }
-        public Visibility ProgressBarVisibility { get { return progressBarVisibility; } set { progressBarVisibility = value; NotifyPropertyChanged("ProgressBarVisibility"); } }
+        #endregion
 
-        public ObservableCollection<CheckableItem<VocableType>> Types { get { return types; } set { types = value; NotifyPropertyChanged("Types"); } }
-        public ObservableCollection<CheckableItem> Groups { get { return groups; } set { groups = value; NotifyPropertyChanged("Groups"); } }
+        #region .: Collections :.
 
-        #region .: Migrated from Vocabulary class :.
+        /// <summary>
+        /// Observable collection of supported vocable groups.
+        /// </summary>
+        public ObservableCollection<CheckableItemBase> GroupsCollection { get; private set; }
 
         /// <summary>
         /// Observable collection of supported vocable types.
         /// </summary>
-        public ObservableCollection<CheckableItem<VocableType>> TypesCollection { get; set; }
-        /// <summary>
-        /// Observable collection of supported vocable groups.
-        /// </summary>
-        public ObservableCollection<CheckableItem> GroupsCollection { get; set; }
-        public Dictionary<string, CheckableItem> GroupsDict;
-        public Vocable CurrentVocable { get; set; }
+        public ObservableCollection<CheckableItem<VocableType>> TypesCollection { get; private set; }
 
         #endregion
 
-        public VocableType EnabledType { get; set; }
+        #region .: Debug :.
 
-        #region .: Debug & Test :.
-
+        public string DebugText { get => debugText; set { debugText = value; NotifyPropertyChanged("DebugText"); } }
         public bool TestButtonVisible { get; private set; } = false;
 
         #endregion
+
+        public string[] Fields { get; } = new string[4];
+        public Visibility[] FieldsVisibility { get; } = new Visibility[4];
+        public bool[] FieldsEmphasized { get; } = new bool[4];
+        public Visibility ProgressBarVisibility { get { return progressBarVisibility; } set { progressBarVisibility = value; NotifyPropertyChanged("ProgressBarVisibility"); } }
+        public Vocable CurrentVocable { get; set; }
+        public VocableType EnabledType { get; set; }
 
         #endregion
 
         #region .: Constructor :.
 
-        public ViewModel()
+        public FlashCardsViewModel()
         {
 #if DEBUG
             TestButtonVisible = true;
@@ -244,45 +236,42 @@ namespace Nippori
 
                 TypesCollection.Add(item);
             }
+
+            NotifyPropertyChanged("TypesCollection");
         }
 
         /// <summary>
         /// Imports group definitions from node 'groups' in the XML document and stores them
-        /// to <see cref="GroupsCollection"/> and <see cref="GroupsDict"/>.
+        /// to <see cref="GroupsCollection"/> and <see cref="groupsDict"/>.
         /// </summary>
         private void ImportGroupDefinitions()
         {
             XmlNode groupsNode = xmlDocument.GetElementsByTagName("groups")[0];
 
-            // create special first item which works as a command for clearing selections
-            CheckableItem groupClearAll = new CheckableItem("Clear all")
-            {
-                ClearsAll = true,
-            };
-            CheckableItem groupCheckAll = new CheckableItem("Select all")
-            {
-                ChecksAll = true,
-            };
-            groupClearAll.IsCheckedChanged += GroupItem_IsCheckedChanged;
-            groupCheckAll.IsCheckedChanged += GroupItem_IsCheckedChanged;
-
             // initialize dictionary and observable collection
-            GroupsDict = new Dictionary<string, CheckableItem>(groupsNode.ChildNodes.Count);
-            GroupsCollection = new ObservableCollection<CheckableItem>
+            groupsDict = new Dictionary<string, CheckableItemBase>(groupsNode.ChildNodes.Count);
+            GroupsCollection = new ObservableCollection<CheckableItemBase>
             {
-                groupClearAll,
-                groupCheckAll
+                new CheckableItemBase("Clear all") { ClearsAll = true },
+                new CheckableItemBase("Select all") { ChecksAll = true },
             };
 
             // fill in the groups from the XML file
             foreach (XmlNode child in groupsNode.ChildNodes)
             {
-                CheckableItem item = new CheckableItem(child.Attributes["name"].Value);
-                item.IsCheckedChanged += GroupItem_IsCheckedChanged;
+                CheckableItemBase item = new CheckableItemBase(child.Attributes["name"].Value);
 
-                GroupsDict.Add(child.Attributes["key"].Value, item);
+                groupsDict.Add(child.Attributes["key"].Value, item);
                 GroupsCollection.Add(item);
             }
+
+            // register event handler for each item
+            foreach (CheckableItemBase item in GroupsCollection)
+            {
+                item.IsCheckedChanged += GroupItem_IsCheckedChanged;
+            }
+
+            NotifyPropertyChanged("GroupsCollection");
         }
 
         /// <summary>
@@ -347,20 +336,20 @@ namespace Nippori
                 if (groups.Equals(string.Empty))
                 {
                     // no group defined -> assign the first one
-                    vocable.Groups = new List<CheckableItem>(new CheckableItem[] { GroupsCollection[0] });
+                    vocable.Groups = new List<CheckableItemBase>(new CheckableItemBase[] { GroupsCollection[0] });
                 }
                 else
                 {
                     List<string> groupKeys = new List<string>(groups.Split(';'));
-                    vocable.Groups = new List<CheckableItem>(groupKeys.Count);
-                    groupKeys.ForEach(key => vocable.Groups.Add(GroupsDict[key]));
+                    vocable.Groups = new List<CheckableItemBase>(groupKeys.Count);
+                    groupKeys.ForEach(key => vocable.Groups.Add(groupsDict[key]));
                 }
 
                 allVocables.Add(vocable);
             }
 
             TypesCollection[0].IsChecked = true;
-            foreach (CheckableItem item in GroupsCollection)
+            foreach (CheckableItemBase item in GroupsCollection)
             {
                 item.IsChecked = true;
             }
@@ -431,9 +420,6 @@ namespace Nippori
             ProgressBarVisibility = Visibility.Visible;
             ReadXmlFile(OpenedFileName);
             ProgressBarVisibility = Visibility.Hidden;
-
-            Types = TypesCollection;
-            Groups = GroupsCollection;
 
             fileLoaded = true;
             StartExam();
@@ -569,7 +555,7 @@ namespace Nippori
         /// <param name="e"></param>
         private void GroupItem_IsCheckedChanged(object sender, EventArgs e)
         {
-            CheckableItem senderItem = (CheckableItem)sender;
+            CheckableItemBase senderItem = (CheckableItemBase)sender;
 
             // check for special 'group' item which is actually a command to clear selection 
             if (senderItem.ClearsAll && senderItem.IsChecked)
@@ -581,17 +567,6 @@ namespace Nippori
                 GroupsCollection.ToList().ForEach(item => item.IsChecked = (!item.ClearsAll && !item.ChecksAll));
             }
         }
-
-        #endregion
-
-        #region .: INotifyPropertyChanged :.
-
-        private void NotifyPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
 
         #endregion
     }

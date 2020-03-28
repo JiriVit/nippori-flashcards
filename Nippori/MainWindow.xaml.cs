@@ -16,6 +16,8 @@ using System.Windows.Shapes;
 
 using Microsoft.Win32;
 
+using Nippori.ViewModel;
+
 namespace Nippori
 {
     /// <summary>
@@ -23,27 +25,38 @@ namespace Nippori
     /// </summary>
     public partial class MainWindow : Window
     {
+        #region .: Properties :.
+
+        public MainWindowViewModel MainWindowVM { get; private set; } = new MainWindowViewModel();
+
+        #endregion
+
+        #region .: Constructor :.
+
         public MainWindow()
         {
             InitializeComponent();
-            App.MyViewModel = new ViewModel();
-            DataContext = App.MyViewModel;
+            DataContext = App.FlashCardsVM;
 
             if (App.Args != null)
             {
-                App.MyViewModel.OpenFile(App.Args[0]);
+                App.FlashCardsVM.OpenFile(App.Args[0]);
             }
         }
+
+        #endregion
+
+        #region .: Event Handlers :.
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
             switch (e.Key)
             {
                 case Key.Space:
-                    App.MyViewModel.Confirm();
+                    App.FlashCardsVM.Confirm();
                     break;
                 case Key.Enter:
-                    App.MyViewModel.Disable();
+                    App.FlashCardsVM.Disable();
                     break;
             }
         }
@@ -58,18 +71,20 @@ namespace Nippori
             };
 
             if (openFileDialog.ShowDialog() == true)
-                App.MyViewModel.OpenFile(openFileDialog.FileName);
+                App.FlashCardsVM.OpenFile(openFileDialog.FileName);
         }
 
         private void ButtonTest_Click(object sender, RoutedEventArgs e)
         {
-            App.MyViewModel.Test();
+            App.FlashCardsVM.Test();
         }
 
         private void MenuItem_SubmenuClosed(object sender, RoutedEventArgs e)
         {
             // TODO do this only if changes were made, not for each submenu closed
-            App.MyViewModel.StartExam();
+            App.FlashCardsVM.StartExam();
         }
+
+        #endregion
     }
 }

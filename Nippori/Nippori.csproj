@@ -75,8 +75,9 @@
     <Compile Include="Pages\FlashcardPage.xaml.cs">
       <DependentUpon>FlashcardPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ViewModel.cs" />
-    <Compile Include="Vocables\CheckableItem.cs" />
+    <Compile Include="FlashCardsViewModel.cs" />
+    <Compile Include="ViewModel\MainWindowViewModel.cs" />
+    <Compile Include="Bases\CheckableItemBase.cs" />
     <Compile Include="Vocables\Lesson.cs" />
     <Compile Include="Vocables\VocableType.cs" />
     <Compile Include="Vocables\Vocable.cs" />
@@ -129,6 +130,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="iconfinder_Flower-2_2974382.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Model\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

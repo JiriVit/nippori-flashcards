@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 
+using Nippori.Bases;
 
 namespace Nippori.Vocables
 {
@@ -25,7 +26,7 @@ namespace Nippori.Vocables
         /// <summary>
         /// Lists groups which this vocable belongs to.
         /// </summary>
-        public List<CheckableItem> Groups { get; set; }
+        public List<CheckableItemBase> Groups { get; set; }
         /// <summary>
         /// Indicates if the vocable is active for exercising or not.
         /// </summary>

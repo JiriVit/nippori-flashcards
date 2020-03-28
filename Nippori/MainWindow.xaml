@@ -25,10 +25,10 @@
             </Menu.Resources>
             <MenuItem Header="Load" Click="ButtonLoad_Click" />
             <MenuItem Header="Types" 
-                      ItemsSource="{Binding Types}" ItemContainerStyle="{StaticResource TypesMenuItemStyle}"
+                      ItemsSource="{Binding TypesCollection}" ItemContainerStyle="{StaticResource TypesMenuItemStyle}"
                       SubmenuClosed="MenuItem_SubmenuClosed"/>
             <MenuItem Header="Groups" 
-                      ItemsSource="{Binding Groups}" ItemContainerStyle="{StaticResource GroupsMenuItemStyle}"
+                      ItemsSource="{Binding GroupsCollection}" ItemContainerStyle="{StaticResource GroupsMenuItemStyle}"
                       SubmenuClosed="MenuItem_SubmenuClosed"/>
             <MenuItem Header="TEST"
                       HorizontalAlignment="Right" Visibility="{Binding TestButtonVisible, Converter={StaticResource BoolToVis}}"
@@ -38,6 +38,7 @@
             <ProgressBar Width="100" Height="18" Visibility="{Binding ProgressBarVisibility}" IsIndeterminate="True"/>
             <TextBox Text="{Binding OpenedFileName, FallbackValue='no file loaded'}" IsReadOnly="True"/>
         </StatusBar>
+        
         <Frame Source="Pages/FlashcardPage.xaml" />
     </DockPanel>
 </Window>

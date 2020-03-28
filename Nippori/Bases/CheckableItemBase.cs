@@ -4,11 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using Nippori.Bases;
-
-namespace Nippori.Vocables
+namespace Nippori.Bases
 {
-    public class CheckableItem : ModelBase
+    public class CheckableItemBase : ModelBase
     {
         #region .: Private Fields :.
 
@@ -47,7 +45,7 @@ namespace Nippori.Vocables
 
         #region .: Constructor :.
 
-        public CheckableItem(string name)
+        public CheckableItemBase(string name)
         {
             Name = name;
         }
@@ -70,7 +68,7 @@ namespace Nippori.Vocables
         #endregion
     }
 
-    public class CheckableItem<T> : CheckableItem
+    public class CheckableItem<T> : CheckableItemBase
     {
         public T Data { set; get; }
 

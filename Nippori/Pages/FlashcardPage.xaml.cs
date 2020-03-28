@@ -24,7 +24,7 @@ namespace Nippori.Pages
         public FlashcardPage()
         {
             InitializeComponent();
-            DataContext = App.MyViewModel;
+            DataContext = App.FlashCardsVM;
         }
     }
 }
