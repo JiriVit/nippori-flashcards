@@ -226,16 +226,10 @@ namespace Nippori
         private void ImportVocableTypeDefinitions()
         {
             XmlNode typesNode = xmlDocument.GetElementsByTagName("types")[0];
-            //TypesCollection = new ObservableCollection<CheckableItem<TypeModel>>(); ***
             TypesCollection = new ObservableCollection<TypeModel>();
             foreach (XmlNode child in typesNode.ChildNodes)
             {
                 TypeModel type = new TypeModel(child);
-
-                // ***
-                //CheckableItem<TypeModel> item = new CheckableItem<TypeModel>(type.Name, type);
-                //item.IsCheckedChanged += TypeItem_IsCheckedChanged;
-                //TypesCollection.Add(item);
 
                 type.IsCheckedChanged += TypeItem_IsCheckedChanged;
                 TypesCollection.Add(type);
@@ -326,15 +320,11 @@ namespace Nippori
                 if (types.Equals(string.Empty))
                 {
                     // no type defined -> assign all of them
-                    //vocable.AllowedTypes = new List<CheckableItem<TypeModel>>(TypesCollection); ***
                     vocable.AllowedTypes = new List<TypeModel>(TypesCollection);
                 }
                 else
                 {
                     List<string> typeNumbers = new List<string>(types.Split(';'));
-                    //vocable.AllowedTypes = new List<CheckableItem<TypeModel>>(typeNumbers.Count);
-                    //typeNumbers.ForEach(typeNumber => vocable.AllowedTypes.Add(TypesCollection[int.Parse(typeNumber) - 1]));
-                    // ***
 
                     vocable.AllowedTypes = new List<TypeModel>(typeNumbers.Count);
                     typeNumbers.ForEach(typeNumber => vocable.AllowedTypes.Add(TypesCollection[int.Parse(typeNumber) - 1]));
