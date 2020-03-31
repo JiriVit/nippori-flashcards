@@ -11,7 +11,7 @@ using System.Xml;
 using Nippori.Bases;
 using Nippori.Model;
 
-namespace Nippori
+namespace Nippori.ViewModel
 {
     public class FlashCardsViewModel : ModelBase
     {
@@ -320,14 +320,14 @@ namespace Nippori
                 if (types.Equals(string.Empty))
                 {
                     // no type defined -> assign all of them
-                    vocable.AllowedTypes = new List<TypeModel>(TypesCollection);
+                    vocable.Types = new List<TypeModel>(TypesCollection);
                 }
                 else
                 {
                     List<string> typeNumbers = new List<string>(types.Split(';'));
 
-                    vocable.AllowedTypes = new List<TypeModel>(typeNumbers.Count);
-                    typeNumbers.ForEach(typeNumber => vocable.AllowedTypes.Add(TypesCollection[int.Parse(typeNumber) - 1]));
+                    vocable.Types = new List<TypeModel>(typeNumbers.Count);
+                    typeNumbers.ForEach(typeNumber => vocable.Types.Add(TypesCollection[int.Parse(typeNumber) - 1]));
                 }
 
                 // assign groups

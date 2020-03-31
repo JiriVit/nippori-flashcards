@@ -15,38 +15,27 @@ namespace Nippori.Model
     {
         #region .: Properties :.
 
+        /// <summary>
+        /// Vocable fields (like Czech/English meaning, infinitive, past tense etc.).
+        /// </summary>
         public string[] Fields { get; private set; }
 
         /// <summary>
-        /// Lists types allowed for this vocable.
+        /// Gets list of types assigned to this vocable.
         /// </summary>
-        public List<TypeModel> AllowedTypes { get; set; }
+        public List<TypeModel> Types { get; set; }
         /// <summary>
-        /// Lists groups which this vocable belongs to.
+        /// Gets list of groups assigned to this vocable.
         /// </summary>
         public List<GroupModel> Groups { get; set; }
         /// <summary>
-        /// Indicates if the vocable is active for exercising or not.
+        /// Indicates that the vocable is active for examination.
         /// </summary>
         public bool Active { get; set; }
 
         #endregion
 
-        #region .: Private Fields :.
-
-        /// <summary>
-        /// Číslo řádku v Excelu, z kterého bylo slovíčko načteno.
-        /// </summary>
-        private int id;
-
-        #endregion
-
         #region .: Constructors :.
-
-        public VocableModel(int id)
-        {
-            this.id = id;
-        }
 
         public VocableModel(XmlNode xmlNode, int fieldsCount)
         {
@@ -78,7 +67,7 @@ namespace Nippori.Model
         public bool IsType(TypeModel vocableType)
         {
             return 
-                (AllowedTypes.Any(type => type == vocableType)) &&
+                (Types.Any(type => type == vocableType)) &&
                 (Fields[vocableType.InputColumns[0] - 1].Length > 0);
         }
 

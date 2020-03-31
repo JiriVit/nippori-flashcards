@@ -75,7 +75,7 @@
     <Compile Include="Pages\FlashcardPage.xaml.cs">
       <DependentUpon>FlashcardPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="FlashCardsViewModel.cs" />
+    <Compile Include="ViewModel\FlashCardsViewModel.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
     <Compile Include="Model\GroupModel.cs" />
     <Compile Include="Model\TypeModel.cs" />
