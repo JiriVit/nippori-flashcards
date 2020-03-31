@@ -6,14 +6,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 
-using Nippori.Bases;
-
-namespace Nippori.Vocables
+namespace Nippori.Model
 {
     /// <summary>
     /// Represents a vocable.
     /// </summary>
-    public class Vocable
+    public class VocableModel
     {
         #region .: Properties :.
 
@@ -22,11 +20,11 @@ namespace Nippori.Vocables
         /// <summary>
         /// Lists types allowed for this vocable.
         /// </summary>
-        public List<CheckableItem<VocableType>> AllowedTypes { get; set; }
+        public List<TypeModel> AllowedTypes { get; set; }
         /// <summary>
         /// Lists groups which this vocable belongs to.
         /// </summary>
-        public List<CheckableItemBase> Groups { get; set; }
+        public List<GroupModel> Groups { get; set; }
         /// <summary>
         /// Indicates if the vocable is active for exercising or not.
         /// </summary>
@@ -45,12 +43,12 @@ namespace Nippori.Vocables
 
         #region .: Constructors :.
 
-        public Vocable(int id)
+        public VocableModel(int id)
         {
             this.id = id;
         }
 
-        public Vocable(XmlNode xmlNode, int fieldsCount)
+        public VocableModel(XmlNode xmlNode, int fieldsCount)
         {
             int i;
 
@@ -77,14 +75,13 @@ namespace Nippori.Vocables
         /// </summary>
         /// <param name="vocableType">Vocable type to be checked against.</param>
         /// <returns>Boolean result.</returns>
-        public bool IsType(VocableType vocableType)
+        public bool IsType(TypeModel vocableType)
         {
             return 
-                (AllowedTypes.Any(type => type.Data == vocableType)) &&
+                (AllowedTypes.Any(type => type == vocableType)) &&
                 (Fields[vocableType.InputColumns[0] - 1].Length > 0);
         }
 
         #endregion
-
     }
 }

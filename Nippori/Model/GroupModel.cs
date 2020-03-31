@@ -1,38 +1,34 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Nippori.Bases
+using Nippori.Bases;
+
+namespace Nippori.Model
 {
-    public class CheckableItemBase : ModelBase
+    /// <summary>
+    /// Represents a group (aka category) of a vocable.
+    /// We organize vocables to groups (per part of speech, per lesson, per topics etc.).
+    /// </summary>
+    public class GroupModel : ModelBase
     {
         #region .: Private Fields :.
 
-        private string name;
         private bool isChecked = false;
 
         #endregion
 
         #region .: Properties :.
 
-        public string Name
-        {
-            get { return name; }
-            set { name = value; NotifyPropertyChanged("Name"); }
-        }
+        public string Name { get; protected set; }
 
         public bool IsChecked
         {
-            get { return isChecked; }
+            get => isChecked;
             set
             {
-                bool previousValue = isChecked;
-                isChecked = value;
-                NotifyPropertyChanged("IsChecked");
-                if (previousValue != isChecked)
+                if (isChecked != value)
                 {
+                    isChecked = value;
+                    NotifyPropertyChanged("IsChecked");
                     OnIsCheckedChanged();
                 }
             }
@@ -45,7 +41,9 @@ namespace Nippori.Bases
 
         #region .: Constructor :.
 
-        public CheckableItemBase(string name)
+        public GroupModel() { }
+
+        public GroupModel(string name)
         {
             Name = name;
         }
@@ -66,15 +64,5 @@ namespace Nippori.Bases
         public event EventHandler IsCheckedChanged;
 
         #endregion
-    }
-
-    public class CheckableItem<T> : CheckableItemBase
-    {
-        public T Data { set; get; }
-
-        public CheckableItem(string name, T data) : base(name)
-        {
-            Data = data;
-        }
     }
 }

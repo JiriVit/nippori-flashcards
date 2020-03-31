@@ -9,7 +9,7 @@ using System.Windows;
 using System.Xml;
 
 using Nippori.Bases;
-using Nippori.Vocables;
+using Nippori.Model;
 
 namespace Nippori
 {
@@ -88,7 +88,7 @@ namespace Nippori
 
         #region .: Collections :.
 
-        private Dictionary<string, CheckableItemBase> groupsDict;
+        private Dictionary<string, GroupModel> groupsDict;
 
         #endregion
 
@@ -99,8 +99,8 @@ namespace Nippori
         #endregion
 
         private Visibility progressBarVisibility = Visibility.Hidden;
-        private List<Vocable> allVocables = new List<Vocable>();
-        private List<Vocable> vocableStack;
+        private List<VocableModel> allVocables = new List<VocableModel>();
+        private List<VocableModel> vocableStack;
         private Random random = new Random();
         private Language currentLanguage;
 
@@ -121,12 +121,12 @@ namespace Nippori
         /// <summary>
         /// Observable collection of supported vocable groups.
         /// </summary>
-        public ObservableCollection<CheckableItemBase> GroupsCollection { get; private set; }
+        public ObservableCollection<GroupModel> GroupsCollection { get; private set; }
 
         /// <summary>
         /// Observable collection of supported vocable types.
         /// </summary>
-        public ObservableCollection<CheckableItem<VocableType>> TypesCollection { get; private set; }
+        public ObservableCollection<TypeModel> TypesCollection { get; private set; }
 
         #endregion
 
@@ -141,8 +141,8 @@ namespace Nippori
         public Visibility[] FieldsVisibility { get; } = new Visibility[4];
         public bool[] FieldsEmphasized { get; } = new bool[4];
         public Visibility ProgressBarVisibility { get { return progressBarVisibility; } set { progressBarVisibility = value; NotifyPropertyChanged("ProgressBarVisibility"); } }
-        public Vocable CurrentVocable { get; set; }
-        public VocableType EnabledType { get; set; }
+        public VocableModel CurrentVocable { get; set; }
+        public TypeModel EnabledType { get; set; }
 
         #endregion
 
@@ -226,15 +226,19 @@ namespace Nippori
         private void ImportVocableTypeDefinitions()
         {
             XmlNode typesNode = xmlDocument.GetElementsByTagName("types")[0];
-            TypesCollection = new ObservableCollection<CheckableItem<VocableType>>();
+            //TypesCollection = new ObservableCollection<CheckableItem<TypeModel>>(); ***
+            TypesCollection = new ObservableCollection<TypeModel>();
             foreach (XmlNode child in typesNode.ChildNodes)
             {
-                VocableType type = new VocableType(child);
+                TypeModel type = new TypeModel(child);
 
-                CheckableItem<VocableType> item = new CheckableItem<VocableType>(type.Name, type);
-                item.IsCheckedChanged += TypeItem_IsCheckedChanged;
+                // ***
+                //CheckableItem<TypeModel> item = new CheckableItem<TypeModel>(type.Name, type);
+                //item.IsCheckedChanged += TypeItem_IsCheckedChanged;
+                //TypesCollection.Add(item);
 
-                TypesCollection.Add(item);
+                type.IsCheckedChanged += TypeItem_IsCheckedChanged;
+                TypesCollection.Add(type);
             }
 
             NotifyPropertyChanged("TypesCollection");
@@ -249,24 +253,24 @@ namespace Nippori
             XmlNode groupsNode = xmlDocument.GetElementsByTagName("groups")[0];
 
             // initialize dictionary and observable collection
-            groupsDict = new Dictionary<string, CheckableItemBase>(groupsNode.ChildNodes.Count);
-            GroupsCollection = new ObservableCollection<CheckableItemBase>
+            groupsDict = new Dictionary<string, GroupModel>(groupsNode.ChildNodes.Count);
+            GroupsCollection = new ObservableCollection<GroupModel>
             {
-                new CheckableItemBase("Clear all") { ClearsAll = true },
-                new CheckableItemBase("Select all") { ChecksAll = true },
+                new GroupModel("Clear all") { ClearsAll = true },
+                new GroupModel("Select all") { ChecksAll = true },
             };
 
             // fill in the groups from the XML file
             foreach (XmlNode child in groupsNode.ChildNodes)
             {
-                CheckableItemBase item = new CheckableItemBase(child.Attributes["name"].Value);
+                GroupModel item = new GroupModel(child.Attributes["name"].Value);
 
                 groupsDict.Add(child.Attributes["key"].Value, item);
                 GroupsCollection.Add(item);
             }
 
             // register event handler for each item
-            foreach (CheckableItemBase item in GroupsCollection)
+            foreach (GroupModel item in GroupsCollection)
             {
                 item.IsCheckedChanged += GroupItem_IsCheckedChanged;
             }
@@ -315,19 +319,24 @@ namespace Nippori
             node = xmlDocument.GetElementsByTagName("vocabulary")[0];
             foreach (XmlNode child in node.ChildNodes)
             {
-                Vocable vocable = new Vocable(child, fieldsCount);
+                VocableModel vocable = new VocableModel(child, fieldsCount);
 
                 // assign types
                 string types = child.Attributes[$"field{fieldsCount + 1}"].Value;
                 if (types.Equals(string.Empty))
                 {
                     // no type defined -> assign all of them
-                    vocable.AllowedTypes = new List<CheckableItem<VocableType>>(TypesCollection);
+                    //vocable.AllowedTypes = new List<CheckableItem<TypeModel>>(TypesCollection); ***
+                    vocable.AllowedTypes = new List<TypeModel>(TypesCollection);
                 }
                 else
                 {
                     List<string> typeNumbers = new List<string>(types.Split(';'));
-                    vocable.AllowedTypes = new List<CheckableItem<VocableType>>(typeNumbers.Count);
+                    //vocable.AllowedTypes = new List<CheckableItem<TypeModel>>(typeNumbers.Count);
+                    //typeNumbers.ForEach(typeNumber => vocable.AllowedTypes.Add(TypesCollection[int.Parse(typeNumber) - 1]));
+                    // ***
+
+                    vocable.AllowedTypes = new List<TypeModel>(typeNumbers.Count);
                     typeNumbers.ForEach(typeNumber => vocable.AllowedTypes.Add(TypesCollection[int.Parse(typeNumber) - 1]));
                 }
 
@@ -336,12 +345,12 @@ namespace Nippori
                 if (groups.Equals(string.Empty))
                 {
                     // no group defined -> assign the first one
-                    vocable.Groups = new List<CheckableItemBase>(new CheckableItemBase[] { GroupsCollection[0] });
+                    vocable.Groups = new List<GroupModel>(new GroupModel[] { GroupsCollection[0] });
                 }
                 else
                 {
                     List<string> groupKeys = new List<string>(groups.Split(';'));
-                    vocable.Groups = new List<CheckableItemBase>(groupKeys.Count);
+                    vocable.Groups = new List<GroupModel>(groupKeys.Count);
                     groupKeys.ForEach(key => vocable.Groups.Add(groupsDict[key]));
                 }
 
@@ -349,7 +358,7 @@ namespace Nippori
             }
 
             TypesCollection[0].IsChecked = true;
-            foreach (CheckableItemBase item in GroupsCollection)
+            foreach (GroupModel item in GroupsCollection)
             {
                 item.IsChecked = true;
             }
@@ -361,7 +370,7 @@ namespace Nippori
 
         public void GetNextVocable()
         {
-            Vocable candidateVocable;
+            VocableModel candidateVocable;
 
             if (vocableStack.Count > 0)
             {
@@ -390,7 +399,7 @@ namespace Nippori
         /// </summary>
         /// <param name="vocable">Vocable to be checked.</param>
         /// <returns>Vocable enabled or not.</returns>
-        private bool IsVocableEnabled(Vocable vocable)
+        private bool IsVocableEnabled(VocableModel vocable)
         {
             return 
                 vocable.Active && 
@@ -404,7 +413,7 @@ namespace Nippori
                                   where IsVocableEnabled(vocable)
                                   select vocable;
 
-            vocableStack = new List<Vocable>(enabledVocables);
+            vocableStack = new List<VocableModel>(enabledVocables);
         }
 
         public void VocabularyStart()
@@ -499,7 +508,7 @@ namespace Nippori
             {
                 if ((vocableStack.Count > 0) &&
                      (TypesCollection[0].IsChecked) &&
-                     CurrentVocable.IsType(TypesCollection[2].Data)
+                     CurrentVocable.IsType(TypesCollection[2])
                    )
                 {
                     FieldsEmphasized[1] = true;
@@ -530,11 +539,11 @@ namespace Nippori
         /// <param name="e"></param>
         private void TypeItem_IsCheckedChanged(object sender, EventArgs e)
         {
-            CheckableItem<VocableType> senderItem = (CheckableItem<VocableType>)sender;
+            TypeModel senderItem2 = (TypeModel)sender;
 
-            if (senderItem.IsChecked)
+            if (senderItem2.IsChecked)
             {
-                foreach (CheckableItem<VocableType> item in TypesCollection)
+                foreach (TypeModel item in TypesCollection)
                 {
                     if (item != sender)
                     {
@@ -542,7 +551,7 @@ namespace Nippori
                     }
                     else
                     {
-                        EnabledType = item.Data;
+                        EnabledType = item;
                     }
                 }
             }
@@ -555,7 +564,7 @@ namespace Nippori
         /// <param name="e"></param>
         private void GroupItem_IsCheckedChanged(object sender, EventArgs e)
         {
-            CheckableItemBase senderItem = (CheckableItemBase)sender;
+            GroupModel senderItem = (GroupModel)sender;
 
             // check for special 'group' item which is actually a command to clear selection 
             if (senderItem.ClearsAll && senderItem.IsChecked)
