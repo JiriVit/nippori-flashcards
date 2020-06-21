@@ -45,7 +45,8 @@
             <TextBlock Text="{Binding StackCount}" FontSize="60" Background="LightGreen"/>
         </Grid>
         <Border Grid.Row="1">
-            <TextBlock Text="{Binding Fields[0]}" Visibility="{Binding FieldsVisibility[0]}" FontSize="80" Foreground="DarkBlue"/>
+            <TextBlock Text="{Binding Fields[0]}" Visibility="{Binding FieldsVisibility[0]}" FontSize="80" Foreground="DarkBlue"
+                       FontFamily="{Binding FieldFontFamily[0]}"/>
         </Border>
         <Border Grid.Row="2">
             <Border.Background>
@@ -58,10 +59,12 @@
                     </Binding.ConverterParameter>
                 </Binding>
             </Border.Background>
-            <TextBlock Text="{Binding Fields[1]}" Visibility="{Binding FieldsVisibility[1]}" FontSize="60"/>
+            <TextBlock Text="{Binding Fields[1]}" Visibility="{Binding FieldsVisibility[1]}" FontSize="60"
+                       FontFamily="{Binding FieldFontFamily[1]}"/>
         </Border>
         <Border Grid.Row="3" Background="LightBlue">
-            <TextBlock Text="{Binding Fields[2]}" Visibility="{Binding FieldsVisibility[2]}" FontSize="60"/>
+            <TextBlock Text="{Binding Fields[2]}" Visibility="{Binding FieldsVisibility[2]}" FontSize="60"
+                       FontFamily="{Binding FieldFontFamily[2]}"/>
         </Border>
         <Border Grid.Row="4" Background="LightYellow">
             <TextBlock Text="{Binding Fields[3]}" Visibility="{Binding FieldsVisibility[3]}" FontSize="40" FontStyle="Italic"/>

@@ -1,5 +1,4 @@
-﻿- Choose better font for Chinese / Japanese characters. With the current one
-  the characters are sometimes wrong.
+﻿- Add selection for serif / sans serif font for Asian characters.
 - Add quiz where English translation + transcription are given and the user is
   supposed to choose signs from more similar options. This helps to memorize the
   precise image of the signs.
@@ -9,3 +8,9 @@
 - Rename 'Active' column to 'Status' and support more values, not only active
   and inactive. We need to separate vocables which are already learnt, so we
   don't want to examine them always. Only when desired.
+
+
+IMPLEMENTED
+--------------------------------------------------------------------------------
+- Choose better font for Chinese / Japanese characters. With the current one
+  the characters are sometimes wrong.

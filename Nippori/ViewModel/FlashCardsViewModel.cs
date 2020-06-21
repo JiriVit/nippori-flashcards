@@ -4,8 +4,10 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 using System.Xml;
 
 using Nippori.Bases;
@@ -43,12 +45,16 @@ namespace Nippori.ViewModel
             {
                 Name = "Japanese",
                 Key = "jp",
+                //FontFamilyForSigns = new FontFamily("Yu Mincho"),
+                FontFamilyForSigns = new FontFamily("Yu Gothic UI SemiLight"),
             };
 
             public static readonly Language Chinese = new Language()
             {
                 Name = "Chinese",
                 Key = "cn",
+                //FontFamilyForSigns = new FontFamily("SimSun"),
+                FontFamilyForSigns = new FontFamily("Microsoft YaHei UI Light"),
             };
 
             #endregion
@@ -63,6 +69,10 @@ namespace Nippori.ViewModel
             /// Gets key, i.e. shortcut of the language, defined in Excel sheet.
             /// </summary>
             public string Key { get; private set; }
+            /// <summary>
+            /// Gets font family to be used for signs.
+            /// </summary>
+            public FontFamily FontFamilyForSigns { get; private set; }
 
             #endregion
         }
@@ -137,9 +147,15 @@ namespace Nippori.ViewModel
 
         #endregion
 
+        #region .: Fields :.
+
         public string[] Fields { get; } = new string[4];
         public Visibility[] FieldsVisibility { get; } = new Visibility[4];
         public bool[] FieldsEmphasized { get; } = new bool[4];
+        public FontFamily[] FieldFontFamily { get; } = new FontFamily[4];
+
+        #endregion
+
         public Visibility ProgressBarVisibility { get { return progressBarVisibility; } set { progressBarVisibility = value; NotifyPropertyChanged("ProgressBarVisibility"); } }
         public VocableModel CurrentVocable { get; set; }
         public TypeModel EnabledType { get; set; }
@@ -414,6 +430,29 @@ namespace Nippori.ViewModel
 
         #endregion
 
+        private bool IsAsianCharacter(char character)
+        {
+            bool isAsian = false;
+
+            string[] regexs =
+            {
+                @"\p{IsCJKUnifiedIdeographs}",
+                @"\p{IsKatakana}",
+                @"\p{IsHiragana}",
+            };
+
+            foreach (string rx in regexs)
+            {
+                if (Regex.IsMatch(character.ToString(), rx))
+                {
+                    isAsian = true;
+                    break;
+                }
+            }
+
+            return isAsian;
+        }
+
         private void LoadDataTaskFunc()
         {
             ProgressBarVisibility = Visibility.Visible;
@@ -451,15 +490,25 @@ namespace Nippori.ViewModel
                     {
                         Fields[i] = string.Empty;
                     }
+
+                    if (Fields[i].Any(c => IsAsianCharacter(c)))
+                    {
+                        FieldFontFamily[i] = currentLanguage.FontFamilyForSigns;
+                    }
+                    else
+                    {
+                        FieldFontFamily[i] = SystemFonts.MessageFontFamily;
+                    }
                 }
             }
             else
             {
                 Fields[0] = "(no vocables in selected set)";
-                Fields[1] = Fields[2] = Fields[3];
+                Fields[1] = Fields[2] = Fields[3] = string.Empty;
             }
 
             NotifyPropertyChanged("Fields");
+            NotifyPropertyChanged("FieldFontFamily");
         }
         
         private void UpdateVisibility()
