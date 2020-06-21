@@ -130,6 +130,8 @@
   <ItemGroup>
     <Resource Include="iconfinder_Flower-2_2974382.ico" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="TodoList.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
