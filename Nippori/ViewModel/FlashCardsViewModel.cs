@@ -11,6 +11,7 @@ using System.Windows.Media;
 using System.Xml;
 
 using Nippori.Bases;
+using Nippori.Japanese;
 using Nippori.Model;
 
 namespace Nippori.ViewModel
@@ -113,6 +114,7 @@ namespace Nippori.ViewModel
         private List<VocableModel> vocableStack;
         private Random random = new Random();
         private Language currentLanguage;
+        private bool jlptKanjiOnly = false;
 
         #endregion
 
@@ -156,6 +158,24 @@ namespace Nippori.ViewModel
 
         #endregion
 
+        #region .: Settings :.
+
+        public bool JlptKanjiOnly
+        {
+            get => jlptKanjiOnly;
+            set
+            {
+                if (value != jlptKanjiOnly)
+                {
+                    jlptKanjiOnly = value;
+                    NotifyPropertyChanged("JlptKanjiOnly");
+                    StartExam();
+                }
+            }
+        }
+
+        #endregion
+
         public Visibility ProgressBarVisibility { get { return progressBarVisibility; } set { progressBarVisibility = value; NotifyPropertyChanged("ProgressBarVisibility"); } }
         public VocableModel CurrentVocable { get; set; }
         public TypeModel EnabledType { get; set; }
@@ -169,6 +189,11 @@ namespace Nippori.ViewModel
 #if DEBUG
             TestButtonVisible = true;
 #endif
+
+            for (int i = 0; i < FieldFontFamily.Length; i++)
+            {
+                FieldFontFamily[i] = SystemFonts.MessageFontFamily;
+            }
         }
 
         #endregion
@@ -227,6 +252,7 @@ namespace Nippori.ViewModel
         /// </summary>
         public void Test()
         {
+            
         }
 
         #endregion
@@ -407,9 +433,17 @@ namespace Nippori.ViewModel
         /// <returns>Vocable enabled or not.</returns>
         private bool IsVocableEnabled(VocableModel vocable)
         {
+            bool jlptKanjiRestriction = false;
+
+            if ((currentLanguage == Language.Japanese) && JlptKanjiOnly)
+            {
+                jlptKanjiRestriction = !vocable.Fields[2].Any(c => JlptUtils.IsKanjiUpToJlptLevel(c, JlptLevels.N4));
+            }
+
             return 
                 vocable.Active && 
                 vocable.IsType(EnabledType) && 
+                !jlptKanjiRestriction &&
                 (vocable.Groups.Any(group => group.IsChecked));
         }
 
@@ -542,12 +576,11 @@ namespace Nippori.ViewModel
             NotifyPropertyChanged("FieldsVisibility");
 
             // nasty hack for emphasizing kanji
-            // TODO Rework this so the field to be emphasized can be defined in Excel, not here.
             if (currentLanguage.Equals(Language.Japanese))
             {
                 if ((vocableStack.Count > 0) &&
                      (TypesCollection[0].IsChecked) &&
-                     CurrentVocable.IsType(TypesCollection[2])
+                     CurrentVocable.Fields[2].Any(c => JlptUtils.IsKanjiUpToJlptLevel(c, JlptLevels.N4))
                    )
                 {
                     FieldsEmphasized[1] = true;

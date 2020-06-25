@@ -2,15 +2,22 @@
 - Add quiz where English translation + transcription are given and the user is
   supposed to choose signs from more similar options. This helps to memorize the
   precise image of the signs.
-- Add selection of JLPT level. Use it to emphasize kanji for this level (and
-  lower) when learning kana -> kanji, and to select only necessary vocables
-  when learning kanji -> kana.
 - Rename 'Active' column to 'Status' and support more values, not only active
   and inactive. We need to separate vocables which are already learnt, so we
   don't want to examine them always. Only when desired.
+- Add option to switch between random and sequence order of the words.
+- Add button to reset temporarily disabled vocables.
+- Add message box to notify about some events.
+- Add option to include some vocabulary in the app and also to update it from
+  GitHub.
 
 
 IMPLEMENTED
 --------------------------------------------------------------------------------
+- Add selection of JLPT level. Use it to emphasize kanji for this level (and
+  lower) when learning kana -> kanji, and to select only necessary vocables
+  when learning kanji -> kana.
+- Add detection of kanji in Japanese vocables, allow to limit the examination
+  to kanji vocables only.
 - Choose better font for Chinese / Japanese characters. With the current one
   the characters are sometimes wrong.

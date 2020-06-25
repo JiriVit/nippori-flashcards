@@ -72,6 +72,8 @@
     </ApplicationDefinition>
     <Compile Include="Bases\ModelBase.cs" />
     <Compile Include="Converters\BoolToBrushConverter.cs" />
+    <Compile Include="Japanese\JlptLevels.cs" />
+    <Compile Include="Japanese\JlptUtils.cs" />
     <Compile Include="Pages\FlashcardPage.xaml.cs">
       <DependentUpon>FlashcardPage.xaml</DependentUpon>
     </Compile>
@@ -125,6 +127,8 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\kanji_n4.csv" />
+    <None Include="Resources\kanji_n5.csv" />
     <None Include="Resources\open_6529.png" />
   </ItemGroup>
   <ItemGroup>
@@ -133,5 +137,6 @@
   <ItemGroup>
     <Resource Include="TodoList.txt" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
