@@ -67,7 +67,7 @@ namespace Nippori.Japanese
         /// <returns></returns>
         private static List<char> CreateKanjiList(string textSource)
         {
-            string[] separator = new string[] { "\r\n" };
+            string[] separator = new string[] { "\r\n", "\n" };
             string[] separated = textSource.Split(separator, StringSplitOptions.RemoveEmptyEntries);
 
             List<char> kanjiList = separated.Select(s => s[0]).ToList<char>();
