@@ -10,6 +10,7 @@
 - Add message box to notify about some events.
 - Add option to include some vocabulary in the app and also to update it from
   GitHub.
+- Don't use kanji above selected JLPT level at all. Don't show them.
 
 
 IMPLEMENTED

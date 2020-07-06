@@ -86,6 +86,7 @@ namespace Nippori.ViewModel
 
         private string openedFileName;
         private bool fileLoaded;
+        private bool noVocablesForExamination = true;
         private int rounds = 0;
         private int state = 0;
 
@@ -220,15 +221,12 @@ namespace Nippori.ViewModel
             }
         }
 
-        public void Reject()
+        /// <summary>
+        /// Disables current vocable so it won't be examined after stack refill.
+        /// </summary>
+        public void DisableCurrentVocable()
         {
-            // rejecting temporarily removed, to be added later and better
-            Confirm();
-        }
-
-        public void Disable()
-        {
-            CurrentVocable.Active = false;
+            CurrentVocable.Enabled = false;
             Confirm();
         }
 
@@ -245,6 +243,12 @@ namespace Nippori.ViewModel
             ShowVocable();
             UpdateVisibility();
             NotifyPropertyChanged("StackCount");
+        }
+
+        public void EnableAllVocables()
+        {
+            allVocables.ForEach(v => v.Enabled = true);
+            StartExam();
         }
 
         /// <summary>
@@ -404,24 +408,38 @@ namespace Nippori.ViewModel
         {
             VocableModel candidateVocable;
 
-            if (vocableStack.Count > 0)
+            if (CurrentVocable != null)
             {
-                while (true)
-                {
-                    candidateVocable = vocableStack[random.Next(vocableStack.Count)];
-                    if (candidateVocable.Equals(CurrentVocable))
-                        continue;
-                    break;
-                }
+                vocableStack.Remove(CurrentVocable);
+            }
 
-                vocableStack.Remove(candidateVocable);
+            if (vocableStack.Count == 0)
+            {
+                RefillStack();
+                Rounds++;
+            }
+
+            if (!noVocablesForExamination)
+            {
+                if (vocableStack.Count > 1)
+                {
+                    while (true)
+                    {
+                        candidateVocable = vocableStack[random.Next(vocableStack.Count)];
+                        if (candidateVocable.Equals(CurrentVocable))
+                            continue;
+                        break;
+                    }
+                }
+                else
+                {
+                    candidateVocable = vocableStack[0];
+                }
                 CurrentVocable = candidateVocable;
-
-                if (vocableStack.Count == 0)
-                {
-                    RefillStack();
-                    Rounds++;
-                }
+            }
+            else
+            {
+                CurrentVocable = null;
             }
         }
 
@@ -441,7 +459,7 @@ namespace Nippori.ViewModel
             }
 
             return 
-                vocable.Active && 
+                vocable.Enabled && 
                 vocable.IsType(EnabledType) && 
                 !jlptKanjiRestriction &&
                 (vocable.Groups.Any(group => group.IsChecked));
@@ -454,6 +472,7 @@ namespace Nippori.ViewModel
                                   select vocable;
 
             vocableStack = new List<VocableModel>(enabledVocables);
+            noVocablesForExamination = (vocableStack.Count == 0);
         }
 
         public void VocabularyStart()
@@ -499,7 +518,7 @@ namespace Nippori.ViewModel
 
         private void ShowVocable()
         {
-            if (vocableStack.Count > 0)
+            if (!noVocablesForExamination)
             {
                 int fieldsCount = EnabledType.InputColumns.Length + EnabledType.OutputColumns.Length;
 

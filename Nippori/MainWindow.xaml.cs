@@ -56,7 +56,7 @@ namespace Nippori
                     App.FlashCardsVM.Confirm();
                     break;
                 case Key.Enter:
-                    App.FlashCardsVM.Disable();
+                    App.FlashCardsVM.DisableCurrentVocable();
                     break;
             }
         }
@@ -83,6 +83,18 @@ namespace Nippori
         {
             // TODO do this only if changes were made, not for each submenu closed
             App.FlashCardsVM.StartExam();
+        }
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            MenuItem menuItem = (MenuItem)sender;
+            
+            switch (menuItem.Tag)
+            {
+                case "EnableAll":
+                    App.FlashCardsVM.EnableAllVocables();
+                    break;
+            }
         }
 
         #endregion

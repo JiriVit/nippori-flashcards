@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 
+using Nippori.Enums;
+
 namespace Nippori.Model
 {
     /// <summary>
@@ -28,10 +30,11 @@ namespace Nippori.Model
         /// Gets list of groups assigned to this vocable.
         /// </summary>
         public List<GroupModel> Groups { get; set; }
+        public VocableStatus Status { get; set; }
         /// <summary>
-        /// Indicates that the vocable is active for examination.
+        /// Indicates that the vocable is enabled for examination.
         /// </summary>
-        public bool Active { get; set; }
+        public bool Enabled { get; set; }
 
         #endregion
 
@@ -49,8 +52,9 @@ namespace Nippori.Model
             }
 
             // read 'active' flag
-            string active = xmlNode.Attributes[$"field{fieldsCount + 3}"].Value;
-            Active = !(active.Equals("0"));
+            string status = xmlNode.Attributes[$"field{fieldsCount + 3}"].Value;
+            Status = (VocableStatus)int.Parse(status);
+            Enabled = Status != VocableStatus.Inactive;
         }
 
         #endregion
