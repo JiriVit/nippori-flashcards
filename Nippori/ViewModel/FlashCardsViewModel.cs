@@ -109,7 +109,6 @@ namespace Nippori.ViewModel
 
         #endregion
 
-        private Visibility progressBarVisibility = Visibility.Hidden;
         private List<VocableModel> allVocables = new List<VocableModel>();
         /// <summary>
         /// Stack of vocables to be trained in current round.
@@ -182,7 +181,6 @@ namespace Nippori.ViewModel
 
         #endregion
 
-        public Visibility ProgressBarVisibility { get { return progressBarVisibility; } set { progressBarVisibility = value; NotifyPropertyChanged("ProgressBarVisibility"); } }
         public VocableModel CurrentVocable { get; set; }
         public TypeModel EnabledType { get; set; }
 
