@@ -17,8 +17,12 @@ namespace Nippori.Enums
         /// </summary>
         Active = 1,
         /// <summary>
-        /// Vocable is considered easy and shall not be examined unless explicitly requested.
+        /// Vocable is considered easy and should not be examined unless explicitly requested.
         /// </summary>
-        Easy = 2
+        Easy = 2,
+        /// <summary>
+        /// Vocable is considered difficult.
+        /// </summary>
+        Difficult = 3,
     }
 }

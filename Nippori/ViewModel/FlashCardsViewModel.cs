@@ -477,6 +477,7 @@ namespace Nippori.ViewModel
 
         public void VocabularyStart()
         {
+            CurrentVocable = null;
             RefillStack();
             Rounds = 0;
         }
