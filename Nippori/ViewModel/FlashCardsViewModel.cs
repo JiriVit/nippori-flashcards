@@ -87,7 +87,6 @@ namespace Nippori.ViewModel
         private string openedFileName;
         private bool fileLoaded;
         private bool noVocablesForExamination = true;
-        private int rounds = 0;
         private int state = 0;
 
         #endregion
@@ -112,6 +111,9 @@ namespace Nippori.ViewModel
 
         private Visibility progressBarVisibility = Visibility.Hidden;
         private List<VocableModel> allVocables = new List<VocableModel>();
+        /// <summary>
+        /// Stack of vocables to be trained in current round.
+        /// </summary>
         private List<VocableModel> vocableStack;
         private Random random = new Random();
         private Language currentLanguage;
@@ -123,8 +125,11 @@ namespace Nippori.ViewModel
 
         #region .: Status :.
 
-        public string StackCount { get => fileLoaded ? vocableStack.Count.ToString() : "--"; }
-        public int Rounds { get => rounds; set { rounds = value; NotifyPropertyChanged("Rounds"); } }
+        public string StackCount
+        {
+            get => fileLoaded ? vocableStack.Count.ToString() : "--";
+            set => NotifyPropertyChanged("StackCount");
+        }
         public string OpenedFileName { get => openedFileName; set { openedFileName = value; NotifyPropertyChanged("OpenedFileName"); } }
 
         #endregion
@@ -170,7 +175,7 @@ namespace Nippori.ViewModel
                 {
                     jlptKanjiOnly = value;
                     NotifyPropertyChanged("JlptKanjiOnly");
-                    StartExam();
+                    StartTraining();
                 }
             }
         }
@@ -201,13 +206,16 @@ namespace Nippori.ViewModel
 
         #region .: Public Methods :.
 
-        public void Confirm()
+        /// <summary>
+        /// Moves to next vocale in the training set.
+        /// </summary>
+        public void MoveToNextVocable()
         {
             if (vocableStack.Count > 0)
             {
                 if (state == 1)
                 {
-                    GetNextVocable();
+                    SelectNextVocable();
 
                     ShowVocable();
                     state = 0;
@@ -217,7 +225,7 @@ namespace Nippori.ViewModel
                     state++;
                 }
                 UpdateVisibility();
-                NotifyPropertyChanged("StackCount");
+                StackCount = "";
             }
         }
 
@@ -227,28 +235,42 @@ namespace Nippori.ViewModel
         public void DisableCurrentVocable()
         {
             CurrentVocable.Enabled = false;
-            Confirm();
+            MoveToNextVocable();
         }
 
-        public void OpenFile(string fileName)
+        /// <summary>
+        /// Loads vocables from given XML file.
+        /// </summary>
+        /// <param name="fileName"></param>
+        public void LoadVocablesFromXmlFile(string fileName)
         {
             OpenedFileName = fileName;
-            new Task(() => LoadDataTaskFunc()).Start();
+            ReadXmlFile(OpenedFileName);
+            fileLoaded = true;
         }
 
-        public void StartExam()
+        /// <summary>
+        /// Starts the training.
+        /// </summary>
+        public void StartTraining()
         {
-            VocabularyStart();
-            GetNextVocable();
+            CurrentVocable = null;
+            
+            RefillStack();
+            SelectNextVocable();
             ShowVocable();
             UpdateVisibility();
-            NotifyPropertyChanged("StackCount");
+
+            StackCount = "";
         }
 
+        /// <summary>
+        /// Makes all vocables enabled for training, ie. resets all that were disabled by the user.
+        /// </summary>
         public void EnableAllVocables()
         {
             allVocables.ForEach(v => v.Enabled = true);
-            StartExam();
+            StartTraining();
         }
 
         /// <summary>
@@ -402,27 +424,32 @@ namespace Nippori.ViewModel
 
         #endregion
 
-        #region .: Migrated from Vocabulary class :.
-
-        public void GetNextVocable()
+        /// <summary>
+        /// Finds next vocable for training and exposes it in <see cref="CurrentVocable"/> property.
+        /// The next vocable is chosen randomly from the stack. Previously trained vocable is removed
+        /// from the stack. If the stack runs out of vocables, it is refilled.
+        /// </summary>
+        public void SelectNextVocable()
         {
             VocableModel candidateVocable;
 
             if (CurrentVocable != null)
             {
+                // remove previously trained vocable from the stack
                 vocableStack.Remove(CurrentVocable);
             }
 
             if (vocableStack.Count == 0)
             {
+                // we ran out of vocables, need to refill
                 RefillStack();
-                Rounds++;
             }
 
             if (!noVocablesForExamination)
             {
                 if (vocableStack.Count > 1)
                 {
+                    // make sure that the next vocable is not the same as the previous one
                     while (true)
                     {
                         candidateVocable = vocableStack[random.Next(vocableStack.Count)];
@@ -475,15 +502,11 @@ namespace Nippori.ViewModel
             noVocablesForExamination = (vocableStack.Count == 0);
         }
 
-        public void VocabularyStart()
-        {
-            CurrentVocable = null;
-            RefillStack();
-            Rounds = 0;
-        }
-
-        #endregion
-
+        /// <summary>
+        /// Determines if a given character is Chinese (hanzi) or Japanese (kanji, hiragana, katakana).
+        /// </summary>
+        /// <param name="character">Character to be evaluated.</param>
+        /// <returns>Boolean result.</returns>
         private bool IsAsianCharacter(char character)
         {
             bool isAsian = false;
@@ -505,16 +528,6 @@ namespace Nippori.ViewModel
             }
 
             return isAsian;
-        }
-
-        private void LoadDataTaskFunc()
-        {
-            ProgressBarVisibility = Visibility.Visible;
-            ReadXmlFile(OpenedFileName);
-            ProgressBarVisibility = Visibility.Hidden;
-
-            fileLoaded = true;
-            StartExam();
         }
 
         private void ShowVocable()

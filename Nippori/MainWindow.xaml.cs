@@ -40,7 +40,8 @@ namespace Nippori
 
             if (App.Args != null)
             {
-                App.FlashCardsVM.OpenFile(App.Args[0]);
+                App.FlashCardsVM.LoadVocablesFromXmlFile(App.Args[0]);
+                App.FlashCardsVM.StartTraining();
             }
         }
 
@@ -53,7 +54,7 @@ namespace Nippori
             switch (e.Key)
             {
                 case Key.Space:
-                    App.FlashCardsVM.Confirm();
+                    App.FlashCardsVM.MoveToNextVocable();
                     break;
                 case Key.Enter:
                     App.FlashCardsVM.DisableCurrentVocable();
@@ -71,7 +72,10 @@ namespace Nippori
             };
 
             if (openFileDialog.ShowDialog() == true)
-                App.FlashCardsVM.OpenFile(openFileDialog.FileName);
+            {
+                App.FlashCardsVM.LoadVocablesFromXmlFile(openFileDialog.FileName);
+                App.FlashCardsVM.StartTraining();
+            }
         }
 
         private void ButtonTest_Click(object sender, RoutedEventArgs e)
@@ -82,7 +86,7 @@ namespace Nippori
         private void MenuItem_SubmenuClosed(object sender, RoutedEventArgs e)
         {
             // TODO do this only if changes were made, not for each submenu closed
-            App.FlashCardsVM.StartExam();
+            App.FlashCardsVM.StartTraining();
         }
 
         private void MenuItem_Click(object sender, RoutedEventArgs e)
