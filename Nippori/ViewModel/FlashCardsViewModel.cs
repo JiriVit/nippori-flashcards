@@ -499,8 +499,14 @@ namespace Nippori.ViewModel
             TypesCollection[0].IsChecked = true;
             foreach (GroupModel item in GroupsCollection)
             {
-                item.IsChecked = true;
+                if (!item.ChecksAll && !item.ClearsAll)
+                {
+                    item.IsChecked = true;
+                }
             }
+
+            // clear this flag, we only want it to carry changes perfomed by user
+            setupWasChanged = false;
         }
 
         #endregion
