@@ -93,12 +93,9 @@ namespace Nippori
         {
             MenuItem menuItem = (MenuItem)sender;
             
-            switch (menuItem.Tag)
-            {
-                case "EnableAll":
-                    App.FlashCardsVM.EnableAllVocables();
-                    break;
-            }
+            //switch (menuItem.Tag)
+            //{
+            //}
         }
 
         #endregion

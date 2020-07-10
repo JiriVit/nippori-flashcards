@@ -16,11 +16,12 @@
             <Setter Property="VerticalContentAlignment" Value="Center" />
         </Style>
         <conv:BoolToBrushConverter x:Key="BoolToBrush"/>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
     </Page.Resources>
     
     <Grid Background="White">
         <Grid.RowDefinitions>
-            <RowDefinition/>
+            <RowDefinition Height="70"/>
             <RowDefinition Height="3*"/>
             <RowDefinition Height="2*"/>
             <RowDefinition Height="2*"/>
@@ -36,13 +37,40 @@
                 <Setter Property="TextAlignment" Value="Center"/>
                 <Setter Property="VerticalAlignment" Value="Center" />
             </Style>
+            <Style TargetType="Button">
+                <Setter Property="Height" Value="60"/>
+                <Setter Property="Width" Value="60"/>
+                <Setter Property="Margin" Value="5,0,0,0"/>
+                <Setter Property="FontSize" Value="40"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="IsEnabled" Value="{Binding FileLoaded}"/>
+                <EventSetter Event="Click" Handler="Button_Click"/>
+            </Style>
+            <Style TargetType="ToggleButton">
+                <Setter Property="Height" Value="60"/>
+                <Setter Property="Width" Value="60"/>
+                <Setter Property="Margin" Value="5,0,0,0"/>
+                <Setter Property="FontSize" Value="40"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="IsEnabled" Value="{Binding FileLoaded}"/>
+                <Setter Property="IsTabStop" Value="False"/>
+                <EventSetter Event="PreviewKeyDown" Handler="ToggleButton_PreviewKeyDown"/>
+            </Style>
         </Grid.Resources>
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="150"/>
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <TextBlock Text="{Binding StackCount}" FontSize="60" Background="LightGreen"/>
+            <TextBlock Text="{Binding StackCount, FallbackValue=10}" FontSize="60" Background="LightGreen"/>
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <Button Content="R" Tag="EnableAll"/>
+                <ToggleButton Content="A" IsChecked="{Binding ActiveVocablesEnabled}"/>
+                <ToggleButton Content="E" IsChecked="{Binding EasyVocablesEnabled}"/>
+                <ToggleButton Content="D" IsChecked="{Binding DifficultVocablesEnabled}"/>
+                <ToggleButton Content="J" IsChecked="{Binding JlptKanjiOnly}" 
+                              Visibility="{Binding JlptKanjiOnlyVisible, Converter={StaticResource BoolToVis}}"/>
+            </StackPanel>
         </Grid>
         <Border Grid.Row="1">
             <TextBlock Text="{Binding Fields[0]}" Visibility="{Binding FieldsVisibility[0]}" FontSize="80" Foreground="DarkBlue"

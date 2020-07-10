@@ -1,17 +1,18 @@
-﻿- Add selection for serif / sans serif font for Asian characters.
+﻿TODO
+--------------------------------------------------------------------------------
+- Add selection for serif / sans serif font for Asian characters.
 - Add quiz where English translation + transcription are given and the user is
   supposed to choose signs from more similar options. This helps to memorize the
   precise image of the signs.
-- Rename 'Active' column to 'Status' and support more values, not only active
-  and inactive. We need to separate vocables which are already learnt, so we
-  don't want to examine them always. Only when desired.
 - Add option to switch between random and sequence order of the words.
-- Add button to reset temporarily disabled vocables.
 - Add message box to notify about some events.
 - Add option to include some vocabulary in the app and also to update it from
   GitHub.
 - Don't use kanji above selected JLPT level at all. Don't show them.
-
+- Add option to copy contents of fields to clipboard.
+- Emphasize only single JLPT kanjis, not whole field (using RichTextBox).
+- When closing type / group selection, restart training only if something was
+  actually changed.
 
 IMPLEMENTED
 --------------------------------------------------------------------------------
@@ -22,3 +23,5 @@ IMPLEMENTED
   to kanji vocables only.
 - Choose better font for Chinese / Japanese characters. With the current one
   the characters are sometimes wrong.
+- Add option to reset temporarily disabled vocables.
+- Add option to enable/disable active/easy/difficult vocables.

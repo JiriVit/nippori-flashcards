@@ -11,6 +11,7 @@ using System.Windows.Media;
 using System.Xml;
 
 using Nippori.Bases;
+using Nippori.Enums;
 using Nippori.Japanese;
 using Nippori.Model;
 
@@ -103,6 +104,17 @@ namespace Nippori.ViewModel
 
         #endregion
 
+        #region .: Training Setup :.
+
+        private bool activeVocablesEnabled = true;
+        private bool easyVocablesEnabled = false;
+        private bool difficultVocablesEnabled = true;
+
+        private bool jlptKanjiOnly = false;
+        private bool jlptKanjiOnlyVisible = false;
+
+        #endregion
+
         #region .: Debug :.
 
         private string debugText;
@@ -116,7 +128,6 @@ namespace Nippori.ViewModel
         private List<VocableModel> vocableStack;
         private Random random = new Random();
         private Language currentLanguage;
-        private bool jlptKanjiOnly = false;
 
         #endregion
 
@@ -130,6 +141,15 @@ namespace Nippori.ViewModel
             set => NotifyPropertyChanged("StackCount");
         }
         public string OpenedFileName { get => openedFileName; set { openedFileName = value; NotifyPropertyChanged("OpenedFileName"); } }
+        public bool FileLoaded
+        {
+            get => fileLoaded;
+            private set
+            {
+                fileLoaded = value;
+                NotifyPropertyChanged("FileLoaded");
+            }
+        }
 
         #endregion
 
@@ -163,7 +183,40 @@ namespace Nippori.ViewModel
 
         #endregion
 
-        #region .: Settings :.
+        #region .: Training Setup :.
+
+        public bool ActiveVocablesEnabled
+        {
+            get => activeVocablesEnabled;
+            set
+            {
+                activeVocablesEnabled = value;
+                NotifyPropertyChanged("ActiveVocablesEnabled");
+                StartTraining();
+            }
+        }
+
+        public bool EasyVocablesEnabled
+        {
+            get => easyVocablesEnabled;
+            set
+            {
+                easyVocablesEnabled = value;
+                NotifyPropertyChanged("DifficultVocablesEnabled");
+                StartTraining();
+            }
+        }
+
+        public bool DifficultVocablesEnabled
+        {
+            get => difficultVocablesEnabled;
+            set
+            {
+                difficultVocablesEnabled = value;
+                NotifyPropertyChanged("DifficultVocablesEnabled");
+                StartTraining();
+            }
+        }
 
         public bool JlptKanjiOnly
         {
@@ -174,6 +227,20 @@ namespace Nippori.ViewModel
                 {
                     jlptKanjiOnly = value;
                     NotifyPropertyChanged("JlptKanjiOnly");
+                    StartTraining();
+                }
+            }
+        }
+
+        public bool JlptKanjiOnlyVisible
+        {
+            get => jlptKanjiOnlyVisible;
+            private set
+            {
+                if (value != jlptKanjiOnlyVisible)
+                {
+                    jlptKanjiOnlyVisible = value;
+                    NotifyPropertyChanged("JlptKanjiOnlyVisible");
                     StartTraining();
                 }
             }
@@ -244,7 +311,7 @@ namespace Nippori.ViewModel
         {
             OpenedFileName = fileName;
             ReadXmlFile(OpenedFileName);
-            fileLoaded = true;
+            FileLoaded = true;
         }
 
         /// <summary>
@@ -253,6 +320,7 @@ namespace Nippori.ViewModel
         public void StartTraining()
         {
             CurrentVocable = null;
+            state = 0;
             
             RefillStack();
             SelectNextVocable();
@@ -366,6 +434,7 @@ namespace Nippori.ViewModel
                         if (lang.Key.Equals(key))
                         {
                             currentLanguage = lang;
+                            JlptKanjiOnlyVisible = (lang == Language.Japanese);
                             break;
                         }
                     }
@@ -483,8 +552,14 @@ namespace Nippori.ViewModel
                 jlptKanjiRestriction = !vocable.Fields[2].Any(c => JlptUtils.IsKanjiUpToJlptLevel(c, JlptLevels.N4));
             }
 
-            return 
+            bool enabledBySetup =
+                ((vocable.Status == VocableStatus.Active) && ActiveVocablesEnabled) ||
+                ((vocable.Status == VocableStatus.Easy) && EasyVocablesEnabled) ||
+                ((vocable.Status == VocableStatus.Difficult) && DifficultVocablesEnabled);
+
+            return
                 vocable.Enabled && 
+                enabledBySetup &&
                 vocable.IsType(EnabledType) && 
                 !jlptKanjiRestriction &&
                 (vocable.Groups.Any(group => group.IsChecked));

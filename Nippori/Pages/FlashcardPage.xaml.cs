@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -21,10 +22,46 @@ namespace Nippori.Pages
     /// </summary>
     public partial class FlashcardPage : Page
     {
+        #region .: Constructor :.
+
         public FlashcardPage()
         {
             InitializeComponent();
             DataContext = App.FlashCardsVM;
         }
+
+        #endregion
+
+        #region .: Event Handlers :.
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Button button = (Button)sender;
+
+            switch (button.Tag)
+            {
+                case "EnableAll":
+                    App.FlashCardsVM.EnableAllVocables();
+                    break;
+            }
+        }
+
+        private void ToggleButton_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            // do not pass the key event to the button, it would change its IsChecked property
+            e.Handled = true;
+
+            switch (e.Key)
+            {
+                case Key.Space:
+                    App.FlashCardsVM.MoveToNextVocable();
+                    break;
+                case Key.Enter:
+                    App.FlashCardsVM.DisableCurrentVocable();
+                    break;
+            }
+        }
+
+        #endregion
     }
 }

@@ -30,10 +30,6 @@
             <MenuItem Header="Groups" 
                       ItemsSource="{Binding GroupsCollection}" ItemContainerStyle="{StaticResource GroupsMenuItemStyle}"
                       SubmenuClosed="MenuItem_SubmenuClosed"/>
-            <MenuItem Header="Settings">
-                <MenuItem Header="Enable all" Tag="EnableAll" Click="MenuItem_Click"/>
-                <MenuItem Header="JLPT Kanji Only" IsCheckable="True" IsChecked="{Binding JlptKanjiOnly}"/>
-            </MenuItem>
             <MenuItem Header="TEST"
                       HorizontalAlignment="Right" Visibility="{Binding TestButtonVisible, Converter={StaticResource BoolToVis}}"
                       Click="ButtonTest_Click"/>
