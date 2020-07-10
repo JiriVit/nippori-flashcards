@@ -4,6 +4,8 @@
 - Add quiz where English translation + transcription are given and the user is
   supposed to choose signs from more similar options. This helps to memorize the
   precise image of the signs.
+- Add quiz where user has to read certain hanzi/kanji in paragraph if continous
+  text.
 - Add option to switch between random and sequence order of the words.
 - Add message box to notify about some events.
 - Add option to include some vocabulary in the app and also to update it from
@@ -11,8 +13,6 @@
 - Don't use kanji above selected JLPT level at all. Don't show them.
 - Add option to copy contents of fields to clipboard.
 - Emphasize only single JLPT kanjis, not whole field (using RichTextBox).
-- When closing type / group selection, restart training only if something was
-  actually changed.
 
 IMPLEMENTED
 --------------------------------------------------------------------------------
@@ -25,3 +25,5 @@ IMPLEMENTED
   the characters are sometimes wrong.
 - Add option to reset temporarily disabled vocables.
 - Add option to enable/disable active/easy/difficult vocables.
+- When closing type / group selection, restart training only if something was
+  actually changed.

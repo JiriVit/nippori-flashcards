@@ -85,8 +85,7 @@ namespace Nippori
 
         private void MenuItem_SubmenuClosed(object sender, RoutedEventArgs e)
         {
-            // TODO do this only if changes were made, not for each submenu closed
-            App.FlashCardsVM.StartTraining();
+            App.FlashCardsVM.RestartTrainingIfSetupChanged();
         }
 
         private void MenuItem_Click(object sender, RoutedEventArgs e)

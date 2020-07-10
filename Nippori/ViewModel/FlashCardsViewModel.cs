@@ -88,6 +88,7 @@ namespace Nippori.ViewModel
         private string openedFileName;
         private bool fileLoaded;
         private bool noVocablesForExamination = true;
+        private bool setupWasChanged;
         private int state = 0;
 
         #endregion
@@ -337,6 +338,19 @@ namespace Nippori.ViewModel
         {
             allVocables.ForEach(v => v.Enabled = true);
             StartTraining();
+        }
+
+        /// <summary>
+        /// Restarts the training, but only if setup was changed since last call of this methods.
+        /// This to be called when a submenu with type/group setup is closed.
+        /// </summary>
+        public void RestartTrainingIfSetupChanged()
+        {
+            if (setupWasChanged)
+            {
+                StartTraining();
+                setupWasChanged = false;
+            }
         }
 
         /// <summary>
@@ -717,9 +731,9 @@ namespace Nippori.ViewModel
         /// <param name="e"></param>
         private void TypeItem_IsCheckedChanged(object sender, EventArgs e)
         {
-            TypeModel senderItem2 = (TypeModel)sender;
+            TypeModel typeModel = (TypeModel)sender;
 
-            if (senderItem2.IsChecked)
+            if (typeModel.IsChecked)
             {
                 foreach (TypeModel item in TypesCollection)
                 {
@@ -733,6 +747,8 @@ namespace Nippori.ViewModel
                     }
                 }
             }
+
+            setupWasChanged = true;
         }
 
         /// <summary>
@@ -749,9 +765,13 @@ namespace Nippori.ViewModel
             {
                 GroupsCollection.ToList().ForEach(item => item.IsChecked = false);
             }
-            if (senderItem.ChecksAll && senderItem.IsChecked)
+            else if (senderItem.ChecksAll && senderItem.IsChecked)
             {
                 GroupsCollection.ToList().ForEach(item => item.IsChecked = (!item.ClearsAll && !item.ChecksAll));
+            }
+            else
+            {
+                setupWasChanged = true;
             }
         }
 
