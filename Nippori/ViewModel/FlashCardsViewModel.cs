@@ -247,6 +247,32 @@ namespace Nippori.ViewModel
             }
         }
 
+        public bool KanjiToEnglishActive
+        {
+            get => (TypesCollection != null) && (TypesCollection.Count > 0) && TypesCollection[0].IsChecked;
+            set
+            {
+                if ((TypesCollection != null) && (TypesCollection.Count > 0))
+                {
+                    TypesCollection[0].IsChecked = value;
+                    RestartTrainingIfSetupChanged();
+                }
+            }
+        }
+
+        public bool EnglishToKanjiActive
+        {
+            get => (TypesCollection != null) && (TypesCollection.Count > 1) && TypesCollection[1].IsChecked;
+            set
+            {
+                if ((TypesCollection != null) && (TypesCollection.Count > 1))
+                {
+                    TypesCollection[1].IsChecked = value;
+                    RestartTrainingIfSetupChanged();
+                }
+            }
+        }
+
         #endregion
 
         public VocableModel CurrentVocable { get; set; }
@@ -751,6 +777,18 @@ namespace Nippori.ViewModel
                     {
                         EnabledType = item;
                     }
+                }
+            }
+            else
+            {
+                int index = TypesCollection.IndexOf(typeModel);
+                if (index == 0)
+                {
+                    NotifyPropertyChanged("KanjiToEnglishActive");
+                }
+                if (index == 1)
+                {
+                    NotifyPropertyChanged("EnglishToKanjiActive");
                 }
             }
 

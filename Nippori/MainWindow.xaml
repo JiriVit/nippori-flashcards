@@ -12,7 +12,7 @@
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
     </Window.Resources>
     <DockPanel>
-        <Menu DockPanel.Dock="Top">
+        <!--<Menu DockPanel.Dock="Top">
             <Menu.Resources>
                 <Style x:Key="TypesMenuItemStyle" TargetType="MenuItem">
                     <Setter Property="Header" Value="{Binding Name}" />
@@ -33,7 +33,40 @@
             <MenuItem Header="TEST"
                       HorizontalAlignment="Right" Visibility="{Binding TestButtonVisible, Converter={StaticResource BoolToVis}}"
                       Click="ButtonTest_Click"/>
-        </Menu>
+        </Menu>-->
+        <Ribbon DockPanel.Dock="Top" SnapsToDevicePixels="True">
+            <Ribbon.Resources>
+                <Style x:Key="GroupsRibbonMenuItemStyle" TargetType="RibbonMenuItem">
+                    <Setter Property="Header" Value="{Binding Name}"/>
+                    <Setter Property="IsChecked" Value="{Binding IsChecked}" />
+                    <Setter Property="IsCheckable" Value="True"/>
+                    <Setter Property="StaysOpenOnClick" Value="True"/>
+                </Style>
+            </Ribbon.Resources>
+            <Ribbon.ApplicationMenu>
+                <RibbonApplicationMenu>
+                    <RibbonApplicationMenuItem Header="Load" ImageSource="Images\OpenFolder_16x.png"/>
+                </RibbonApplicationMenu>
+            </Ribbon.ApplicationMenu>
+            <RibbonTab Header="Home">
+                <RibbonGroup Header="Status">
+                    <RibbonTwoLineText Text="{Binding StackCount}" FontSize="48" Width="150"/>
+                </RibbonGroup>
+                <RibbonGroup Header="Direction">
+                    <RibbonToggleButton Label="To English" LargeImageSource="Images\HanCharacter_40x.png" IsChecked="{Binding KanjiToEnglishActive}"/>
+                    <RibbonToggleButton Label="To Chinese" LargeImageSource="Images\Label_40x.png" IsChecked="{Binding EnglishToKanjiActive}"/>
+                </RibbonGroup>
+                <RibbonGroup Header="Filter">
+                    <RibbonMenuButton Label="Groups" LargeImageSource="Images\Filter_40x.png" 
+                                      ItemsSource="{Binding GroupsCollection}" ItemContainerStyle="{StaticResource GroupsRibbonMenuItemStyle}"
+                                      DropDownClosed="RibbonMenuButton_DropDownClosed"/>
+                    <RibbonButton Label="Restore" Tag="EnableAll" LargeImageSource="Images\Restart_40x.png" Click="Button_Click"/>
+                    <RibbonToggleButton Label="Normal" IsChecked="{Binding ActiveVocablesEnabled}" LargeImageSource="Images\StatusOK_40x.png" />
+                    <RibbonToggleButton Label="Easy" IsChecked="{Binding EasyVocablesEnabled}" LargeImageSource="Images\StatusDowngrade_40x.png"/>
+                    <RibbonToggleButton Label="Difficult" IsChecked="{Binding DifficultVocablesEnabled}" LargeImageSource="Images\StatusInvalid_40x.png"/>
+                </RibbonGroup>
+            </RibbonTab>
+        </Ribbon>
         <Frame Source="Pages/FlashcardPage.xaml" />
     </DockPanel>
 </Window>

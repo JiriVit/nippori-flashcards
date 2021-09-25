@@ -13,6 +13,11 @@
 - Don't use kanji above selected JLPT level at all. Don't show them.
 - Add option to copy contents of fields to clipboard.
 - Emphasize only single JLPT kanjis, not whole field (using RichTextBox).
+- Split groups to level, lexical categories and groups (used purely to split
+  vocables to batches for easier training), allow selection of those separately.
+- Add presets (eg. this lesson, these groups, this type).
+- Remember recently used presets.
+- Add separate option to examine katakana only.
 
 IMPLEMENTED
 --------------------------------------------------------------------------------

@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Ribbon;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -78,6 +79,21 @@ namespace Nippori
             }
         }
 
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Button button = (Button)sender;
+
+            if (button.Tag is string tag)
+            {
+                switch (tag)
+                {
+                    case "EnableAll":
+                        App.FlashCardsVM.EnableAllVocables();
+                        break;
+                }
+            }
+        }
+
         private void ButtonTest_Click(object sender, RoutedEventArgs e)
         {
             App.FlashCardsVM.Test();
@@ -97,6 +113,12 @@ namespace Nippori
             //}
         }
 
+        private void RibbonMenuButton_DropDownClosed(object sender, EventArgs e)
+        {
+            App.FlashCardsVM.RestartTrainingIfSetupChanged();
+        }
+
         #endregion
+
     }
 }

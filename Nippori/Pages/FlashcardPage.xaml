@@ -21,7 +21,7 @@
     
     <Grid Background="White">
         <Grid.RowDefinitions>
-            <RowDefinition Height="70"/>
+            <RowDefinition Height="0"/>
             <RowDefinition Height="3*"/>
             <RowDefinition Height="2*"/>
             <RowDefinition Height="2*"/>
@@ -45,6 +45,7 @@
                 <Setter Property="Cursor" Value="Hand"/>
                 <Setter Property="IsEnabled" Value="{Binding FileLoaded}"/>
                 <EventSetter Event="Click" Handler="Button_Click"/>
+                <EventSetter Event="PreviewKeyDown" Handler="ToggleButton_PreviewKeyDown"/>
             </Style>
             <Style TargetType="ToggleButton">
                 <Setter Property="Height" Value="60"/>
