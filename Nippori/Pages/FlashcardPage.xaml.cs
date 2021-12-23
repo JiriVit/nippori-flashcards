@@ -62,6 +62,14 @@ namespace Nippori.Pages
             }
         }
 
+        private void TextBlock_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            TextBlock textBlock = (TextBlock)sender;
+
+            Clipboard.SetText(textBlock.Text);
+        }
+
         #endregion
+
     }
 }

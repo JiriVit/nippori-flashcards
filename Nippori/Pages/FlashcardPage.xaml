@@ -73,10 +73,15 @@
                               Visibility="{Binding JlptKanjiOnlyVisible, Converter={StaticResource BoolToVis}}"/>
             </StackPanel>
         </Grid>
+        
+        <!-- Field 0: The text being always shown -->
         <Border Grid.Row="1">
             <TextBlock Text="{Binding Fields[0]}" Visibility="{Binding FieldsVisibility[0]}" FontSize="80" Foreground="DarkBlue"
-                       FontFamily="{Binding FieldFontFamily[0]}"/>
+                       FontFamily="{Binding FieldFontFamily[0]}"
+                       Cursor="Hand" MouseDown="TextBlock_MouseDown"/>
         </Border>
+        
+        <!-- Field 1: First item shown optionally -->
         <Border Grid.Row="2">
             <Border.Background>
                 <Binding Path="FieldsEmphasized[1]" Converter="{StaticResource BoolToBrush}">
@@ -89,12 +94,18 @@
                 </Binding>
             </Border.Background>
             <TextBlock Text="{Binding Fields[1]}" Visibility="{Binding FieldsVisibility[1]}" FontSize="60"
-                       FontFamily="{Binding FieldFontFamily[1]}"/>
+                       FontFamily="{Binding FieldFontFamily[1]}"
+                       Cursor="Hand" MouseDown="TextBlock_MouseDown"/>
         </Border>
+        
+        <!-- Field 2: Second item shown optionally -->
         <Border Grid.Row="3" Background="LightBlue">
             <TextBlock Text="{Binding Fields[2]}" Visibility="{Binding FieldsVisibility[2]}" FontSize="60"
-                       FontFamily="{Binding FieldFontFamily[2]}"/>
+                       FontFamily="{Binding FieldFontFamily[2]}" Margin="0,6,-0.4,8.4"
+                       Cursor="Hand" MouseDown="TextBlock_MouseDown"/>
         </Border>
+        
+        <!-- Field 3: For notes -->
         <Border Grid.Row="4" Background="LightYellow">
             <TextBlock Text="{Binding Fields[3]}" Visibility="{Binding FieldsVisibility[3]}" FontSize="40" FontStyle="Italic"/>
         </Border>
