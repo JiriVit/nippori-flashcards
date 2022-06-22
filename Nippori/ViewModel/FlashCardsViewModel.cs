@@ -275,6 +275,12 @@ namespace Nippori.ViewModel
 
         #endregion
 
+        #region .: RichTextBox Prototyping :.
+
+        public string RtbText { get; set; } = ToFlowDocument("prdel", 80, SystemFonts.MessageFontFamily);
+
+        #endregion
+
         public VocableModel CurrentVocable { get; set; }
         public TypeModel EnabledType { get; set; }
 
@@ -695,6 +701,9 @@ namespace Nippori.ViewModel
 
             NotifyPropertyChanged("Fields");
             NotifyPropertyChanged("FieldFontFamily");
+
+            RtbText = ToFlowDocument(Fields[0], 80, FieldFontFamily[0]);
+            NotifyPropertyChanged(nameof(RtbText));
         }
         
         private void UpdateVisibility()
@@ -745,6 +754,14 @@ namespace Nippori.ViewModel
                 NotifyPropertyChanged("FieldsEmphasized");
             }
         }
+
+        #region .: Utils :.
+
+        private static string ToFlowDocument(string text, int fontSize, FontFamily fontFamily) => 
+            "<FlowDocument xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\" TextAlignment=\"Center\">" +
+            $"<Paragraph FontFamily=\"{fontFamily}\" FontSize=\"{fontSize}\">{text}</Paragraph></FlowDocument>";
+
+        #endregion
 
         #region .: Debug :.
 

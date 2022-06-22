@@ -79,6 +79,7 @@
     <Compile Include="Pages\FlashcardPage.xaml.cs">
       <DependentUpon>FlashcardPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Utils\RichTextBoxHelper.cs" />
     <Compile Include="ViewModel\FlashCardsViewModel.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
     <Compile Include="Model\GroupModel.cs" />
@@ -157,5 +158,6 @@
     <Resource Include="Images\StatusInvalid_40x.png" />
     <Resource Include="Images\StatusOK_40x.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
