@@ -11,16 +11,21 @@
 - Add option to include some vocabulary in the app and also to update it from
   GitHub.
 - Don't use kanji above selected JLPT level at all. Don't show them.
-- Add option to copy contents of fields to clipboard.
 - Emphasize only single JLPT kanjis, not whole field (using RichTextBox).
 - Split groups to level, lexical categories and groups (used purely to split
   vocables to batches for easier training), allow selection of those separately.
 - Add presets (eg. this lesson, these groups, this type).
 - Remember recently used presets.
 - Add separate option to examine katakana only.
+- Add option to search for stroke order for the character.
+  - For Chinese it is http://www.strokeorder.info/mandarin.php?q=X
+- When hovering over a vocable, show list of options, including copy to
+  clipboard, look up in a dictionary, look up in Google Images, look up in
+  Google Translator (to read aloud).
 
 IMPLEMENTED
 --------------------------------------------------------------------------------
+- Add option to copy contents of fields to clipboard.
 - Add selection of JLPT level. Use it to emphasize kanji for this level (and
   lower) when learning kana -> kanji, and to select only necessary vocables
   when learning kanji -> kana.
