@@ -72,6 +72,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Bases\ModelBase.cs" />
+    <Compile Include="Controls\VocableField.xaml.cs">
+      <DependentUpon>VocableField.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Converters\BoolToBrushConverter.cs" />
     <Compile Include="Enums\VocableStatus.cs" />
     <Compile Include="Japanese\JlptLevels.cs" />
@@ -85,6 +88,11 @@
     <Compile Include="Model\GroupModel.cs" />
     <Compile Include="Model\TypeModel.cs" />
     <Compile Include="Model\VocableModel.cs" />
+    <Compile Include="ViewModel\VocableFieldViewModel.cs" />
+    <Page Include="Controls\VocableField.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
