@@ -7,18 +7,27 @@
              xmlns:utils="clr-namespace:Nippori.Utils"
              xmlns:viewmodel="clr-namespace:Nippori.ViewModel"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="800"
+             >
 
-    <Border Background="LightGray" CornerRadius="15"
+    <!-- The purpose of this grid is to enforce certain background color -->
+    <Grid Background="White">
+        <Border CornerRadius="15"
+            Background="{Binding Background}"
             d:DataContext="{d:DesignInstance Type=viewmodel:VocableFieldViewModel}"
             DataContextChanged="Border_DataContextChanged">
-        
-        <!-- Create an instance of ViewModel and assign it as DataContext -->
-        <Border.DataContext>
-            <viewmodel:VocableFieldViewModel/>
-        </Border.DataContext>
-        
-        <RichTextBox utils:RichTextBoxHelper.DocumentXaml="{Binding RtbDocumentXaml}"
-            Margin="15" Height="100" Focusable="False" IsReadOnly="True" Background="Transparent"/>
-    </Border>
+
+            <!-- Create an instance of ViewModel and assign it as DataContext -->
+            <Border.DataContext>
+                <viewmodel:VocableFieldViewModel/>
+            </Border.DataContext>
+
+            <RichTextBox utils:RichTextBoxHelper.DocumentXaml="{Binding RtbDocumentXaml}"
+                Margin="15" Height="100" Focusable="False" IsReadOnly="True" Background="Transparent"
+                Cursor="Hand"
+                MouseMove="RichTextBox_MouseMove"
+                MouseLeave="RichTextBox_MouseLeave"/>
+        </Border>
+    </Grid>
+    
 </UserControl>

@@ -26,6 +26,8 @@ namespace Nippori.Controls
         #region .: Private Variables :.
 
         private VocableFieldViewModel vocableFieldVM;
+        private string charUnderCursor = string.Empty;
+        private int selStartOffsetPrev, selEndOffsetPrev;
 
         #endregion
 
@@ -65,15 +67,26 @@ namespace Nippori.Controls
         /// </summary>
         static VocableField()
         {
-            // Override metadata of inherited DependencyProperty FontSize to add custom PropertyChangedCallback
+            // Override metadata of inherited DependencyProperties to add custom PropertyChangedCallback
             // which passes the updated value to the ViewModel
+
             FontSizeProperty.OverrideMetadata(typeof(VocableField), 
                 new FrameworkPropertyMetadata(new PropertyChangedCallback(OnFontSizeChanged)));
+            BackgroundProperty.OverrideMetadata(typeof(VocableField),
+                new FrameworkPropertyMetadata(new PropertyChangedCallback(OnBackgroundChanged)));
+            ForegroundProperty.OverrideMetadata(typeof(VocableField),
+                new FrameworkPropertyMetadata(new PropertyChangedCallback(OnForegroundChanged)));
         }
 
         #endregion
 
         #region .: Private Methods :.
+
+        private void ResetColorMarking(RichTextBox richTextBox)
+        {
+            TextRange tr = new TextRange(richTextBox.Document.ContentStart, richTextBox.Document.ContentEnd);
+            tr.ApplyPropertyValue(ForegroundProperty, Brushes.Black);
+        }
 
         private void OnTextChanged(DependencyPropertyChangedEventArgs e)
         {
@@ -83,6 +96,16 @@ namespace Nippori.Controls
         private void OnFontSizeChanged(DependencyPropertyChangedEventArgs e)
         {
             vocableFieldVM.FontSize = (double)e.NewValue;
+        }
+
+        private void OnBackgroundChanged(DependencyPropertyChangedEventArgs e)
+        {
+            vocableFieldVM.Background = (Brush)e.NewValue;
+        }
+
+        private void OnForegroundChanged(DependencyPropertyChangedEventArgs e)
+        {
+            vocableFieldVM.Foreground = (Brush)e.NewValue;
         }
 
         #endregion
@@ -111,6 +134,84 @@ namespace Nippori.Controls
         private static void OnFontSizeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ((VocableField)d).OnFontSizeChanged(e);
+        }
+
+        private static void OnBackgroundChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((VocableField)d).OnBackgroundChanged(e);
+        }
+
+        private static void OnForegroundChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((VocableField)d).OnForegroundChanged(e);
+        }
+
+
+        #endregion
+
+        #region .: RichTextBox :.
+
+        private void RichTextBox_MouseMove(object sender, MouseEventArgs e)
+        {
+            // TODO Investigate why sometimes the first character from the right is not marked.
+            //      This usually happens after cursor leaves area of the RTB.
+
+            RichTextBox richTextBox = (RichTextBox)sender;
+
+            TextPointer contentStart = richTextBox.Document.ContentStart;
+            TextPointer contentEnd = richTextBox.Document.ContentEnd;
+
+            Point mousePosition = e.GetPosition(richTextBox);
+            TextPointer textPointer = richTextBox.GetPositionFromPoint(mousePosition, false);
+            if (textPointer != null)
+            {
+                TextPointer selStart, selEnd;
+
+                // this needs to be done because the selection pointer changes in the middle of
+                // the characters, not between them (as one would naturally expect)
+                if (textPointer.LogicalDirection == LogicalDirection.Forward)
+                {
+                    selStart = textPointer.GetPositionAtOffset(0);
+                    selEnd = textPointer.GetPositionAtOffset(1);
+                }
+                else
+                {
+                    selStart = textPointer.GetPositionAtOffset(-1);
+                    selEnd = textPointer.GetPositionAtOffset(0);
+                }
+
+                int selStartOffset = contentStart.GetOffsetToPosition(selStart);
+                int selEndOffset = contentStart.GetOffsetToPosition(selEnd);
+                if ((selStartOffset != selStartOffsetPrev) || (selEndOffset != selEndOffsetPrev))
+                {
+                    Debug.WriteLine($"{selStartOffset}, {selEndOffset}");
+
+                    TextRange tr = new TextRange(contentStart, contentEnd);
+
+                    // color whole text to black (to remove previous red marking)
+                    tr.ApplyPropertyValue(ForegroundProperty, Brushes.Black);
+
+                    // color the character under mouse cursor to red
+                    tr.Select(selStart, selEnd);
+                    tr.ApplyPropertyValue(ForegroundProperty, Brushes.Red);
+
+                    charUnderCursor = tr.Text;
+
+                    selStartOffsetPrev = selStartOffset;
+                    selEndOffsetPrev = selEndOffset;
+                }
+            }
+            else
+            {
+                ResetColorMarking(richTextBox);
+                charUnderCursor = string.Empty;
+            }
+        }
+
+        private void RichTextBox_MouseLeave(object sender, MouseEventArgs e)
+        {
+            RichTextBox richTextBox = (RichTextBox)sender;
+            ResetColorMarking(richTextBox);
         }
 
         #endregion

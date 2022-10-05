@@ -84,7 +84,8 @@
         </Grid>
         
         <!-- Field 0: The text being always shown -->
-        <controls:VocableField Grid.Row="1" Text="{Binding Fields[0]}" FontSize="80"/>
+        <controls:VocableField Grid.Row="1" Text="{Binding Fields[0]}" FontSize="80"
+                               Background="LightGray"/>
         <!--
         <Border Grid.Row="1" Margin="6" Background="LightGray" CornerRadius="15">
             <TextBlock Text="{Binding Fields[0]}" Visibility="{Binding FieldsVisibility[0]}" FontSize="80" Foreground="DarkBlue"

@@ -16,6 +16,8 @@ namespace Nippori.ViewModel
 
         private string text;
         private double fontSize = 40.0;
+        private Brush background = Brushes.Transparent;
+        private Brush foreground = SystemColors.WindowTextBrush;
 
         #endregion
 
@@ -44,6 +46,26 @@ namespace Nippori.ViewModel
             {
                 fontSize = value;
                 RtbDocumentXaml = RtbDocumentXaml;
+            }
+        }
+
+        public Brush Background
+        {
+            get => background;
+            set
+            {
+                background = value;
+                NotifyPropertyChanged(nameof(Background));
+            }
+        }
+
+        public Brush Foreground
+        {
+            get => foreground;
+            set
+            {
+                foreground = value;
+                NotifyPropertyChanged(nameof(Foreground));
             }
         }
 
