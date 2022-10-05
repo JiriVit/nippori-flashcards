@@ -5,7 +5,7 @@ Flashcard application for exercising foreign languages.
 
 **Programming language:** C# with Windows Presentation Foundation
 
-**IDE:** Visual Studio 2017 Community Edition
+**IDE:** Visual Studio 2022 Community Edition
 
 ## Summary
 
