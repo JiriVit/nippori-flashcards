@@ -24,7 +24,6 @@
 
             <RichTextBox utils:RichTextBoxHelper.DocumentXaml="{Binding RtbDocumentXaml}"
                 Margin="15" Height="100" Focusable="False" IsReadOnly="True" Background="Transparent"
-                Cursor="Hand"
                 MouseMove="RichTextBox_MouseMove"
                 MouseLeave="RichTextBox_MouseLeave"/>
         </Border>

@@ -27,7 +27,8 @@ namespace Nippori.Controls
 
         private VocableFieldViewModel vocableFieldVM;
         private string charUnderCursor = string.Empty;
-        private int selStartOffsetPrev, selEndOffsetPrev;
+        private int selStartOffsetPrev = -1;
+        private int selEndOffsetPrev = -1;
 
         #endregion
 
@@ -146,16 +147,12 @@ namespace Nippori.Controls
             ((VocableField)d).OnForegroundChanged(e);
         }
 
-
         #endregion
 
         #region .: RichTextBox :.
 
         private void RichTextBox_MouseMove(object sender, MouseEventArgs e)
         {
-            // TODO Investigate why sometimes the first character from the right is not marked.
-            //      This usually happens after cursor leaves area of the RTB.
-
             RichTextBox richTextBox = (RichTextBox)sender;
 
             TextPointer contentStart = richTextBox.Document.ContentStart;
@@ -184,8 +181,6 @@ namespace Nippori.Controls
                 int selEndOffset = contentStart.GetOffsetToPosition(selEnd);
                 if ((selStartOffset != selStartOffsetPrev) || (selEndOffset != selEndOffsetPrev))
                 {
-                    Debug.WriteLine($"{selStartOffset}, {selEndOffset}");
-
                     TextRange tr = new TextRange(contentStart, contentEnd);
 
                     // color whole text to black (to remove previous red marking)
@@ -199,12 +194,17 @@ namespace Nippori.Controls
 
                     selStartOffsetPrev = selStartOffset;
                     selEndOffsetPrev = selEndOffset;
+
+                    richTextBox.Cursor = Cursors.Hand;
                 }
             }
             else
             {
                 ResetColorMarking(richTextBox);
+                selStartOffsetPrev = -1;
+                selEndOffsetPrev = -1;
                 charUnderCursor = string.Empty;
+                richTextBox.Cursor = Cursors.Arrow;
             }
         }
 
