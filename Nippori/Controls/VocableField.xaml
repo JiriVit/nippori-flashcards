@@ -13,7 +13,7 @@
     <!-- The purpose of this grid is to enforce certain background color -->
     <Grid Background="White">
         <Border CornerRadius="15"
-            Background="{Binding Background}"
+            Background="{Binding Background, FallbackValue=LightGray}"
             d:DataContext="{d:DesignInstance Type=viewmodel:VocableFieldViewModel}"
             DataContextChanged="Border_DataContextChanged">
 
@@ -22,10 +22,26 @@
                 <viewmodel:VocableFieldViewModel/>
             </Border.DataContext>
 
-            <RichTextBox utils:RichTextBoxHelper.DocumentXaml="{Binding RtbDocumentXaml}"
-                Margin="15" Height="100" Focusable="False" IsReadOnly="True" Background="Transparent"
-                MouseMove="RichTextBox_MouseMove" MouseLeave="RichTextBox_MouseLeave"
-                MouseDown="RichTextBox_MouseDown"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="104"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="104"/>
+                </Grid.ColumnDefinitions>
+
+                <RichTextBox Grid.Column="1" Margin="15" Height="100" 
+                    utils:RichTextBoxHelper.DocumentXaml="{Binding RtbDocumentXaml}"
+                    Focusable="False" IsReadOnly="True" Background="Transparent"
+                    MouseMove="RichTextBox_MouseMove" MouseLeave="RichTextBox_MouseLeave"
+                    MouseDown="RichTextBox_MouseDown"/>
+
+                <WrapPanel Grid.Column="0" Margin="15" Orientation="Vertical" Background="LightGreen"
+                           MouseEnter="WrapPanel_MouseEnter" MouseLeave="WrapPanel_MouseLeave">
+                    <Button Content="1" Width="35" Height="35" Margin="2" Visibility="Hidden"/>
+                    <Button Content="2" Width="35" Height="35" Margin="2" Visibility="Hidden"/>
+                </WrapPanel>
+            </Grid>
+            
         </Border>
     </Grid>
     

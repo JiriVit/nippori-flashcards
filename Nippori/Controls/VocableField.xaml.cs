@@ -228,6 +228,30 @@ namespace Nippori.Controls
 
         #endregion
 
+        #region .: WrapPanel :.
+
+        private void WrapPanel_MouseEnter(object sender, MouseEventArgs e)
+        {
+            WrapPanel wrapPanel = (WrapPanel)sender;
+
+            foreach (UIElement uiElement in wrapPanel.Children)
+            {
+                uiElement.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void WrapPanel_MouseLeave(object sender, MouseEventArgs e)
+        {
+            WrapPanel wrapPanel = (WrapPanel)sender;
+
+            foreach (UIElement uiElement in wrapPanel.Children)
+            {
+                uiElement.Visibility = Visibility.Hidden;
+            }
+        }
+
+        #endregion
+
         #endregion
 
         #region .: Events :.
@@ -235,6 +259,5 @@ namespace Nippori.Controls
         public event EventHandler CharacterMouseDown;
 
         #endregion
-
     }
 }
