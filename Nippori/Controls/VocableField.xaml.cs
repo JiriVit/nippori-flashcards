@@ -26,7 +26,6 @@ namespace Nippori.Controls
         #region .: Private Variables :.
 
         private VocableFieldViewModel vocableFieldVM;
-        private string charUnderCursor = string.Empty;
         private int selStartOffsetPrev = -1;
         private int selEndOffsetPrev = -1;
 
@@ -50,6 +49,11 @@ namespace Nippori.Controls
             get => (string)GetValue(TextProperty);
             set => SetValue(TextProperty, value);
         }
+
+        /// <summary>
+        /// Gets the character under mouse cursor.
+        /// </summary>
+        public string CharacterUnderCursor { get; private set; } = string.Empty;
 
         #endregion
 
@@ -190,7 +194,7 @@ namespace Nippori.Controls
                     tr.Select(selStart, selEnd);
                     tr.ApplyPropertyValue(ForegroundProperty, Brushes.Red);
 
-                    charUnderCursor = tr.Text;
+                    CharacterUnderCursor = tr.Text;
 
                     selStartOffsetPrev = selStartOffset;
                     selEndOffsetPrev = selEndOffset;
@@ -203,7 +207,7 @@ namespace Nippori.Controls
                 ResetColorMarking(richTextBox);
                 selStartOffsetPrev = -1;
                 selEndOffsetPrev = -1;
-                charUnderCursor = string.Empty;
+                CharacterUnderCursor = string.Empty;
                 richTextBox.Cursor = Cursors.Arrow;
             }
         }
@@ -214,8 +218,23 @@ namespace Nippori.Controls
             ResetColorMarking(richTextBox);
         }
 
+        private void RichTextBox_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (CharacterUnderCursor != string.Empty)
+            {
+                CharacterMouseDown?.Invoke(this, new EventArgs());
+            }
+        }
+
         #endregion
 
         #endregion
+
+        #region .: Events :.
+
+        public event EventHandler CharacterMouseDown;
+
+        #endregion
+
     }
 }

@@ -15,6 +15,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using Nippori.Controls;
+
 namespace Nippori.Pages
 {
     /// <summary>
@@ -33,6 +35,17 @@ namespace Nippori.Pages
         #endregion
 
         #region .: Event Handlers :.
+
+        #region .: VocableField :.
+
+        private void VocableField_CharacterMouseDown(object sender, EventArgs e)
+        {
+            VocableField vf = (VocableField)sender;
+
+            Debug.WriteLine($"CharacterMouseDown: {vf.CharacterUnderCursor}");
+        }
+
+        #endregion
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
@@ -70,6 +83,5 @@ namespace Nippori.Pages
         }
 
         #endregion
-
     }
 }
