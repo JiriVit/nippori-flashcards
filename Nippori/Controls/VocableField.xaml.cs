@@ -252,12 +252,24 @@ namespace Nippori.Controls
 
         #endregion
 
+        #region .: Button :.
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            DebugEvent?.Invoke(this, new EventArgs());
+        }
+
+        #endregion
+
         #endregion
 
         #region .: Events :.
 
         public event EventHandler CharacterMouseDown;
 
+        public event EventHandler DebugEvent;
+
         #endregion
+
     }
 }

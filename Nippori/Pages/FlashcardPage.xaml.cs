@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
+using System.Speech.Synthesis;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -24,11 +27,22 @@ namespace Nippori.Pages
     /// </summary>
     public partial class FlashcardPage : Page
     {
+        #region .: Private Variables :.
+
+        SpeechSynthesizer speechSynthesizer = new SpeechSynthesizer();
+
+        #endregion
+
         #region .: Constructor :.
 
         public FlashcardPage()
         {
             InitializeComponent();
+
+            CultureInfo japanCulture = new CultureInfo("ja-JP");
+            speechSynthesizer.SetOutputToDefaultAudioDevice();
+            speechSynthesizer.SelectVoiceByHints(VoiceGender.NotSet, VoiceAge.NotSet, 0, japanCulture);
+
             DataContext = App.FlashCardsVM;
         }
 
@@ -42,7 +56,27 @@ namespace Nippori.Pages
         {
             VocableField vf = (VocableField)sender;
 
-            Debug.WriteLine($"CharacterMouseDown: {vf.CharacterUnderCursor}");
+            string url = $"https://jisho.org/search/{vf.CharacterUnderCursor}%20%23kanji";
+            try
+            {
+                ProcessStartInfo info = new ProcessStartInfo(url)
+                {
+                    UseShellExecute = true,
+                };
+                Process.Start(info);
+            }
+            catch (Win32Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+            }
+
+        }
+
+        private void VocableField_DebugEvent(object sender, EventArgs e)
+        {
+            VocableField vocableField = (VocableField)sender;
+
+            speechSynthesizer.Speak(vocableField.Text);
         }
 
         #endregion
