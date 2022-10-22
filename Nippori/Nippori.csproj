@@ -73,6 +73,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Bases\ModelBase.cs" />
+    <Compile Include="Controls\ButtonClickEventArgs.cs" />
+    <Compile Include="Controls\ButtonCommands.cs" />
     <Compile Include="Controls\VocableField.xaml.cs">
       <DependentUpon>VocableField.xaml</DependentUpon>
     </Compile>

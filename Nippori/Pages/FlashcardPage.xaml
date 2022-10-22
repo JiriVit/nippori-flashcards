@@ -87,6 +87,7 @@
         <controls:VocableField Grid.Row="1" Text="{Binding Fields[0]}" FontSize="80"
                                Background="LightGray"
                                CharacterMouseDown="VocableField_CharacterMouseDown"
+                               ButtonClick="VocableField_ButtonClick"
                                DebugEvent="VocableField_DebugEvent"/>
         <!--
         <Border Grid.Row="1" Margin="6" Background="LightGray" CornerRadius="15">

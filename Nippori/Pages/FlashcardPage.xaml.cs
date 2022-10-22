@@ -48,15 +48,14 @@ namespace Nippori.Pages
 
         #endregion
 
-        #region .: Event Handlers :.
+        #region .: Private Methods :.
 
-        #region .: VocableField :.
-
-        private void VocableField_CharacterMouseDown(object sender, EventArgs e)
+        /// <summary>
+        /// Opens the given URL in default web browser.
+        /// </summary>
+        /// <param name="url">URL to open in the browser.</param>
+        private void OpenWebBrowser(string url)
         {
-            VocableField vf = (VocableField)sender;
-
-            string url = $"https://jisho.org/search/{vf.CharacterUnderCursor}%20%23kanji";
             try
             {
                 ProcessStartInfo info = new ProcessStartInfo(url)
@@ -69,14 +68,45 @@ namespace Nippori.Pages
             {
                 Debug.WriteLine(ex.ToString());
             }
+        }
 
+        #endregion
+
+        #region .: Event Handlers :.
+
+        #region .: VocableField :.
+
+        private void VocableField_CharacterMouseDown(object sender, EventArgs e)
+        {
+            VocableField vf = (VocableField)sender;
+
+            string url = $"https://jisho.org/search/{vf.CharacterUnderCursor}%20%23kanji";
+            OpenWebBrowser(url);
         }
 
         private void VocableField_DebugEvent(object sender, EventArgs e)
         {
+        }
+
+        private void VocableField_ButtonClick(object sender, ButtonClickEventArgs e)
+        {
+            string url;
             VocableField vocableField = (VocableField)sender;
 
-            speechSynthesizer.Speak(vocableField.Text);
+            switch (e.Command)
+            {
+                case ButtonCommands.Speak:
+                    speechSynthesizer.Speak(vocableField.Text);
+                    break;
+                case ButtonCommands.DeepL:
+                    url = $"https://www.deepl.com/translator#ja/en/{vocableField.Text}";
+                    OpenWebBrowser(url);
+                    break;
+                case ButtonCommands.GoogleImages:
+                    url = $"https://www.google.com/search?tbm=isch&q={vocableField.Text}";
+                    OpenWebBrowser(url);
+                    break;
+            }
         }
 
         #endregion
@@ -117,5 +147,6 @@ namespace Nippori.Pages
         }
 
         #endregion
+
     }
 }

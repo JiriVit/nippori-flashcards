@@ -45,8 +45,9 @@
                             <EventSetter Event="Click" Handler="Button_Click"/>
                         </Style>
                     </WrapPanel.Resources>
-                    <Button Content="1" Tag="1"/>
-                    <Button Content="2" Tag="2"/>
+                    <Button Content="S" Tag="{x:Static local:ButtonCommands.Speak}"/>
+                    <Button Content="D" Tag="{x:Static local:ButtonCommands.DeepL}"/>
+                    <Button Content="I" Tag="{x:Static local:ButtonCommands.GoogleImages}"/>
                 </WrapPanel>
             </Grid>
             

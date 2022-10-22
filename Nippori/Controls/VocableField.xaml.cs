@@ -256,7 +256,12 @@ namespace Nippori.Controls
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            DebugEvent?.Invoke(this, new EventArgs());
+            Button button = (Button)sender;
+
+            if (button.Tag is ButtonCommands cmd)
+            {
+                ButtonClick?.Invoke(this, new ButtonClickEventArgs(cmd));
+            }
         }
 
         #endregion
@@ -265,7 +270,14 @@ namespace Nippori.Controls
 
         #region .: Events :.
 
+        /// <summary>
+        /// Occurs when the right mouse button is pressed while the cursor points on certain character.
+        /// </summary>
         public event EventHandler CharacterMouseDown;
+        /// <summary>
+        /// Occurs when one of the command buttons is clicked.
+        /// </summary>
+        public event EventHandler<ButtonClickEventArgs> ButtonClick;
 
         public event EventHandler DebugEvent;
 
