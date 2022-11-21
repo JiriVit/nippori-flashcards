@@ -22,6 +22,7 @@
 - When hovering over a vocable, show list of options, including copy to
   clipboard, look up in a dictionary, look up in Google Images, look up in
   Google Translator (to read aloud).
+- Replace the Ribbon with UWP-like sidebar.
 
 IMPLEMENTED
 --------------------------------------------------------------------------------
