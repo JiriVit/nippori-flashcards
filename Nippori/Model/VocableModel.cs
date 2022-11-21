@@ -53,7 +53,14 @@ namespace Nippori.Model
 
             // read 'active' flag
             string status = xmlNode.Attributes[$"field{fieldsCount + 3}"].Value;
-            Status = (VocableStatus)int.Parse(status);
+            if (status.Equals(string.Empty))
+            {
+                Status = VocableStatus.Active;
+            }
+            else
+            {
+                Status = (VocableStatus)int.Parse(status);
+            }
             Enabled = Status != VocableStatus.Inactive;
         }
 
