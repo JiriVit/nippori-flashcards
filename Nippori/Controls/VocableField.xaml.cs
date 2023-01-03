@@ -37,6 +37,10 @@ namespace Nippori.Controls
             DependencyProperty.Register("Text", typeof(string), typeof(VocableField),
                 new PropertyMetadata("", new PropertyChangedCallback(OnTextChanged)));
 
+        public static readonly DependencyProperty SpeakEnabledProperty =
+            DependencyProperty.Register("SpeakEnabled", typeof(bool), typeof(VocableField),
+                new PropertyMetadata(true, new PropertyChangedCallback(OnSpeakEnabledChanged)));
+
         #endregion
 
         #region .: Properties :.
@@ -48,6 +52,15 @@ namespace Nippori.Controls
         {
             get => (string)GetValue(TextProperty);
             set => SetValue(TextProperty, value);
+        }
+
+        /// <summary>
+        /// Gets or sets boolean value which determines if the speak feature is enabled.
+        /// </summary>
+        public bool SpeakEnabled
+        {
+            get => (bool)GetValue(SpeakEnabledProperty);
+            set => SetValue(SpeakEnabledProperty, value);
         }
 
         /// <summary>
@@ -93,9 +106,16 @@ namespace Nippori.Controls
             tr.ApplyPropertyValue(ForegroundProperty, Brushes.Black);
         }
 
+        #region .: PropertyChanged Callbacks :.
+
         private void OnTextChanged(DependencyPropertyChangedEventArgs e)
         {
             vocableFieldVM.Text = e.NewValue.ToString();
+        }
+
+        private void OnSpeakEnabledChanged(DependencyPropertyChangedEventArgs e)
+        {
+            vocableFieldVM.SpeakEnabled = (bool)e.NewValue;
         }
 
         private void OnFontSizeChanged(DependencyPropertyChangedEventArgs e)
@@ -112,6 +132,8 @@ namespace Nippori.Controls
         {
             vocableFieldVM.Foreground = (Brush)e.NewValue;
         }
+
+        #endregion
 
         #endregion
 
@@ -134,6 +156,11 @@ namespace Nippori.Controls
         private static void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ((VocableField)d).OnTextChanged(e);
+        }
+
+        private static void OnSpeakEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((VocableField)d).OnSpeakEnabledChanged(e);
         }
 
         private static void OnFontSizeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)

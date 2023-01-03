@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,6 +19,7 @@ namespace Nippori.ViewModel
         private double fontSize = 40.0;
         private Brush background = Brushes.Transparent;
         private Brush foreground = SystemColors.WindowTextBrush;
+        private bool speakEnabled = true;
 
         #endregion
 
@@ -66,6 +68,17 @@ namespace Nippori.ViewModel
             {
                 foreground = value;
                 NotifyPropertyChanged(nameof(Foreground));
+            }
+        }
+
+        public bool SpeakEnabled
+        {
+            get => speakEnabled;
+            set
+            {
+                speakEnabled = value;
+                Debug.WriteLine($"SpeakEnabled changed to {value}");
+                NotifyPropertyChanged(nameof(SpeakEnabled));
             }
         }
 

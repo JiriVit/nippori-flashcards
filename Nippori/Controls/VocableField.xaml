@@ -35,7 +35,8 @@
                     MouseMove="RichTextBox_MouseMove" MouseLeave="RichTextBox_MouseLeave"
                     MouseDown="RichTextBox_MouseDown"/>
 
-                <WrapPanel Grid.Column="0" Margin="15" Orientation="Vertical" Background="LightGreen"
+                <WrapPanel Grid.Column="0" Margin="15" Orientation="Vertical" 
+                           Background="{Binding Background, FallbackValue=LightGray}"
                            MouseEnter="WrapPanel_MouseEnter" MouseLeave="WrapPanel_MouseLeave">
                     <WrapPanel.Resources>
                         <Style TargetType="Button">
@@ -45,9 +46,10 @@
                             <EventSetter Event="Click" Handler="Button_Click"/>
                         </Style>
                     </WrapPanel.Resources>
-                    <Button Content="S" Tag="{x:Static local:ButtonCommands.Speak}"/>
-                    <Button Content="D" Tag="{x:Static local:ButtonCommands.DeepL}"/>
-                    <Button Content="I" Tag="{x:Static local:ButtonCommands.GoogleImages}"/>
+                    <Button ToolTip="Speak" Tag="{x:Static local:ButtonCommands.Speak}"
+                            Visibility="{Binding SpeakEnabled, Converter={StaticResource BoolToVis}}"/>
+                    <Button ToolTip="DeepL" Tag="{x:Static local:ButtonCommands.DeepL}"/>
+                    <Button ToolTip="Google Images"  Tag="{x:Static local:ButtonCommands.GoogleImages}"/>
                 </WrapPanel>
             </Grid>
             
