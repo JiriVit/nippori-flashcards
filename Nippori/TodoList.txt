@@ -23,6 +23,7 @@
   clipboard, look up in a dictionary, look up in Google Images, look up in
   Google Translator (to read aloud).
 - Replace the Ribbon with UWP-like sidebar.
+- Fix handling of XML parsing errors.
 
 IMPLEMENTED
 --------------------------------------------------------------------------------
