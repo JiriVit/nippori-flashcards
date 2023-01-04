@@ -114,6 +114,8 @@ namespace Nippori.ViewModel
         private bool jlptKanjiOnly = false;
         private bool jlptKanjiOnlyVisible = false;
 
+        private bool sequentialOrderActive = false;
+
         #endregion
 
         #region .: Debug :.
@@ -272,6 +274,30 @@ namespace Nippori.ViewModel
                 }
             }
         }
+
+
+        public bool RandomOrderActive
+        {
+            get => !sequentialOrderActive;
+            set
+            {
+                sequentialOrderActive = !value;
+                NotifyPropertyChanged(nameof(RandomOrderActive));
+                NotifyPropertyChanged(nameof(SequentialOrderActive));
+            }
+        }
+
+        public bool SequentialOrderActive
+        {
+            get => sequentialOrderActive;
+            set
+            {
+                sequentialOrderActive = value;
+                NotifyPropertyChanged(nameof(SequentialOrderActive));
+                NotifyPropertyChanged(nameof(RandomOrderActive));
+            }
+        }
+
 
         #endregion
 
@@ -568,13 +594,20 @@ namespace Nippori.ViewModel
             {
                 if (vocableStack.Count > 1)
                 {
-                    // make sure that the next vocable is not the same as the previous one
-                    while (true)
+                    if (!sequentialOrderActive)
                     {
-                        candidateVocable = vocableStack[random.Next(vocableStack.Count)];
-                        if (candidateVocable.Equals(CurrentVocable))
-                            continue;
-                        break;
+                        // make sure that the next vocable is not the same as the previous one
+                        while (true)
+                        {
+                            candidateVocable = vocableStack[random.Next(vocableStack.Count)];
+                            if (candidateVocable.Equals(CurrentVocable))
+                                continue;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        candidateVocable = vocableStack[0];
                     }
                 }
                 else
@@ -619,11 +652,7 @@ namespace Nippori.ViewModel
 
         private void RefillStack()
         {
-            var enabledVocables = from vocable in allVocables
-                                  where IsVocableEnabled(vocable)
-                                  select vocable;
-
-            vocableStack = new List<VocableModel>(enabledVocables);
+            vocableStack = allVocables.Where(v => IsVocableEnabled(v)).ToList();
             noVocablesForExamination = (vocableStack.Count == 0);
         }
 
