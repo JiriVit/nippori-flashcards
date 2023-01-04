@@ -3,11 +3,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewmodel="clr-namespace:Nippori.ViewModel"
         xmlns:local="clr-namespace:Nippori"
         mc:Ignorable="d"
         Title="Nippori" Height="450" Width="800" 
         WindowStartupLocation="CenterScreen" WindowState="Maximized"
-        KeyDown="Window_KeyDown">
+        KeyDown="Window_KeyDown"
+        d:DataContext="{d:DesignInstance Type=viewmodel:FlashCardsViewModel}">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
     </Window.Resources>
@@ -64,6 +66,10 @@
                     <RibbonToggleButton Label="Normal" IsChecked="{Binding ActiveVocablesEnabled}" LargeImageSource="Images\StatusOK_40x.png" />
                     <RibbonToggleButton Label="Easy" IsChecked="{Binding EasyVocablesEnabled}" LargeImageSource="Images\StatusDowngrade_40x.png"/>
                     <RibbonToggleButton Label="Difficult" IsChecked="{Binding DifficultVocablesEnabled}" LargeImageSource="Images\StatusInvalid_40x.png"/>
+                </RibbonGroup>
+                <RibbonGroup Header="Order">
+                    <RibbonToggleButton Label="Random" LargeImageSource="Images\ButtonIcon_40x.png" IsChecked="{Binding RandomOrderActive}"/>
+                    <RibbonToggleButton Label="Sequential" LargeImageSource="Images\ButtonIcon_40x.png" IsChecked="{Binding SequentialOrderActive}"/>
                 </RibbonGroup>
             </RibbonTab>
         </Ribbon>

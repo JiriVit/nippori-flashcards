@@ -169,6 +169,8 @@
     <Resource Include="Images\StatusInvalid_40x.png" />
     <Resource Include="Images\StatusOK_40x.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Images\ButtonIcon_40x.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
