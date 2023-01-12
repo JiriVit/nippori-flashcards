@@ -37,9 +37,9 @@ namespace Nippori.Controls
             DependencyProperty.Register("Text", typeof(string), typeof(VocableField),
                 new PropertyMetadata("", new PropertyChangedCallback(OnTextChanged)));
 
-        public static readonly DependencyProperty SpeakEnabledProperty =
-            DependencyProperty.Register("SpeakEnabled", typeof(bool), typeof(VocableField),
-                new PropertyMetadata(true, new PropertyChangedCallback(OnSpeakEnabledChanged)));
+        public static readonly DependencyProperty KanjiFeaturesEnabledProperty =
+            DependencyProperty.Register("KanjiFeaturesEnabled", typeof(bool), typeof(VocableField),
+                new PropertyMetadata(true, new PropertyChangedCallback(OnKanjiFeaturesEnabledChanged)));
 
         #endregion
 
@@ -55,12 +55,12 @@ namespace Nippori.Controls
         }
 
         /// <summary>
-        /// Gets or sets boolean value which determines if the speak feature is enabled.
+        /// Gets or sets boolean value which determines if the kanji features (character highlighting, action buttons) are enabled.
         /// </summary>
-        public bool SpeakEnabled
+        public bool KanjiFeaturesEnabled
         {
-            get => (bool)GetValue(SpeakEnabledProperty);
-            set => SetValue(SpeakEnabledProperty, value);
+            get => (bool)GetValue(KanjiFeaturesEnabledProperty);
+            set => SetValue(KanjiFeaturesEnabledProperty, value);
         }
 
         /// <summary>
@@ -100,96 +100,13 @@ namespace Nippori.Controls
 
         #region .: Private Methods :.
 
-        private void ResetColorMarking(RichTextBox richTextBox)
+        #region .: RichTextBox Character Highlighting :.
+
+        private void UpdateCharacterHighlighting(RichTextBox richTextBox, Point mousePosition)
         {
-            TextRange tr = new TextRange(richTextBox.Document.ContentStart, richTextBox.Document.ContentEnd);
-            tr.ApplyPropertyValue(ForegroundProperty, Brushes.Black);
-        }
-
-        #region .: PropertyChanged Callbacks :.
-
-        private void OnTextChanged(DependencyPropertyChangedEventArgs e)
-        {
-            vocableFieldVM.Text = e.NewValue.ToString();
-        }
-
-        private void OnSpeakEnabledChanged(DependencyPropertyChangedEventArgs e)
-        {
-            vocableFieldVM.SpeakEnabled = (bool)e.NewValue;
-        }
-
-        private void OnFontSizeChanged(DependencyPropertyChangedEventArgs e)
-        {
-            vocableFieldVM.FontSize = (double)e.NewValue;
-        }
-
-        private void OnBackgroundChanged(DependencyPropertyChangedEventArgs e)
-        {
-            vocableFieldVM.Background = (Brush)e.NewValue;
-        }
-
-        private void OnForegroundChanged(DependencyPropertyChangedEventArgs e)
-        {
-            vocableFieldVM.Foreground = (Brush)e.NewValue;
-        }
-
-        #endregion
-
-        #endregion
-
-        #region .: Event Handlers :.
-
-        #region .: DataContext :.
-
-        private void Border_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            if (e.NewValue is VocableFieldViewModel model)
-            {
-                vocableFieldVM = model;
-            }
-        }
-
-        #endregion
-
-        #region .: DependencyProperty :.
-
-        private static void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ((VocableField)d).OnTextChanged(e);
-        }
-
-        private static void OnSpeakEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ((VocableField)d).OnSpeakEnabledChanged(e);
-        }
-
-        private static void OnFontSizeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ((VocableField)d).OnFontSizeChanged(e);
-        }
-
-        private static void OnBackgroundChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ((VocableField)d).OnBackgroundChanged(e);
-        }
-
-        private static void OnForegroundChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ((VocableField)d).OnForegroundChanged(e);
-        }
-
-        #endregion
-
-        #region .: RichTextBox :.
-
-        private void RichTextBox_MouseMove(object sender, MouseEventArgs e)
-        {
-            RichTextBox richTextBox = (RichTextBox)sender;
-
             TextPointer contentStart = richTextBox.Document.ContentStart;
             TextPointer contentEnd = richTextBox.Document.ContentEnd;
 
-            Point mousePosition = e.GetPosition(richTextBox);
             TextPointer textPointer = richTextBox.GetPositionFromPoint(mousePosition, false);
             if (textPointer != null)
             {
@@ -239,15 +156,113 @@ namespace Nippori.Controls
             }
         }
 
+        #endregion
+
+        private void ResetColorMarking(RichTextBox richTextBox)
+        {
+            TextRange tr = new TextRange(richTextBox.Document.ContentStart, richTextBox.Document.ContentEnd);
+            tr.ApplyPropertyValue(ForegroundProperty, Brushes.Black);
+        }
+
+        #region .: PropertyChanged Callbacks :.
+
+        private void OnTextChanged(DependencyPropertyChangedEventArgs e)
+        {
+            vocableFieldVM.Text = e.NewValue.ToString();
+        }
+
+        private void OnKanjiFeaturesEnabledChanged(DependencyPropertyChangedEventArgs e)
+        {
+            vocableFieldVM.KanjiFeaturesEnabled = (bool)e.NewValue;
+        }
+
+        private void OnFontSizeChanged(DependencyPropertyChangedEventArgs e)
+        {
+            vocableFieldVM.FontSize = (double)e.NewValue;
+        }
+
+        private void OnBackgroundChanged(DependencyPropertyChangedEventArgs e)
+        {
+            vocableFieldVM.Background = (Brush)e.NewValue;
+        }
+
+        private void OnForegroundChanged(DependencyPropertyChangedEventArgs e)
+        {
+            vocableFieldVM.Foreground = (Brush)e.NewValue;
+        }
+
+        #endregion
+
+        #endregion
+
+        #region .: Event Handlers :.
+
+        #region .: DataContext :.
+
+        private void Border_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (e.NewValue is VocableFieldViewModel model)
+            {
+                vocableFieldVM = model;
+            }
+        }
+
+        #endregion
+
+        #region .: DependencyProperty :.
+
+        private static void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((VocableField)d).OnTextChanged(e);
+        }
+
+        private static void OnKanjiFeaturesEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((VocableField)d).OnKanjiFeaturesEnabledChanged(e);
+        }
+
+        private static void OnFontSizeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((VocableField)d).OnFontSizeChanged(e);
+        }
+
+        private static void OnBackgroundChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((VocableField)d).OnBackgroundChanged(e);
+        }
+
+        private static void OnForegroundChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((VocableField)d).OnForegroundChanged(e);
+        }
+
+        #endregion
+
+        #region .: RichTextBox :.
+
+        private void RichTextBox_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (vocableFieldVM.KanjiFeaturesEnabled)
+            {
+                RichTextBox richTextBox = (RichTextBox)sender;
+                Point mousePosition = e.GetPosition(richTextBox);
+
+                UpdateCharacterHighlighting(richTextBox, mousePosition);
+            }
+        }
+
         private void RichTextBox_MouseLeave(object sender, MouseEventArgs e)
         {
-            RichTextBox richTextBox = (RichTextBox)sender;
-            ResetColorMarking(richTextBox);
+            if (vocableFieldVM.KanjiFeaturesEnabled)
+            {
+                RichTextBox richTextBox = (RichTextBox)sender;
+                ResetColorMarking(richTextBox);
+            }
         }
 
         private void RichTextBox_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (CharacterUnderCursor != string.Empty)
+            if (vocableFieldVM.KanjiFeaturesEnabled && (CharacterUnderCursor != string.Empty))
             {
                 CharacterMouseDown?.Invoke(this, new EventArgs());
             }

@@ -31,25 +31,26 @@
 
                 <RichTextBox Grid.Column="1" Margin="15" Height="100" 
                     utils:RichTextBoxHelper.DocumentXaml="{Binding RtbDocumentXaml}"
-                    Focusable="False" IsReadOnly="True" Background="Transparent"
+                    Focusable="False" IsReadOnly="True" Background="Transparent" Cursor="Arrow"
                     MouseMove="RichTextBox_MouseMove" MouseLeave="RichTextBox_MouseLeave"
                     MouseDown="RichTextBox_MouseDown"/>
 
-                <WrapPanel Grid.Column="0" Margin="15" Orientation="Vertical" 
+                <WrapPanel Grid.Column="0" Margin="15" Orientation="Vertical"                            
                            Background="{Binding Background, FallbackValue=LightGray}"
-                           MouseEnter="WrapPanel_MouseEnter" MouseLeave="WrapPanel_MouseLeave">
+                           Visibility="{Binding KanjiFeaturesEnabled, Converter={StaticResource BoolToVis}}">
                     <WrapPanel.Resources>
                         <Style TargetType="Button">
                             <Setter Property="Width" Value="35"/>
                             <Setter Property="Height" Value="35"/>
                             <Setter Property="Margin" Value="2"/>
+                            <Setter Property="FontSize" Value="14"/>
+                            <Setter Property="Focusable" Value="False"/>
                             <EventSetter Event="Click" Handler="Button_Click"/>
                         </Style>
                     </WrapPanel.Resources>
-                    <Button ToolTip="Speak" Tag="{x:Static local:ButtonCommands.Speak}"
-                            Visibility="{Binding SpeakEnabled, Converter={StaticResource BoolToVis}}"/>
-                    <Button ToolTip="DeepL" Tag="{x:Static local:ButtonCommands.DeepL}"/>
-                    <Button ToolTip="Google Images"  Tag="{x:Static local:ButtonCommands.GoogleImages}"/>
+                    <Button Content="SP" ToolTip="Speak" Tag="{x:Static local:ButtonCommands.Speak}"/>
+                    <Button Content="DL" ToolTip="DeepL" Tag="{x:Static local:ButtonCommands.DeepL}"/>
+                    <Button Content="GI" ToolTip="Google Images"  Tag="{x:Static local:ButtonCommands.GoogleImages}"/>
                 </WrapPanel>
             </Grid>
             

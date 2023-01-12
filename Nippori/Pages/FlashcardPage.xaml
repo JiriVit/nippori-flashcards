@@ -84,7 +84,7 @@
         
         <!-- Field 0: The text being always shown -->
         <controls:VocableField Grid.Row="1" Text="{Binding Fields[0]}" FontSize="80"
-                               Background="LightGray" SpeakEnabled="False"
+                               Background="LightGray"
                                CharacterMouseDown="VocableField_CharacterMouseDown"
                                ButtonClick="VocableField_ButtonClick"
                                DebugEvent="VocableField_DebugEvent"/>

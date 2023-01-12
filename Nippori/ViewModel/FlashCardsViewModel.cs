@@ -179,6 +179,9 @@ namespace Nippori.ViewModel
 
         #region .: Fields :.
 
+        // TODO Replace this shit with a class which encapsulates all properties of the vocable field.
+        // TODO Replace arrays with separate properties for each field.
+
         public string[] Fields { get; } = new string[4];
         public Visibility[] FieldsVisibility { get; } = new Visibility[4];
         public bool[] FieldsEmphasized { get; } = new bool[4];

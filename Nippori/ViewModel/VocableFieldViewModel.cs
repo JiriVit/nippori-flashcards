@@ -19,7 +19,7 @@ namespace Nippori.ViewModel
         private double fontSize = 40.0;
         private Brush background = Brushes.Transparent;
         private Brush foreground = SystemColors.WindowTextBrush;
-        private bool speakEnabled = true;
+        private bool kanjiFeaturesEnabled = true;
 
         #endregion
 
@@ -71,14 +71,13 @@ namespace Nippori.ViewModel
             }
         }
 
-        public bool SpeakEnabled
+        public bool KanjiFeaturesEnabled
         {
-            get => speakEnabled;
+            get => kanjiFeaturesEnabled;
             set
             {
-                speakEnabled = value;
-                Debug.WriteLine($"SpeakEnabled changed to {value}");
-                NotifyPropertyChanged(nameof(SpeakEnabled));
+                kanjiFeaturesEnabled = value;
+                NotifyPropertyChanged(nameof(KanjiFeaturesEnabled));
             }
         }
 
