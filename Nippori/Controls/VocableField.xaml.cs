@@ -321,9 +321,6 @@ namespace Nippori.Controls
         /// </summary>
         public event EventHandler<ButtonClickEventArgs> ButtonClick;
 
-        public event EventHandler DebugEvent;
-
         #endregion
-
     }
 }
