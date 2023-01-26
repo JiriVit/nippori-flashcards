@@ -1,7 +1,7 @@
 # nippori-flashcards
 Flashcard application for exercising foreign languages.
 
-**Platform:** .NET 4.6.1
+**Platform:** .NET 7.0 for Windows
 
 **Programming language:** C# with Windows Presentation Foundation
 
