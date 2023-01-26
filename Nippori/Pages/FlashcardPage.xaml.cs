@@ -84,10 +84,6 @@ namespace Nippori.Pages
             OpenWebBrowser(url);
         }
 
-        private void VocableField_DebugEvent(object sender, EventArgs e)
-        {
-        }
-
         private void VocableField_ButtonClick(object sender, ButtonClickEventArgs e)
         {
             string url;
