@@ -8,7 +8,9 @@ using System.Windows;
 
 using Nippori.ViewModel;
 using Nippori.Japanese;
+using System.Runtime.Versioning;
 
+[assembly: SupportedOSPlatform("windows")]
 namespace Nippori
 {
     /// <summary>
