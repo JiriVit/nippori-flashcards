@@ -25,6 +25,7 @@
             <Setter Property="Background" Value="Transparent"/>
         </Style>
         <conv:BoolToBrushConverter x:Key="BoolToBrush"/>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
     </Page.Resources>
     
     <Grid Background="White">
@@ -83,7 +84,7 @@
         </Grid>
         
         <!-- Field 0: The text being always shown -->
-        <controls:VocableField Grid.Row="1" Text="{Binding Fields[0]}" FontSize="80"
+        <controls:VocableField Grid.Row="1" Text="{Binding MainField.Text}" FontSize="80"
                                Background="LightGray"
                                CharacterMouseDown="VocableField_CharacterMouseDown"
                                ButtonClick="VocableField_ButtonClick"/>

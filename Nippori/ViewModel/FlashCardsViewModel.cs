@@ -14,6 +14,7 @@ using Nippori.Bases;
 using Nippori.Enums;
 using Nippori.Japanese;
 using Nippori.Model;
+using Nippori.Utils;
 
 namespace Nippori.ViewModel
 {
@@ -181,6 +182,11 @@ namespace Nippori.ViewModel
 
         // TODO Replace this shit with a class which encapsulates all properties of the vocable field.
         // TODO Replace arrays with separate properties for each field.
+
+        public VocableFieldProperties MainField { get; private set; } = new VocableFieldProperties();
+        public VocableFieldProperties FirstOptionalField { get; private set; } = new VocableFieldProperties();
+        public VocableFieldProperties SecondOptionalField { get; private set; } = new VocableFieldProperties();
+        public VocableFieldProperties NoteField { get; private set; } = new VocableFieldProperties();
 
         public string[] Fields { get; } = new string[4];
         public Visibility[] FieldsVisibility { get; } = new Visibility[4];
@@ -730,6 +736,9 @@ namespace Nippori.ViewModel
                 Fields[0] = "(no vocables in selected set)";
                 Fields[1] = Fields[2] = Fields[3] = string.Empty;
             }
+
+            MainField.Text = Fields[0];
+            NotifyPropertyChanged(nameof(MainField));
 
             NotifyPropertyChanged("Fields");
             NotifyPropertyChanged("FieldFontFamily");
