@@ -23,10 +23,6 @@ namespace Nippori.Model
         public string[] Fields { get; private set; }
 
         /// <summary>
-        /// Gets list of types assigned to this vocable.
-        /// </summary>
-        public List<TypeModel> Types { get; set; }
-        /// <summary>
         /// Gets list of groups assigned to this vocable.
         /// </summary>
         public List<GroupModel> Groups { get; set; }
@@ -62,24 +58,6 @@ namespace Nippori.Model
                 Status = (VocableStatus)int.Parse(status);
             }
             Enabled = Status != VocableStatus.Inactive;
-        }
-
-        #endregion
-
-        #region .: Public Methods :.
-
-        /// <summary>
-        /// Finds out if this vocable is of given vocable type.
-        /// It is evaluated if the type is listed among allowed types in the vocabulary and also if
-        /// the first input field defined by the type is not empty.
-        /// </summary>
-        /// <param name="vocableType">Vocable type to be checked against.</param>
-        /// <returns>Boolean result.</returns>
-        public bool IsType(TypeModel vocableType)
-        {
-            return 
-                (Types.Any(type => type == vocableType)) &&
-                (Fields[vocableType.InputColumns[0] - 1].Length > 0);
         }
 
         #endregion

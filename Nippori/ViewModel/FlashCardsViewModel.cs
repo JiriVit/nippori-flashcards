@@ -116,6 +116,7 @@ namespace Nippori.ViewModel
         private bool jlptKanjiOnlyVisible = false;
 
         private bool sequentialOrderActive = false;
+        private Direction activeDirection = Direction.ToEnglish;
 
         #endregion
 
@@ -163,11 +164,6 @@ namespace Nippori.ViewModel
         /// Observable collection of supported vocable groups.
         /// </summary>
         public ObservableCollection<GroupModel> GroupsCollection { get; private set; }
-
-        /// <summary>
-        /// Observable collection of supported vocable types.
-        /// </summary>
-        public ObservableCollection<TypeModel> TypesCollection { get; private set; }
 
         #endregion
 
@@ -260,27 +256,25 @@ namespace Nippori.ViewModel
 
         public bool KanjiToEnglishActive
         {
-            get => (TypesCollection != null) && (TypesCollection.Count > 0) && TypesCollection[0].IsChecked;
+            get => activeDirection == Direction.ToEnglish;
             set
             {
-                if ((TypesCollection != null) && (TypesCollection.Count > 0))
-                {
-                    TypesCollection[0].IsChecked = value;
-                    RestartTrainingIfSetupChanged();
-                }
+                activeDirection = value ? Direction.ToEnglish : Direction.FromEnglish;
+                NotifyPropertyChanged(nameof(EnglishToKanjiActive));
+                setupWasChanged = true;
+                RestartTrainingIfSetupChanged();
             }
         }
 
         public bool EnglishToKanjiActive
         {
-            get => (TypesCollection != null) && (TypesCollection.Count > 1) && TypesCollection[1].IsChecked;
+            get => activeDirection == Direction.FromEnglish;
             set
             {
-                if ((TypesCollection != null) && (TypesCollection.Count > 1))
-                {
-                    TypesCollection[1].IsChecked = value;
-                    RestartTrainingIfSetupChanged();
-                }
+                activeDirection = value ? Direction.FromEnglish : Direction.ToEnglish;
+                NotifyPropertyChanged(nameof(KanjiToEnglishActive));
+                setupWasChanged = true;
+                RestartTrainingIfSetupChanged();
             }
         }
 
@@ -317,7 +311,6 @@ namespace Nippori.ViewModel
         #endregion
 
         public VocableModel CurrentVocable { get; set; }
-        public TypeModel EnabledType { get; set; }
 
         #endregion
 
@@ -435,25 +428,6 @@ namespace Nippori.ViewModel
         #region .: XML Import :.
 
         /// <summary>
-        /// Imports vocable type definitions from node 'types' in the XML document and stores them
-        /// to <see cref="TypesCollection"/>.
-        /// </summary>
-        private void ImportVocableTypeDefinitions()
-        {
-            XmlNode typesNode = xmlDocument.GetElementsByTagName("types")[0];
-            TypesCollection = new ObservableCollection<TypeModel>();
-            foreach (XmlNode child in typesNode.ChildNodes)
-            {
-                TypeModel type = new TypeModel(child);
-
-                type.IsCheckedChanged += TypeItem_IsCheckedChanged;
-                TypesCollection.Add(type);
-            }
-
-            NotifyPropertyChanged("TypesCollection");
-        }
-
-        /// <summary>
         /// Imports group definitions from node 'groups' in the XML document and stores them
         /// to <see cref="GroupsCollection"/> and <see cref="groupsDict"/>.
         /// </summary>
@@ -522,7 +496,6 @@ namespace Nippori.ViewModel
                 }
             }
 
-            ImportVocableTypeDefinitions();
             ImportGroupDefinitions();
 
             /* import vocables */
@@ -530,21 +503,6 @@ namespace Nippori.ViewModel
             foreach (XmlNode child in node.ChildNodes)
             {
                 VocableModel vocable = new VocableModel(child, fieldsCount);
-
-                // assign types
-                string types = child.Attributes[$"field{fieldsCount + 1}"].Value;
-                if (types.Equals(string.Empty))
-                {
-                    // no type defined -> assign all of them
-                    vocable.Types = new List<TypeModel>(TypesCollection);
-                }
-                else
-                {
-                    List<string> typeNumbers = new List<string>(types.Split(';'));
-
-                    vocable.Types = new List<TypeModel>(typeNumbers.Count);
-                    typeNumbers.ForEach(typeNumber => vocable.Types.Add(TypesCollection[int.Parse(typeNumber) - 1]));
-                }
 
                 // assign groups
                 string groups = child.Attributes[$"field{fieldsCount + 2}"].Value;
@@ -563,7 +521,6 @@ namespace Nippori.ViewModel
                 allVocables.Add(vocable);
             }
 
-            TypesCollection[0].IsChecked = true;
             foreach (GroupModel item in GroupsCollection)
             {
                 if (!item.ChecksAll && !item.ClearsAll)
@@ -654,7 +611,6 @@ namespace Nippori.ViewModel
             return
                 vocable.Enabled && 
                 enabledBySetup &&
-                vocable.IsType(EnabledType) && 
                 !jlptKanjiRestriction &&
                 (vocable.Groups.Any(group => group.IsChecked));
         }
@@ -695,40 +651,31 @@ namespace Nippori.ViewModel
 
         private void ShowVocable()
         {
+            // TODO Replace indexed fields with named ones.
+
             if (!noVocablesForExamination)
             {
-                int fieldsCount = EnabledType.InputColumns.Length + EnabledType.OutputColumns.Length;
+                switch (activeDirection)
+                {
+                    case Direction.FromEnglish:
+                        Fields[0] = CurrentVocable.Fields[0]; // English
+                        Fields[1] = CurrentVocable.Fields[2]; // kanji
+                        Fields[2] = CurrentVocable.Fields[1]; // transcription
+                        break;
+                    case Direction.ToEnglish:
+                        Fields[0] = CurrentVocable.Fields[2]; // kanji
+                        Fields[1] = CurrentVocable.Fields[1]; // transcription
+                        Fields[2] = CurrentVocable.Fields[0]; // English
+                        break;
+                }
 
+                Fields[3] = string.Empty; // TODO Replace with notes
                 for (int i = 0; i < Fields.Length; i++)
                 {
-                    if (i < fieldsCount)
-                    {
-                        if (i < EnabledType.InputColumns.Length)
-                        {
-                            Fields[i] = CurrentVocable.Fields[EnabledType.InputColumns[i] - 1];
-                        }
-                        else
-                        {
-                            Fields[i] = CurrentVocable.Fields[EnabledType.OutputColumns[i - EnabledType.InputColumns.Length] - 1];
-                        }
-                    }
-                    else if (i == (Fields.Length - 1))
-                    {
-                        Fields[i] = CurrentVocable.Fields[CurrentVocable.Fields.Length - 1];
-                    }
-                    else
-                    {
-                        Fields[i] = string.Empty;
-                    }
-
-                    if (Fields[i].Any(c => IsAsianCharacter(c)))
-                    {
-                        FieldFontFamily[i] = currentLanguage.FontFamilyForSigns;
-                    }
-                    else
-                    {
-                        FieldFontFamily[i] = SystemFonts.MessageFontFamily;
-                    }
+                    FieldFontFamily[i] = 
+                        Fields[i].Any(IsAsianCharacter) ? 
+                        currentLanguage.FontFamilyForSigns : 
+                        SystemFonts.MessageFontFamily;
                 }
             }
             else
@@ -740,8 +687,8 @@ namespace Nippori.ViewModel
             MainField.Text = Fields[0];
             NotifyPropertyChanged(nameof(MainField));
 
-            NotifyPropertyChanged("Fields");
-            NotifyPropertyChanged("FieldFontFamily");
+            NotifyPropertyChanged(nameof(Fields));
+            NotifyPropertyChanged(nameof(FieldFontFamily));
 
             RtbText = ToFlowDocument(Fields[0], 80, FieldFontFamily[0]);
             NotifyPropertyChanged(nameof(RtbText));
@@ -755,13 +702,13 @@ namespace Nippori.ViewModel
             {
                 if (state == 0)
                 {
-                    visibleFields = EnabledType.InputColumns.Length;
-                    FieldsVisibility[FieldsVisibility.Length - 1] = Visibility.Hidden;
+                    visibleFields = 1;
+                    FieldsVisibility[^1] = Visibility.Hidden;
                 }
                 else
                 {
-                    visibleFields = EnabledType.InputColumns.Length + EnabledType.OutputColumns.Length;
-                    FieldsVisibility[FieldsVisibility.Length - 1] = Visibility.Visible;
+                    visibleFields = 3;
+                    FieldsVisibility[^1] = Visibility.Visible;
                 }
 
                 for (int i = 0; i < (FieldsVisibility.Length - 1); i++)
@@ -775,25 +722,7 @@ namespace Nippori.ViewModel
                 FieldsVisibility[1] = FieldsVisibility[2] = FieldsVisibility[3] = Visibility.Hidden;
             }
 
-            NotifyPropertyChanged("FieldsVisibility");
-
-            // nasty hack for emphasizing kanji
-            if (currentLanguage.Equals(Language.Japanese))
-            {
-                if ((vocableStack.Count > 0) &&
-                     (TypesCollection[0].IsChecked) &&
-                     CurrentVocable.Fields[2].Any(c => JlptUtils.IsKanjiUpToJlptLevel(c, JlptLevels.N4))
-                   )
-                {
-                    FieldsEmphasized[1] = true;
-                }
-                else
-                {
-                    FieldsEmphasized[1] = false;
-                }
-
-                NotifyPropertyChanged("FieldsEmphasized");
-            }
+            NotifyPropertyChanged(nameof(FieldsVisibility));
         }
 
         #region .: Utils :.
@@ -811,47 +740,6 @@ namespace Nippori.ViewModel
         #endregion
 
         #region .: Event Handlers :.
-
-        /// <summary>
-        /// Unchecks all exercise types except of the one just checked (which raised the event)
-        /// and triggers stack refill (to reflect the change).
-        /// This is to make sure that only one exercise type is checked at a time.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void TypeItem_IsCheckedChanged(object sender, EventArgs e)
-        {
-            TypeModel typeModel = (TypeModel)sender;
-
-            if (typeModel.IsChecked)
-            {
-                foreach (TypeModel item in TypesCollection)
-                {
-                    if (item != sender)
-                    {
-                        item.IsChecked = false;
-                    }
-                    else
-                    {
-                        EnabledType = item;
-                    }
-                }
-            }
-            else
-            {
-                int index = TypesCollection.IndexOf(typeModel);
-                if (index == 0)
-                {
-                    NotifyPropertyChanged("KanjiToEnglishActive");
-                }
-                if (index == 1)
-                {
-                    NotifyPropertyChanged("EnglishToKanjiActive");
-                }
-            }
-
-            setupWasChanged = true;
-        }
 
         /// <summary>
         /// Triggers stack refill, to reflect change of enabled groups.
